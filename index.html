@@ -128,16 +128,26 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .s2{font-size:11.5px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sctl{display:flex;flex:none}
 .done{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;margin-left:6px;cursor:pointer;flex:none}
-.g2in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.g2in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 .g2in>div{min-width:0}
-.g2in input[type=time]{display:block;width:100%;min-width:0;max-width:100%;height:46px;min-height:46px;line-height:normal;box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--text);font:inherit;-webkit-appearance:none;appearance:none}
-.g2in .timebox{position:relative;flex:1;min-width:0}
-.g2in .timebox input[type=time]{width:100%;height:46px;min-height:46px;position:relative;z-index:1;background:var(--field);padding-right:34px}
-.g2in .timehint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);pointer-events:none;font-size:inherit;z-index:2}
+/* Consistent touch-friendly time controls: same height and centered text */
+.g2in input[type=time]{display:block;width:100%;min-width:0;max-width:100%;height:54px;min-height:54px;line-height:normal;box-sizing:border-box;padding:0 12px;border:1px solid var(--line);border-radius:14px;background:var(--card2);color:var(--text);font:inherit;-webkit-appearance:none;appearance:none;text-align:center;font-variant-numeric:tabular-nums}
+.g2in .timebox{position:relative;display:block;flex:1 1 auto;width:100%;min-width:0;height:54px}
+.g2in .timebox input[type=time]{position:absolute;inset:0;width:100%;height:54px;min-height:54px;z-index:1;background:var(--card2);padding:0 10px;text-align:center}
+.g2in .timehint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--sub);pointer-events:none;font-size:inherit;line-height:1.2;z-index:2;text-align:center;padding:0 8px}
 .g2in .timehint[hidden]{display:none}
 .g2in .timebox input[type=time]:focus+.timehint{display:none}
+.g2in .inl{position:relative;display:flex;align-items:stretch;gap:8px;min-width:0}
+.g2in .inl .timebox{flex:1 1 0}
+.item.open .ibody{padding:14px;gap:12px}
+.item.open .ibody input.pl{min-height:54px;padding:12px;font-size:16px;border-radius:12px}
+.item.open .fld>span{font-size:12px;margin-bottom:6px;line-height:1.35}
+.item.open .ibody input:not([type=time]),.item.open .ibody select{min-height:50px;padding:10px 12px}
+.item.open .ibody textarea{min-height:104px;padding:12px;line-height:1.45}
+.item.open .g2in{gap:12px}
+.item.open .g2in .inl .rmsub{flex:none;position:static;align-self:center;transform:none;width:30px;height:30px;padding:0;margin:0}
+@media(max-width:380px){.item.open .ibody{padding:12px;gap:11px}.g2in{gap:9px}.g2in input[type=time],.g2in .timebox,.g2in .timebox input[type=time]{height:52px;min-height:52px}.g2in .timebox input[type=time]{height:52px}}
 
-.g2in .inl{position:relative}
 .g2in .inl input{flex:1 1 auto;width:100%;padding-right:30px}
 .g2in .inl .rmsub{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:var(--card)}
 .ev.hasp .subs{margin-right:-34px}
@@ -263,9 +273,7 @@ const dlabel=d=>(d.getMonth()+1)+'/'+d.getDate()+'('+WD[d.getDay()]+')';
 function itemsOf(t,i){return (t.items[i]=t.items[i]||[])}
 const hm=s=>{if(!s)return null;const [h,m]=String(s).split(':').map(Number);return isFinite(h)&&isFinite(m)?h*60+m:null};
 const fmtHM=x=>String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');
-function durMin(it){const s=hm(it.time),e=hm(it.end);
-  if(s!=null&&e!=null){let d=e-s;if(d<=0)d+=1440;return d}
-  return (+it.hh||0)*60+(+it.mm||0)}
+function durMin(it){return (+it.hh||0)*60+(+it.mm||0)}
 function durTxt(m){if(!m)return'';const h=Math.floor(m/60),r=m%60;return (h?h+'시간':'')+(r?(h?' ':'')+r+'분':'')}
 const timeTxt=it=>it.time?(it.end?it.time+' – '+it.end:it.time):'--:--';
 function krwPer(code){if(code==='KRW')return 1;if(RATES&&RATES[code])return 1/RATES[code];return FALLBACK[code]||1}
@@ -412,9 +420,7 @@ function cv(side,v){const t=trip();const r=+t.rate||1;const o=side==='L'?$('#cvK
 function findItem(id){const t=trip();for(const k in t.items){const a=t.items[k];const i=a.findIndex(x=>x.id===id);if(i>=0)return {a,i,it:a[i]}}}
 function setItem(id,k,v){const f=findItem(id);if(!f)return;f.it[k]=v;persist()}
 function selDay(i){S.day=i;S.open=null;render()}
-function addItem(){const t=trip(),a=itemsOf(t,S.day);let time='09:00';
-  const l=a[a.length-1];if(l&&hm(l.time)!=null){let x=l.end&&hm(l.end)!=null?hm(l.end):hm(l.time)+(durMin(l)||60);if(x>=1440)x=1439;x=Math.min(x,23*60+30);time=fmtHM(x)}
-  const endMin=Math.min(hm(time)+60,1439);const end=fmtHM(endMin);const nid=uid();S.open=nid;a.push({id:nid,time,end,place:'',hh:'',mm:'',amount:'',cur:t.currency==='KRW'?'KRW':'LOCAL',memo:'',sub:[],pinName:'',pinText:'',url:'',lat:null,lng:null});persist();render();
+function addItem(){const t=trip(),a=itemsOf(t,S.day);const nid=uid();S.open=nid;a.push({id:nid,time:'',end:'',place:'',hh:'',mm:'',amount:'',cur:t.currency==='KRW'?'KRW':'LOCAL',memo:'',sub:[],pinName:'',pinText:'',url:'',lat:null,lng:null});persist();render();
   setTimeout(()=>{const e=[...document.querySelectorAll('.item .pl')].pop();if(e){e.closest('.item').scrollIntoView({block:'start',behavior:'smooth'});e.focus({preventScroll:true})}},60)}
 function delItem(id){const f=findItem(id);if(f.it.place&&!confirm('이 일정을 삭제할까요?'))return;f.a.splice(f.i,1);if(S.open===id)S.open=null;persist();render()}
 function moveItem(id,d){const f=findItem(id),j=f.i+d;if(j<0||j>=f.a.length)return;[f.a[f.i],f.a[j]]=[f.a[j],f.a[f.i]];persist();const y=scrollY;render();scrollTo(0,y)}
@@ -701,12 +707,8 @@ function setTime(id,k,v){
   const head=document.querySelector('#it-'+id+' .hdt');if(head)head.textContent=timeTxt(f.it);
   const card=document.querySelector('#it-'+id);
   if(card){
-    const dur=durMin(f.it),der=hm(f.it.time)!=null&&hm(f.it.end)!=null;
     const fields=card.querySelectorAll('.g2 .fld input[type=number]');
-    if(fields.length>=2){fields[0].value=der?Math.floor(dur/60):(f.it.hh||'');fields[1].value=der?dur%60:(f.it.mm||'');fields[0].disabled=fields[1].disabled=der}
-    const note=card.querySelector('.g2 .fld .muted');if(note)note.remove();
-    const durationField=card.querySelector('.g2 .fld');
-    if(der&&durationField){const note=document.createElement('div');note.className='muted';note.style.marginTop='3px';note.textContent='시작·종료로 자동 계산';durationField.appendChild(note)}
+    if(fields.length>=2){fields[0].value=f.it.hh||'';fields[1].value=f.it.mm||'';fields[0].disabled=fields[1].disabled=false}
     const endClear=card.querySelector('[aria-label="종료 시간 지우기"]');if(endClear)endClear.hidden=!f.it.end;
   }
   const total=document.querySelector('#daytotal');if(total)total.innerHTML=moneyTxt(trip(),dayTotal(trip(),S.day));
@@ -729,8 +731,8 @@ function itemSummary(t,it,i,n){const id=it.id;
 function itemCard(t,it,i,n){
   if(S.open!==it.id)return itemSummary(t,it,i,n);
   const lc=t.currency,id=it.id,unit=unitOf(t,it);
-  const der=!!(hm(it.time)!=null&&hm(it.end)!=null),dm=durMin(it);
-  const dh=der?Math.floor(dm/60):it.hh,dmn=der?dm%60:it.mm;
+  const dm=durMin(it);
+  const dh= Math.floor(dm/60)||'',dmn=dm%60||'';
   const subs=it.sub||[];
   return `<div class="card item open" id="it-${id}">
   <div class="ih"><span class="no">${i+1}</span><span class="hdt">${esc(timeTxt(it))}</span><span class="sp" onclick="toggleItem('${id}')"></span>
@@ -741,11 +743,11 @@ function itemCard(t,it,i,n){
   <div class="ibody">
     <input class="pl" id="pl-${id}" placeholder="일정 입력" value="${esc(it.place)}" oninput="setItem('${id}','place',this.value)" onchange="refreshDerived()">
     <div class="g2in">
-      <div class="fld"><span>시작 시간</span><input type="time" value="${it.time||''}" onchange="setTime('${id}','time',this.value)" aria-label="시작 시간"></div>
+      <div class="fld"><span>시작 시간</span><div class="timebox"><input type="time" value="${it.time||''}" onchange="setTime('${id}','time',this.value)" aria-label="시작 시간"><span class="timehint" ${it.time?'hidden':''}>시간 선택</span></div></div>
       <div class="fld"><span>종료 시간 (선택)</span><div class="inl"><div class="timebox"><input type="time" value="${it.end||''}" onchange="setTime('${id}','end',this.value)" aria-label="종료 시간"><span class="timehint" ${it.end?'hidden':''}>시간 선택</span></div><button class="rmsub" ${it.end?'':'hidden'} onclick="setTime('${id}','end','')" aria-label="종료 시간 지우기">×</button></div></div>
     </div>
     <div class="g2">
-      <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${dh}" ${der?'disabled':''} onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${dmn}" ${der?'disabled':''} onchange="setItem('${id}','mm',this.value)"><small>분</small></div>${der?'<div class="muted" style="margin-top:3px">시작·종료로 자동 계산</div>':''}</div>
+      <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${dh}" onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${dmn}" onchange="setItem('${id}','mm',this.value)"><small>분</small></div></div>
       <div class="fld"><span>금액</span><div class="inl"><input type="number" inputmode="decimal" placeholder="0" value="${it.amount}" oninput="setItem('${id}','amount',this.value);updSubTot('${id}')" onchange="refreshDerived()"><select onchange="setItem('${id}','cur',this.value);refreshDerived();updSubTot('${id}')"><option value="KRW" ${it.cur==='KRW'?'selected':''}>₩ 원</option>${lc!=='KRW'?`<option value="LOCAL" ${it.cur==='LOCAL'?'selected':''}>${lc}</option>`:''}</select></div></div>
     </div>
     <div class="fld"><span>지도 위치</span>
