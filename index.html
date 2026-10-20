@@ -421,14 +421,32 @@ function parsePin(raw){const t=(raw||'').trim();if(!t)return{};
   else if(um){const pre=t.slice(0,um.index).trim();if(pre)name=pre.split(/\n/)[0].trim()}
   if(/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(name)||/[°′″]/.test(name))name='';
   return m?{lat:+m[1],lng:+m[2],url,name}:{url,name}}
-function setPin(id,text){const f=findItem(id);if(!f)return;const p=parsePin(text);const it=f.it;
+async function setPin(id,text){const f=findItem(id);if(!f)return;const p=parsePin(text);const it=f.it;
   Object.assign(it,{pinText:text,lat:p.lat??null,lng:p.lng??null,url:p.url||''});
   persist();
   const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(it);
-  const b=$('#pb-'+id);if(b)b.classList.toggle('on',it.lat!=null);refreshDerived()}
+  const b=$('#pb-'+id);if(b)b.classList.toggle('on',it.lat!=null);refreshDerived();
+  // Google Maps의 장소 URL에는 좌표가 없는 경우가 있어 장소명을 추출해 좌표 검색을 시도합니다.
+  if(it.url&&it.lat==null&&p.name){
+    if(e)e.innerHTML='⏳ 장소 좌표를 확인하는 중…';
+    try{
+      const endpoint='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q='+encodeURIComponent(p.name);
+      const res=await fetch(endpoint,{headers:{'Accept':'application/json'}});
+      if(!res.ok)throw new Error('geocode failed');
+      const rows=await res.json();
+      const hit=rows&&rows[0];
+      const latest=findItem(id);
+      if(hit&&latest&&latest.it.pinText===text){
+        latest.it.lat=Number(hit.lat);latest.it.lng=Number(hit.lon);latest.it.pinName=p.name;
+        persist();const el=$('#pin-'+id);if(el)el.innerHTML=pinStatus(latest.it);
+        const btn=$('#pb-'+id);if(btn)btn.classList.toggle('on',latest.it.lat!=null);refreshDerived();
+      }else if(e)e.innerHTML=pinStatus(it)||'⚠️ 좌표를 찾지 못했어요. 좌표가 포함된 지도 URL이나 위도, 경도를 입력해 주세요.';
+    }catch(err){const el=$('#pin-'+id);if(el)el.innerHTML='⚠️ 좌표 자동 확인에 실패했어요. 좌표가 포함된 지도 URL이나 위도, 경도를 입력해 주세요.'}
+  }
+}
 function applyPinName(id){const f=findItem(id);const n=((f&&f.it.pinName)||'').trim();if(!n){toast('적용할 장소명이 없어요');return}
   f.it.place=n;persist();const pe=$('#pl-'+id);if(pe)pe.value=n;toast('일정 입력란에 적용했어요')}
-const pinStatus=it=>it.lat!=null?`📌 핀 지정됨 (${it.lat.toFixed(5)}, ${it.lng.toFixed(5)})`:it.url?'🔗 링크는 저장됐지만 좌표를 읽지 못해 지도에는 표시되지 않아요. 브라우저에서 연 긴 주소를 붙여넣어 주세요.':'';
+const pinStatus=it=>it.lat!=null?`📌 핀 지정됨 (${it.lat.toFixed(5)}, ${it.lng.toFixed(5)})`:it.url?'🔗 URL 저장됨 · 좌표 확인이 필요해요. 장소 URL이면 자동 확인을 시도합니다.':'';
 const pinsOf=(t,i)=>itemsOf(t,i).filter(x=>x.lat!=null);
 function mapEmbed(t,i){const all=itemsOf(t,i),ps=all.filter(x=>x.lat!=null),miss=all.length-ps.length;
   const note=all.length?`<div class="muted" style="margin-top:6px">핀 지정 ${ps.length}곳 표시${miss?` · 핀 미지정 ${miss}곳은 지도에서 제외`:''}</div>`:'';
