@@ -402,12 +402,9 @@ function delItem(id){const f=findItem(id);if(f.it.place&&!confirm('이 일정을
 function moveItem(id,d){const f=findItem(id),j=f.i+d;if(j<0||j>=f.a.length)return;[f.a[f.i],f.a[j]]=[f.a[j],f.a[f.i]];persist();const y=scrollY;render();scrollTo(0,y)}
 function sortItems(){const a=itemsOf(trip(),S.day);a.sort((x,y)=>(x.time||'99').localeCompare(y.time||'99'));persist();render();toast('시간순으로 정렬했어요')}
 const isGmap=u=>/^https:\/\/((www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+|goo\.gl\/maps|maps\.app\.goo\.gl)([\/?#]|$)/.test(u||'');
-function searchMap(id){const f=findItem(id);const t=trip();const it=f.it;
-  const base=(it.pinName||it.place||'').trim();
-  if(!base){toast('먼저 일정이나 구글맵 장소명을 입력하세요');return}
-  const q=it.pinName?it.pinName:[base,t.city,t.country].filter(Boolean).join(' ');
-  window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank');
-  toast('핀을 고른 뒤 공유 링크를 복사해 붙여넣으세요')}
+function searchMap(id){
+  window.open('https://www.google.com/maps','_blank','noopener');
+}
 function parsePin(raw){const t=(raw||'').trim();if(!t)return{};
   const um=t.match(/https?:\/\/[^\s]+/);const link=um?um[0]:'';const url=isGmap(link)?link:'';
   const hay=link||t;
@@ -420,8 +417,6 @@ function parsePin(raw){const t=(raw||'').trim();if(!t)return{};
   return m?{lat:+m[1],lng:+m[2],url,name}:{url,name}}
 function setPin(id,text){const f=findItem(id);if(!f)return;const p=parsePin(text);const it=f.it;
   Object.assign(it,{pinText:text,lat:p.lat??null,lng:p.lng??null,url:p.url||''});
-  if(p.name){it.pinName=p.name;const e=$('#pn-'+id);if(e)e.value=p.name;
-    if(!it.place){it.place=p.name;const pe=$('#pl-'+id);if(pe)pe.value=p.name}}
   persist();
   const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(it);
   const b=$('#pb-'+id);if(b)b.classList.toggle('on',it.lat!=null);refreshDerived()}
@@ -616,7 +611,6 @@ function itemCard(t,it,i,n){
     </div>
     <div class="fld"><span>지도 위치</span>
       <div class="inl"><input id="pt-${id}" placeholder="구글맵 링크 / 좌표 붙여넣기" value="${esc(it.pinText||'')}" onchange="setPin('${id}',this.value)"><button class="pinbtn ${it.lat!=null?'on':''}" id="pb-${id}" onclick="searchMap('${id}')" title="구글맵에서 검색 · 핀 지정" aria-label="구글맵에서 검색 · 핀 지정"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></button></div>
-      <div class="inl" style="margin-top:6px"><input id="pn-${id}" placeholder="구글맵 장소명 (링크에서 자동 입력)" value="${esc(it.pinName||'')}" oninput="setItem('${id}','pinName',this.value)" onchange="refreshDerived()"><button class="addsub" onclick="applyPinName('${id}')" title="일정 입력란에 이 이름을 넣어요">일정명에 적용</button></div>
       <div class="pinst" id="pin-${id}">${pinStatus(it)}</div></div>
     <div class="fld"><span>메모</span><textarea class="memo" rows="2" placeholder="메모 (줄바꿈 가능)" oninput="setItem('${id}','memo',this.value)">${esc(it.memo)}</textarea></div>
     <div class="fld"><span>상세 일정</span>
