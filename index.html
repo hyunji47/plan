@@ -129,11 +129,16 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .done{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;margin-left:6px;cursor:pointer;flex:none}
 .g2in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 .g2in>div{min-width:0}
+.g2in input[type=time]{width:100%;min-width:0;max-width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none}
+.g2in .inl{position:relative}
+.g2in .inl input{flex:1 1 auto;width:100%;padding-right:30px}
+.g2in .inl .rmsub{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:var(--card)}
+.ev.hasp .subs{margin-right:-34px}
 .ev .dur{font-weight:600;color:var(--sub);font-size:12px;margin-left:8px}
 .ev .pn{font-size:12px;color:var(--sub);margin-top:1px}
 .ev .memo{margin-top:6px;font-size:13px;color:var(--sub);opacity:.82;white-space:pre-wrap;overflow-wrap:anywhere}
 .subs{margin-top:8px;display:flex;flex-direction:column;gap:4px}
-.sr{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:5px 0 5px 9px;border-radius:8px;background:color-mix(in srgb,var(--card2) 45%,var(--card));font-size:13px}
+.sr{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--card2) 45%,var(--card));font-size:13px}
 .sr span{min-width:0;overflow-wrap:anywhere}
 .sr b{flex:none;font-weight:400;font-variant-numeric:tabular-nums}
 .sr.tot,.sr.tot b{font-weight:700;color:var(--accent)}
@@ -711,7 +716,7 @@ function itemCard(t,it,i,n){
     <button class="done" onclick="toggleItem('${id}')">완료</button></div>
   <div class="ibody">
     <input class="pl" id="pl-${id}" placeholder="일정 입력" value="${esc(it.place)}" oninput="setItem('${id}','place',this.value)" onchange="refreshDerived()">
-    <div class="g2">
+    <div class="g2in">
       <div class="fld"><span>시작 시간</span><input type="time" value="${it.time||''}" onchange="setTime('${id}','time',this.value)" aria-label="시작 시간"></div>
       <div class="fld"><span>종료 시간 (선택)</span><div class="inl"><input type="time" value="${it.end||''}" onchange="setTime('${id}','end',this.value)" aria-label="종료 시간">${it.end?`<button class="rmsub" onclick="setTime('${id}','end','')" aria-label="종료 시간 지우기">×</button>`:''}</div></div>
     </div>
