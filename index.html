@@ -402,17 +402,19 @@ function delItem(id){const f=findItem(id);if(f.it.place&&!confirm('이 일정을
 function moveItem(id,d){const f=findItem(id),j=f.i+d;if(j<0||j>=f.a.length)return;[f.a[f.i],f.a[j]]=[f.a[j],f.a[f.i]];persist();const y=scrollY;render();scrollTo(0,y)}
 function sortItems(){const a=itemsOf(trip(),S.day);a.sort((x,y)=>(x.time||'99').localeCompare(y.time||'99'));persist();render();toast('시간순으로 정렬했어요')}
 const isGmap=u=>/^https:\/\/((www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+|goo\.gl\/maps|maps\.app\.goo\.gl)([\/?#]|$)/.test(u||'');
+function googleMapHref(it){
+  // 프리뷰/루트/핀 팝업에서 같은 링크 생성 규칙을 사용합니다.
+  // 좌표가 있으면 장소명과 좌표를 함께 검색어로 전달해 이름이 표시되도록 합니다.
+  if(it&&it.lat!=null&&it.lng!=null){
+    const name=(it.pinName||it.place||'').trim();
+    const q=name?`${name} ${it.lat},${it.lng}`:`${it.lat},${it.lng}`;
+    return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+  }
+  return (it&&it.url)||'https://www.google.com/maps';
+}
 function searchMap(id){
   const f=findItem(id);if(!f)return;
-  const it=f.it;
-  // 저장된 장소명이 있으면 장소명으로 열어 좌표 숫자 대신 장소명이 표시되도록 합니다.
-  // 장소명이 없으면 좌표를 사용하고, URL만 있으면 원본 URL을 엽니다.
-  let target=it.url||'https://www.google.com/maps';
-  if(it.lat!=null&&it.lng!=null){
-    const q=(it.pinName||it.place||'').trim();
-    target='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q||`${it.lat},${it.lng}`);
-  }
-  window.open(target,'_blank','noopener');
+  window.open(googleMapHref(f.it),'_blank','noopener');
 }
 function parsePin(raw){const t=(raw||'').trim();if(!t)return{};
   const um=t.match(/https?:\/\/[^\s]+/);const link=um?um[0]:'';const url=isGmap(link)?link:'';
@@ -685,7 +687,7 @@ function previewHero(t,ci,n,cnt){
   <div class="pstats"><div><b>${n-1}박 ${n}일</b><small>기간</small></div><div><b>${cnt}곳</b><small>방문 장소</small></div><div><b>₩${fmt(tot)}</b><small>예상 경비<br>${sub}</small></div></div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
-  const cnt=Object.keys(t.items).reduce((s,k)=>+k<n?s+t.items[k].length:s,0);
+  const cnt=Object.keys(t.items).reduce((s,k)=>+k<n?s+t.items[k].filter(it=>it.lat!=null&&it.lng!=null).length:s,0);
   let h=previewHero(t,ci,n,cnt);
   if(!S.view)h+=`<button class="btn block" onclick="shareSheet()" style="margin-bottom:12px">📤 프리뷰 공유하기</button>`;
   else h+=`<div class="muted" style="text-align:center;margin-bottom:10px">공유된 프리뷰 화면입니다${S.shareId?' · 오른쪽 위 ↻ 로 최신 일정 확인':''}</div>`;
@@ -694,7 +696,7 @@ function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">이 날은 등록된 일정이 없어요.</div>`;
   else{const ai=activeIdx(t,S.pday,a);h+='<div class="tl">';a.forEach((it,k)=>{
     const hl=k===ai,hasPin=it.lat!=null||!!it.url;
-    const pinHref=it.url||('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.lat+','+it.lng));
+    const pinHref=googleMapHref(it);
     const dur=durTxt(durMin(it)),unit=unitOf(t,it),tot=itemTotal(it);
     const subs=(it.sub||[]).filter(s=>s.name||+s.amt);
     const ss=subSum(it);
@@ -724,7 +726,7 @@ async function initPMap(){const el=$('#lmap');if(!el)return;const t=trip();
     const b=[];
     ps.forEach((it,i)=>{
       const ic=L.divIcon({className:'',html:`<div class="lpin"><span>${i+1}</span></div>`,iconSize:[30,30],iconAnchor:[15,36],popupAnchor:[0,-34]});
-      const href=it.url||('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.lat+','+it.lng));
+      const href=googleMapHref(it);
       L.marker([it.lat,it.lng],{icon:ic}).addTo(map).bindPopup(`<b>${esc(it.pinName||it.place||'핀')}</b><br>${esc(timeTxt(it))}<br><a href="${esc(href)}" target="_blank" rel="noopener">구글 지도에서 열기</a>`);
       b.push([it.lat,it.lng])});
     map.fitBounds(b,{padding:[34,34],maxZoom:16});setTimeout(()=>map.invalidateSize(),50)
