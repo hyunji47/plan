@@ -535,6 +535,21 @@ async function refreshShared(){if(!S.shareId)return;toast('불러오는 중…')
   const before=JSON.stringify(S.viewTrip);const ok=await loadShared(S.shareId);
   if(S.viewTrip&&S.pday>=dayCount(S.viewTrip))S.pday=0;render();
   toast(!ok?'불러오지 못했어요. 네트워크를 확인하세요':JSON.stringify(S.viewTrip)===before?'이미 최신이에요':'최신 일정으로 갱신했어요')}
+let sharedPollBusy=false;
+async function pollShared(){
+  if(sharedPollBusy||!S.view||!S.shareId||S.screen!=='preview'||document.hidden||document.querySelector('details[open]'))return;
+  sharedPollBusy=true;
+  try{
+    const fresh=cleanTrip(await blobGet(S.shareId));fresh.shareId=S.shareId;
+    const before=JSON.stringify(S.viewTrip),after=JSON.stringify(fresh);
+    if(before!==after){
+      const y=scrollY;S.viewTrip=fresh;S.loadErr=false;
+      if(S.pday>=dayCount(fresh))S.pday=0;
+      render();scrollTo(0,y);
+    }
+  }catch(e){/* 자동 확인 실패는 화면을 방해하지 않고 다음 주기에 재시도 */}
+  finally{sharedPollBusy=false}
+}
 async function retryShared(){S.loadErr=false;render();await loadShared(S.shareId);render()}
 
 function shareSheet(){const t=trip();
@@ -744,6 +759,8 @@ function render(){const y=scrollY;
   else render.scrolled=0;
   scrollTo(0,y)}
 setInterval(()=>{if(S.screen==='preview'&&!document.querySelector('details[open]'))render()},30000);
+// 공유 링크를 보는 기기는 15초마다 서버의 변경 여부를 확인하고, 변경된 경우에만 화면을 갱신합니다.
+setInterval(()=>{pollShared()},15000);
 
 /* ---------- 시작 ---------- */
 (async function init(){
