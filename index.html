@@ -131,6 +131,10 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .g2in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 .g2in>div{min-width:0}
 .g2in input[type=time]{width:100%;min-width:0;max-width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none}
+.g2in .timebox{position:relative;flex:1;min-width:0}
+.g2in .timebox input[type=time]{width:100%}
+.g2in .timehint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);pointer-events:none;font-size:inherit}
+.g2in .timehint[hidden]{display:none}
 .g2in .inl{position:relative}
 .g2in .inl input{flex:1 1 auto;width:100%;padding-right:30px}
 .g2in .inl .rmsub{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:var(--card)}
@@ -736,7 +740,7 @@ function itemCard(t,it,i,n){
     <input class="pl" id="pl-${id}" placeholder="일정 입력" value="${esc(it.place)}" oninput="setItem('${id}','place',this.value)" onchange="refreshDerived()">
     <div class="g2in">
       <div class="fld"><span>시작 시간</span><input type="time" value="${it.time||''}" onchange="setTime('${id}','time',this.value)" aria-label="시작 시간"></div>
-      <div class="fld"><span>종료 시간 (선택)</span><div class="inl"><input type="time" value="${it.end||''}" onchange="setTime('${id}','end',this.value)" aria-label="종료 시간"><button class="rmsub" ${it.end?'':'hidden'} onclick="setTime('${id}','end','')" aria-label="종료 시간 지우기">×</button></div></div>
+      <div class="fld"><span>종료 시간 (선택)</span><div class="inl"><div class="timebox"><input type="time" value="${it.end||''}" onchange="setTime('${id}','end',this.value)" aria-label="종료 시간"><span class="timehint" ${it.end?'hidden':''}>시간 선택</span></div><button class="rmsub" ${it.end?'':'hidden'} onclick="setTime('${id}','end','')" aria-label="종료 시간 지우기">×</button></div></div>
     </div>
     <div class="g2">
       <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${dh}" ${der?'disabled':''} onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${dmn}" ${der?'disabled':''} onchange="setItem('${id}','mm',this.value)"><small>분</small></div>${der?'<div class="muted" style="margin-top:3px">시작·종료로 자동 계산</div>':''}</div>
