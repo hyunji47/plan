@@ -713,7 +713,7 @@ function itemSummary(t,it,i,n){const id=it.id;
   const meta=[dur&&'⏱ '+dur,tot>0&&'💰 '+fmt2(tot)+' '+unitOf(t,it),(it.lat!=null||it.url)&&'📍 핀',memo1&&'📝 '+esc(memo1)].filter(Boolean).join(' · ');
   return `<div class="card item sum" id="it-${id}" onclick="toggleItem('${id}')">
     <span class="no">${i+1}</span>
-    <div class="sbody"><div class="s1"><b class="st">${esc(timeTxt(it))}</b><span class="spl ${it.place?'':'ph'}">${esc(it.place||'일정 입력')}</span></div>${meta?`<div class="s2">${meta}</div>`:''}</div>
+    <div class="sbody"><div class="s1"><b class="st">${esc(timeTxt(it))}</b><span class="spl ${it.place?'':'ph'}">${esc(it.place||'일정 입력')}</span></div></div>
     <div class="sctl" onclick="event.stopPropagation()">
       <button class="mini" ${i===0?'disabled':''} onclick="moveItem('${id}',-1)" aria-label="위로 이동">${ICO('<path d="M6 15l6-6 6 6"/>')}</button>
       <button class="mini" ${i===n-1?'disabled':''} onclick="moveItem('${id}',1)" aria-label="아래로 이동">${ICO('<path d="M6 9l6 6 6-6"/>')}</button></div></div>`}
@@ -748,8 +748,7 @@ function itemCard(t,it,i,n){
       <div class="subbar"><button class="addsub" onclick="addSub('${id}')">＋ 상세 일정 추가</button>${subs.length?`<span class="subtot" ${subSum(it)>0?'':'hidden'}>금액 합계 <span id="stot-${id}">${fmt2(subSum(it))} ${unit}</span></span>`:''}</div></div>
   </div></div>`}
 function screenPlan(){const t=trip();const a=itemsOf(t,S.day);const d=dateOfDay(t,S.day);
-  let h=`<div style="height:6px"></div>${dayTabs(t,S.day,'selDay')}
-  <div class="dsum"><div><b>${S.day+1}일차</b><span>${dlabel(d)}</span><div class="muted" style="margin-top:3px">${a.length}개 일정</div></div><div class="dm" id="daytotal">${moneyTxt(t,dayTotal(t,S.day))}</div></div>`;
+  let h=`<div style="height:6px"></div>${dayTabs(t,S.day,'selDay')}`;
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">아직 일정이 없어요. 아래 버튼으로 추가하세요.</div>`;
   a.forEach((it,i)=>h+=itemCard(t,it,i,a.length));
   h+=`<div class="row"><button class="btn block" onclick="addItem()">＋ 일정 추가</button>${a.length>1?'<button class="btn ghost fix" onclick="sortItems()">시간순 정렬</button>':''}</div>
