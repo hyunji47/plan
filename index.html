@@ -785,7 +785,7 @@ function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
     const meta=(!ss&&tot>0)?`<div class="muted">💰 ${fmt2(tot)} ${unit}</div>`:'';
     const subHtml=subs.length?`<div class="subs">${ss&&+it.amount?`<div class="sr"><span>기본 금액</span><b>${fmt2(+it.amount)} ${unit}</b></div>`:''}${subs.map(s=>`<div class="sr"><span>${esc(s.name||'상세 일정')}</span>${+s.amt?`<b>${fmt2(+s.amt)} ${unit}</b>`:''}</div>`).join('')}${ss?`<div class="sr tot"><span>합계</span><b>${fmt2(tot)} ${unit}</b></div>`:''}</div>`:'';
     h+=`<div class="ev${hl?' hl':''}${hasPin?' hasp':''}" ${hl?'id="hlnow"':''}>${hasPin?`<a class="evpin" href="${esc(pinHref)}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`:''}<div class="t">${esc(timeTxt(it))}${dur?`<span class="dur">⏱ ${dur}</span>`:''}${hl?'<span class="nowtag">지금 진행</span>':''}</div>
-    <div class="p">${esc(it.place||'(일정 미입력)')}</div>${it.pinName&&it.pinName!==it.place?`<div class="pn">📍 ${esc(it.pinName)}</div>`:''}${meta}${it.memo?`<div class="memo">${esc(it.memo)}</div>`:''}${subHtml}</div>`});h+='</div>'}
+    <div class="p">${esc(it.place||'(일정 미입력)')}</div>${meta}${it.memo?`<div class="memo">${esc(it.memo)}</div>`:''}${subHtml}</div>`});h+='</div>'}
   h+=`<details class="card" ontoggle="if(this.open)initPMap()"><summary>🗺️ ${S.pday+1}일차 핀 지도 보기</summary><div id="lmap" style="margin-top:8px"></div></details>`;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 
