@@ -246,9 +246,11 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const fmt=n=>Math.round(n).toLocaleString('ko-KR');
 const fmt2=n=>(+n).toLocaleString('ko-KR',{maximumFractionDigits:n<10?3:2});
 const trip=()=>S.view?S.viewTrip:S.store.trips.find(t=>t.id===S.tripId);
-function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.trips)S.store=j}catch(e){}}
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.trips)S.store=j}catch(e){}lastSnap=snap()}
+let lastSnap='';
+const snap=()=>JSON.stringify(S.store.trips,(k,v)=>k==='img'?undefined:v);
 let pt=null;
-function persist(now){if(S.view)return;clearTimeout(pt);const f=()=>{try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){toast('저장 공간이 부족해요. 백업 후 정리해 주세요')}scheduleSync()};now?f():pt=setTimeout(f,300)}
+function persist(now){if(S.view)return;clearTimeout(pt);const f=()=>{const sn=snap();if(sn!==lastSnap){lastSnap=sn;S.store.updatedAt=Date.now();cloudSchedule()}try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){toast('저장 공간이 부족해요. 백업 후 정리해 주세요')}scheduleSync()};now?f():pt=setTimeout(f,300)}
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)}
 function openModal(h){const m=$('#modal');m.innerHTML='<div class="sheet">'+h+'</div>';m.classList.add('on')}
 function closeModal(){$('#modal').classList.remove('on')}
@@ -342,7 +344,7 @@ const BK='tp.lastBackup';
 const lastBk=()=>{try{return +localStorage.getItem(BK)||0}catch(e){return 0}};
 const bkStale=()=>S.store.trips.length>0&&(Date.now()-lastBk()>14*864e5);
 const bkText=()=>{const t=lastBk();return t?'마지막 백업: '+new Date(t).toLocaleDateString('ko-KR'):'아직 백업한 적이 없어요'};
-function saveNow(){persist(true);toast('저장되었어요 ✓'+(bkStale()?' · 백업한 지 오래됐어요':''))}
+async function saveNow(){persist(true);if(gh()){toast('저장 중…');const ok=await cloudPush();toast(ok?'저장되었어요 · 클라우드에도 올렸어요 ✓':'이 기기에는 저장됐지만 클라우드 저장은 실패했어요')}else toast('저장되었어요 ✓'+(bkStale()?' · 백업한 지 오래됐어요':''))}
 async function exportBackup(){
   const data=JSON.stringify({app:'travel-planner',v:1,exported:new Date().toISOString(),trips:S.store.trips},null,1);
   const name='여행플래너_백업_'+ymd(new Date())+'.json';
@@ -392,15 +394,18 @@ function openMenu(){
   ${bkStale()?'<div class="muted" style="padding:0 8px 6px;color:var(--danger)">백업한 지 오래됐어요. 브라우저 데이터가 지워지면 일정도 사라집니다.</div>':''}
   <button class="mi" onclick="menuDo('export')"><span class="ic">💾</span>백업 내보내기</button>
   <button class="mi" onclick="menuDo('import')"><span class="ic">📥</span>백업 가져오기</button>
+  <div class="mh">클라우드 동기화</div>
+  <div class="muted" style="padding:0 8px 4px">${gh()?(S.cloudAt?'마지막 동기화: '+new Date(S.cloudAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'켜져 있어요 · 일정을 고치면 자동으로 올라가요'):'꺼져 있어요 · 아래 설정에서 GitHub를 연결하세요'}</div>
+  ${gh()?'<button class="mi" onclick="menuDo(\'cloud\')"><span class="ic">☁️</span>지금 동기화</button>':''}
   <div class="mh">공유</div>
-  <button class="mi" onclick="menuDo('gh')"><span class="ic">🔗</span>고정 공유 링크 설정</button>
+  <button class="mi" onclick="menuDo('gh')"><span class="ic">🔗</span>GitHub 연결 · 고정 링크 설정</button>
   ${S.screen==='preview'&&!S.view?'<button class="mi" onclick="menuDo(\'file\')"><span class="ic">📄</span>파일로 공유하기</button>':''}
   <div class="mh">화면</div>
   <button class="mi" onclick="menuDo('theme')"><span class="ic">${dark?'☀️':'🌙'}</span>${dark?'라이트 모드':'다크 모드'}</button></div>`;
   $('#drawer').classList.add('on')}
 function closeMenu(){$('#drawer').classList.remove('on')}
 function menuDo(a){closeMenu();
-  if(a==='list')go('list');else if(a==='new')newTrip();else if(a==='export')exportBackup();else if(a==='import')pickBackup();else if(a==='theme')toggleTheme();else if(a==='gh')showGhSettings();else if(a==='file')shareFile()}
+  if(a==='list')go('list');else if(a==='new')newTrip();else if(a==='export')exportBackup();else if(a==='import')pickBackup();else if(a==='theme')toggleTheme();else if(a==='gh')showGhSettings();else if(a==='file')shareFile();else if(a==='cloud')cloudSync(true)}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();closeModal()}});
 
 /* ---------- 정보 입력 ---------- */
@@ -528,7 +533,7 @@ async function blobGet(id){const r=await fetch(BLOB+'/'+id,{headers:{'Accept':'a
 const GHK='travelplanner.gh',GHN=/^[A-Za-z0-9_.-]{1,100}$/,GHAPI='https://api.github.com/repos/';
 const gh=()=>{try{const g=JSON.parse(localStorage.getItem(GHK)||'null');return g&&GHN.test(g.owner)&&GHN.test(g.repo)&&g.token?g:null}catch(e){return null}};
 function parseSrc(x){const m=/^([A-Za-z0-9_.-]{1,100})\/([A-Za-z0-9_.-]{1,100})\/([A-Za-z0-9-]{8,64})$/.exec(x||'');return m?{o:m[1],r:m[2],id:m[3]}:null}
-const ghUrl=src=>GHAPI+src.o+'/'+src.r+'/contents/shared/'+src.id+'.json';
+const ghUrl=src=>GHAPI+src.o+'/'+src.r+'/contents/'+(src.path||'shared/'+src.id+'.json');
 /* 받는 사람: 토큰 없이 읽기. no-cache = 매번 ETag로 확인 (변경 없으면 304, 호출 한도 소모 없음) */
 async function ghGet(src){const r=await fetch(ghUrl(src),{headers:{'Accept':'application/vnd.github.raw+json'},cache:'no-cache'});
   if(!r.ok)throw new Error('gh get '+r.status);return r.json()}
@@ -541,32 +546,66 @@ async function ghFetchSha(src,g){const r=await fetch(ghUrl(src)+'?t='+Date.now()
 async function ghPutNow(src,obj){const g=gh();if(!g)throw new Error('no token');
   const content=b64(JSON.stringify(obj));
   for(let k=0;k<2;k++){
-    let sha=shaCache[src.id];if(!sha||k)sha=await ghFetchSha(src,g);
+    let sha=shaCache[src.path||src.id];if(!sha||k)sha=await ghFetchSha(src,g);
     const r=await fetch(ghUrl(src),{method:'PUT',headers:{...ghAuth(g),'Content-Type':'application/json'},body:JSON.stringify(Object.assign({message:'update shared trip',content},sha?{sha}:{}))});
-    if(r.ok){shaCache[src.id]=(await r.json()).content.sha;return}
+    if(r.ok){shaCache[src.path||src.id]=(await r.json()).content.sha;return}
     if(r.status!==409&&r.status!==422)throw new Error('put '+r.status);
-    delete shaCache[src.id]}
+    delete shaCache[src.path||src.id]}
   throw new Error('conflict')}
 const ghPut=(src,obj)=>(ghChain=ghChain.catch(()=>{}).then(()=>ghPutNow(src,obj)));
 async function ghDel(src){const g=gh();if(!g)return false;
   try{const sha=await ghFetchSha(src,g);if(!sha)return true;
     const r=await fetch(ghUrl(src),{method:'DELETE',headers:{...ghAuth(g),'Content-Type':'application/json'},body:JSON.stringify({message:'remove shared trip',sha})});
-    delete shaCache[src.id];return r.ok}catch(e){return false}}
+    delete shaCache[src.path||src.id];return r.ok}catch(e){return false}}
 const newShareId=()=>Array.from(crypto.getRandomValues(new Uint8Array(10)),b=>'abcdefghjkmnpqrstuvwxyz23456789'[b%31]).join('');
 function showGhSettings(){const g=gh()||{};
-  openModal(`<h2>🔗 고정 공유 링크 설정</h2>
-  <p class="muted" style="margin-top:0">일정을 고치면 내 GitHub 저장소의 <b>shared/</b> 폴더에 자동 저장돼요. 받는 사람은 같은 링크를 새로고침만 하면 최신 내용을 봐요.</p>
+  openModal(`<h2>🔗 GitHub 연결</h2>
+  <p class="muted" style="margin-top:0">① <b>모든 일정을 클라우드에 자동 저장</b>해서 다른 기기·브라우저에서도 같은 내용이 열려요 (data/store.json). ② 공유 링크는 고정 주소로 만들어져요 (shared/ 폴더).</p>
   <label class="muted">GitHub 아이디</label><input id="ghO" value="${esc(g.owner||'')}" autocapitalize="off" autocorrect="off" placeholder="예: hongildong">
   <label class="muted">저장소 이름 (공개 저장소)</label><input id="ghR" value="${esc(g.repo||'')}" autocapitalize="off" autocorrect="off" placeholder="예: travel">
   <label class="muted">토큰 (Fine-grained, 해당 저장소 Contents 읽기/쓰기)</label><input id="ghT" type="password" value="${esc(g.token||'')}" autocapitalize="off" autocorrect="off" placeholder="github_pat_…">
+  <label class="muted">내 일정 저장용 저장소 (선택 · 비공개 권장, 비우면 위 저장소)</label><input id="ghS" value="${esc(g.syncRepo||'')}" autocapitalize="off" autocorrect="off" placeholder="예: hongildong/travel-data">
   <p class="muted" style="font-size:12px">토큰은 이 기기 브라우저에만 저장돼요. 반드시 <b>이 저장소 하나에만</b> 권한을 준 토큰을 쓰세요. 저장소가 공개라서 shared 폴더의 일정 파일은 주소를 아는 누구나 볼 수 있어요.</p>
   <div style="display:flex;gap:8px"><button class="btn block" onclick="saveGh()">저장</button>${g.token?'<button class="btn ghost" onclick="clearGh()">해제</button>':''}</div>
   <div style="height:6px"></div><button class="btn ghost block" onclick="closeModal()">닫기</button>`)}
-function saveGh(){const o=$('#ghO').value.trim(),r=$('#ghR').value.trim().replace(/\.git$/,''),t=$('#ghT').value.trim();
+function saveGh(){const o=$('#ghO').value.trim(),r=$('#ghR').value.trim().replace(/\.git$/,''),t=$('#ghT').value.trim(),sy=($('#ghS').value||'').trim().replace(/\.git$/,'');if(sy&&!SYNCRE.test(sy)){toast('저장소는 아이디/저장소 형식으로 입력하세요');return}
   if(!GHN.test(o)||!GHN.test(r)||!t){toast('아이디, 저장소, 토큰을 모두 입력하세요');return}
-  try{localStorage.setItem(GHK,JSON.stringify({owner:o,repo:r,token:t}))}catch(e){toast('저장하지 못했어요');return}
-  closeModal();toast('저장했어요. 이제 프리뷰 공유하기를 누르면 고정 링크가 만들어져요')}
+  try{localStorage.setItem(GHK,JSON.stringify({owner:o,repo:r,token:t,syncRepo:sy}))}catch(e){toast('저장하지 못했어요');return}
+  closeModal();toast('연결했어요. 동기화를 시작합니다…');cloudSync(true)}
 function clearGh(){try{localStorage.removeItem(GHK)}catch(e){}closeModal();toast('설정을 해제했어요')}
+
+/* ---------- 내 모든 일정 클라우드(GitHub) 동기화 ---------- */
+const SYNCRE=/^([A-Za-z0-9_.-]{1,100})\/([A-Za-z0-9_.-]{1,100})$/;
+function cloudSrc(){const g=gh();if(!g)return null;const m=SYNCRE.exec((g.syncRepo||'').trim());return {o:m?m[1]:g.owner,r:m?m[2]:g.repo,path:'data/store.json'}}
+let cloudT=null,cloudBusy=false;
+function cloudSchedule(){if(S.view||!gh())return;clearTimeout(cloudT);cloudT=setTimeout(()=>cloudPush().then(ok=>{if(!ok)toast('클라우드에 저장하지 못했어요. 네트워크·토큰을 확인하세요')}),3000)}
+function cloudPayload(){return {app:'travel-planner',v:1,updatedAt:S.store.updatedAt||Date.now(),trips:S.store.trips.map(t=>{const c=JSON.parse(JSON.stringify(t));delete c.img;return c})}}
+async function cloudPush(){const src=cloudSrc();if(!src)return false;clearTimeout(cloudT);cloudT=null;
+  try{if(!S.store.updatedAt)S.store.updatedAt=Date.now();await ghPut(src,cloudPayload());S.cloudAt=Date.now();return true}catch(e){return false}}
+async function cloudPull(){const src=cloudSrc(),g=gh();if(!src||!g)throw new Error('no cfg');
+  const r=await fetch(ghUrl(src)+'?t='+Date.now(),{headers:{'Accept':'application/vnd.github.raw+json','Authorization':'Bearer '+g.token},cache:'no-store'});
+  if(r.status===404)return null;if(!r.ok)throw new Error('pull '+r.status);return r.json()}
+function applyRemote(rem){
+  try{localStorage.setItem(KEY+'.bak',JSON.stringify(S.store))}catch(e){}
+  S.store={trips:rem.trips.filter(t=>t&&typeof t==='object'&&t.id&&t.items&&t.start&&t.end),updatedAt:rem.updatedAt};
+  try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){}
+  lastSnap=snap();
+  if(S.tripId&&!S.store.trips.some(t=>t.id===S.tripId)){S.tripId=null;S.screen='list'}
+  S.listKey=null;S.bgKey=null;render()}
+async function cloudSync(manual){
+  if(S.view||!gh()||cloudBusy)return;cloudBusy=true;
+  try{
+    if(cloudT){await cloudPush()}
+    const rem=await cloudPull();const lu=S.store.updatedAt||0;
+    if(rem&&Array.isArray(rem.trips)&&(+rem.updatedAt||0)>lu&&(S.store.trips.length===0||(+rem.updatedAt||0)>lu)){
+      applyRemote(rem);S.cloudAt=Date.now();toast('다른 기기의 최신 일정을 불러왔어요 ✓')}
+    else if(!rem||lu>(+rem.updatedAt||0)){
+      if(!S.store.trips.length&&!rem){if(manual)toast('저장할 일정이 없어요')}
+      else{const ok=await cloudPush();if(manual||!ok)toast(ok?'클라우드에 저장했어요 ✓':'클라우드에 저장하지 못했어요. 토큰·저장소를 확인하세요')}}
+    else{S.cloudAt=Date.now();if(manual)toast('이미 최신이에요 ✓')}
+  }catch(e){if(manual)toast('동기화하지 못했어요. 네트워크·토큰을 확인하세요')}
+  finally{cloudBusy=false}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.view&&gh()&&!cloudT)cloudSync(false)});
 
 /* 받은 데이터는 신뢰하지 않고 필요한 값만 걸러서 사용 */
 function cleanTrip(j){if(!j||typeof j!=='object')throw new Error('bad');
@@ -654,7 +693,7 @@ async function shareFile(){const t=pub();closeModal();
 /* ---------- 화면 ---------- */
 function ddayBadge(t){const td=new Date().setHours(0,0,0,0),s=parseD(t.start),e=parseD(t.end);
   if(td<s)return 'D-'+Math.round((s-td)/864e5);if(td>e)return '종료';return '여행 중'}
-async function refreshOwn(){persist(true);toast('새로고침 중…');try{await fetchRates(true)}catch(e){}const y=scrollY;render();scrollTo(0,y);toast('새로고침했어요')}
+async function refreshOwn(){persist(true);toast('새로고침 중…');if(gh())await cloudSync(false);try{await fetchRates(true)}catch(e){}const y=scrollY;render();scrollTo(0,y);toast('새로고침했어요')}
 function header(){const t=trip();const th=document.documentElement.getAttribute('data-theme')==='dark'?'☀️':'🌙';
   const back=S.view||S.screen==='list'?'':`<button class="ib" onclick="go('list')" aria-label="목록">‹</button>`;
   const ttl=S.screen==='list'?'✈️ 내 여행':esc(t?.title||(S.view?'여행 일정':'새 여행'));
@@ -855,6 +894,7 @@ setInterval(()=>{pollShared()},30000);
   try{if(window.__SHARED__)shared=cleanTrip(window.__SHARED__);else if(h.startsWith('#v='))shared=cleanTrip(await dec(h.slice(3)))}catch(e){shared=null}
   if(shared){S.view=true;S.viewTrip=shared;S.shareId=shared.shareId||null;S.screen='preview';S.pday=todayIdx(shared);render.scrolled=0;render();return}
   load();render();
+  if(gh())cloudSync(false);
 })();
 </script>
 </body>
