@@ -34,9 +34,12 @@ input:focus,select:focus{border-color:var(--accent)}
 .muted{color:var(--sub);font-size:12px}
 .hero{padding:18px 4px 8px}.hero h2{font-size:24px;margin:0 0 4px;text-shadow:0 1px 8px var(--bg)}
 .trip{display:flex;gap:12px;align-items:center;cursor:pointer;padding:0;overflow:hidden}
-.trip .th{width:clamp(112px,36%,160px);min-height:136px;align-self:stretch;background:var(--accent2) center/cover;flex:none;display:flex;align-items:center;justify-content:center;font-size:34px}
+.trip .th{position:relative;width:clamp(112px,36%,160px);min-height:136px;align-self:stretch;background:var(--accent2) center/cover;flex:none;display:flex;align-items:center;justify-content:center;font-size:34px}
 .trip .tb{padding:12px 12px 12px 0;flex:1;min-width:0}
 .trip b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trip{position:relative}
+.badge.tr{position:absolute;top:10px;right:12px;margin:0;z-index:1}
+.trip .tt{display:block;padding-right:58px}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent2);color:var(--accent);margin-left:6px}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -46,7 +49,7 @@ input:focus,select:focus{border-color:var(--accent)}
 .tab small{display:block;opacity:.75;font-size:11px}
 .item{position:relative}
 .card.item{padding:0;overflow:hidden;margin-bottom:8px;scroll-margin-top:68px}
-.ih{display:flex;align-items:center;gap:4px;padding:5px 6px 5px 10px;background:var(--card2);border-bottom:1px solid var(--line)}
+.ih{display:flex;align-items:center;gap:4px;padding:7px 8px 7px 14px;background:var(--card2);border-bottom:1px solid var(--line)}
 .ih .no{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
 .ih .tm{width:auto;flex:none;padding:4px 6px;font-weight:700;background:var(--card)}
 .ih .sp{flex:1}
@@ -54,7 +57,7 @@ input:focus,select:focus{border-color:var(--accent)}
 .mini:active{background:var(--line)}
 .mini:disabled{opacity:.25;cursor:default}
 .mini.del{opacity:.55}.mini.del:active{color:var(--danger);opacity:1}
-.ibody{padding:10px;display:flex;flex-direction:column;gap:8px}
+.ibody{padding:16px 14px;display:flex;flex-direction:column;gap:8px}
 .ibody input.pl{font-size:15px;font-weight:600}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .fld{min-width:0}
@@ -79,9 +82,9 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 .tl{position:relative;padding-left:22px}
 .tl:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
 .ev{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:10px}
-.ev:before{content:"";position:absolute;left:-20px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
-.ev.hl{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 16px 2px color-mix(in srgb,var(--accent) 50%,transparent),0 0 38px 8px color-mix(in srgb,var(--accent) 24%,transparent)}
-.ev.hl:before{background:var(--accent);width:14px;height:14px;left:-22px;top:14px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent),0 0 12px var(--accent)}
+.ev:before{content:"";position:absolute;left:-22px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
+.ev.hl{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.ev.hl:before{background:var(--accent);width:14px;height:14px;left:-24px;top:14px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent),0 0 12px var(--accent)}
 .ev .t{font-weight:700;font-size:13px;color:var(--accent)}
 .ev .p{font-size:16px;font-weight:600;margin:2px 0}
 .nowtag{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px}
@@ -107,9 +110,15 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .pin h2{font-size:28px;line-height:1.2;margin:10px 0 6px;color:#fff;text-shadow:none;text-wrap:balance;word-break:keep-all}
 .pdate{font-size:13px;opacity:.92;font-variant-numeric:tabular-nums}
 .pstats{position:relative;margin:-26px 0 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
-.pstats>div{padding:12px 6px;text-align:center;border-right:1px solid var(--line);min-width:0}
+.pstats>div{display:flex;flex-direction:column;justify-content:center;padding:12px 6px;text-align:center;border-right:1px solid var(--line);min-width:0}
 .pstats>div:last-child{border-right:0}
 .pstats b{display:block;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.pstats .est{font-size:10px;font-weight:500;color:var(--sub);opacity:.7;margin-left:3px}
+.dsum{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 16px;padding:14px 16px;background:var(--card2);border:1px solid transparent;border-radius:14px}
+.dsum b{font-size:17px;margin-right:8px}
+.dsum span{font-size:14px;color:var(--sub)}
+.dsum .dm{font-size:13px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;text-align:right}
+.pstats small.ico{margin:0 0 3px;font-size:12px}
 .pstats small{display:block;font-size:11px;color:var(--sub);margin-top:3px}
 .ev.hasp{padding-right:44px}
 .evpin{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);background:var(--accent2);text-decoration:none}
@@ -140,6 +149,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .ev .memo{margin-top:6px;font-size:13px;color:var(--sub);opacity:.82;white-space:pre-wrap;overflow-wrap:anywhere}
 .subs{margin-top:8px;display:flex;flex-direction:column;gap:4px}
 .sr{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--card2) 45%,var(--card));font-size:13px}
+.sr:not(.tot){color:color-mix(in srgb,var(--text) 38%,var(--sub))}
 .sr span{min-width:0;overflow-wrap:anywhere}
 .sr b{flex:none;font-weight:400;font-variant-numeric:tabular-nums}
 .sr.tot,.sr.tot b{font-weight:700;color:var(--accent)}
@@ -159,8 +169,8 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 #lmap.on{height:300px;border-radius:14px;overflow:hidden;isolation:isolate}
 .lpin{width:30px;height:30px;border-radius:50% 50% 50% 0;background:#2f6bff;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .lpin span{transform:rotate(45deg);color:#fff;font-size:12px;font-weight:700}
-@media (prefers-reduced-motion:no-preference){.ev.hl{animation:glow 2.8s ease-in-out infinite}}
-@keyframes glow{0%,100%{box-shadow:0 0 0 1px var(--accent),0 0 12px 1px color-mix(in srgb,var(--accent) 40%,transparent),0 0 28px 5px color-mix(in srgb,var(--accent) 18%,transparent)}50%{box-shadow:0 0 0 1px var(--accent),0 0 20px 4px color-mix(in srgb,var(--accent) 62%,transparent),0 0 46px 12px color-mix(in srgb,var(--accent) 30%,transparent)}}
+@media (prefers-reduced-motion:no-preference){.ev.hl:before{animation:glow 2s ease-in-out infinite}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 28%,transparent),0 0 8px var(--accent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 12%,transparent),0 0 16px var(--accent)}}
 .trash.edit:hover,.trash.edit:active{color:var(--accent)}
 #drawer{position:fixed;inset:0;z-index:70;visibility:hidden;background:rgba(0,0,0,0);transition:background .25s,visibility 0s .25s}
 #drawer.on{visibility:visible;background:rgba(0,0,0,.45);transition:background .25s}
@@ -384,12 +394,13 @@ function openMenu(){
   <button class="mi" onclick="menuDo('import')"><span class="ic">📥</span>백업 가져오기</button>
   <div class="mh">공유</div>
   <button class="mi" onclick="menuDo('gh')"><span class="ic">🔗</span>고정 공유 링크 설정</button>
+  ${S.screen==='preview'&&!S.view?'<button class="mi" onclick="menuDo(\'file\')"><span class="ic">📄</span>파일로 공유하기</button>':''}
   <div class="mh">화면</div>
   <button class="mi" onclick="menuDo('theme')"><span class="ic">${dark?'☀️':'🌙'}</span>${dark?'라이트 모드':'다크 모드'}</button></div>`;
   $('#drawer').classList.add('on')}
 function closeMenu(){$('#drawer').classList.remove('on')}
 function menuDo(a){closeMenu();
-  if(a==='list')go('list');else if(a==='new')newTrip();else if(a==='export')exportBackup();else if(a==='import')pickBackup();else if(a==='theme')toggleTheme();else if(a==='gh')showGhSettings()}
+  if(a==='list')go('list');else if(a==='new')newTrip();else if(a==='export')exportBackup();else if(a==='import')pickBackup();else if(a==='theme')toggleTheme();else if(a==='gh')showGhSettings();else if(a==='file')shareFile()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();closeModal()}});
 
 /* ---------- 정보 입력 ---------- */
@@ -501,7 +512,7 @@ async function enc(o){const json=JSON.stringify(o);
 async function dec(s){const k=s.slice(0,2),b=unb64u(s.slice(2));
   if(k==='g.'){const r=await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();return JSON.parse(new TextDecoder().decode(r))}
   return JSON.parse(new TextDecoder().decode(b))}
-const pub=t0=>{const t=JSON.parse(JSON.stringify(t0||trip()));delete t.img;delete t.thumb;delete t.shareId;return t};
+const pub=(t0,th)=>{const t=JSON.parse(JSON.stringify(t0||trip()));delete t.img;if(!th)delete t.thumb;delete t.shareId;return t};
 const BLOB='https://jsonblob.com/api/jsonBlob';
 const BID=/^[A-Za-z0-9-]{8,64}$/;
 const baseUrl=()=>location.href.split('#')[0];
@@ -565,6 +576,7 @@ function cleanTrip(j){if(!j||typeof j!=='object')throw new Error('bad');
   const t={id:s(j.id,40),country:s(j.country,60),city:s(j.city,80),title:s(j.title,120),start:j.start,end:j.end,
     currency:/^[A-Z]{3}$/.test(j.currency)?j.currency:'KRW',rate:num(j.rate)||1,items:{}};
   if(BID.test(j.shareId||''))t.shareId=j.shareId;
+  if(typeof j.thumb==='string'&&j.thumb.length<600000&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(j.thumb))t.thumb=j.thumb;
   const n=dayCount(t);
   for(let d=0;d<n;d++){const arr=Array.isArray(j.items&&j.items[d])?j.items[d]:[];
     t.items[d]=arr.slice(0,100).filter(it=>it&&typeof it==='object').map(it=>({
@@ -578,7 +590,7 @@ function cleanTrip(j){if(!j||typeof j!=='object')throw new Error('bad');
 /* 공유 중인 여행은 고칠 때마다 자동으로 링크에 반영 */
 let syncT=null;
 function scheduleSync(){if(S.view)return;const t=S.store.trips.find(x=>x.id===S.tripId);if(!t||!t.shareId)return;clearTimeout(syncT);const id=t.id;syncT=setTimeout(()=>syncShare(id).then(ok=>{if(!ok)toast('공유 링크에 반영하지 못했어요. 네트워크·토큰을 확인하세요')}),2500)}
-async function syncShare(tid){const t=S.store.trips.find(x=>x.id===tid);if(!t||!t.shareId)return false;try{const g=parseSrc(t.shareId);if(g)await ghPut(g,pub(t));else await blobPut(t.shareId,pub(t));return true}catch(e){return false}}
+async function syncShare(tid){const t=S.store.trips.find(x=>x.id===tid);if(!t||!t.shareId)return false;try{const g=parseSrc(t.shareId);if(g)await ghPut(g,pub(t,true));else await blobPut(t.shareId,pub(t));return true}catch(e){return false}}
 async function pushNow(){const t=trip();toast('반영 중…');const ok=await syncShare(t.id);toast(ok?'공유 링크에 반영했어요 ✓':'반영하지 못했어요. 네트워크를 확인하세요')}
 async function stopShare(){const t=trip();if(!t.shareId)return;
   if(!confirm('공유 링크를 끄면 받은 사람도 더 이상 일정을 볼 수 없어요. 끌까요?'))return;
@@ -612,7 +624,7 @@ let ghWarn='';
 async function makeShareUrl(t){ghWarn='';
   if(gh()||parseSrc(t.shareId)){
     try{const g=gh();let src=parseSrc(t.shareId);if(!src)src={o:g.owner,r:g.repo,id:newShareId()};
-      await ghPut(src,pub(t));
+      await ghPut(src,pub(t,true));
       const key=src.o+'/'+src.r+'/'+src.id;if(t.shareId!==key){t.shareId=key;persist(true)}
       return baseUrl()+'#g='+key}
     catch(e){ghWarn='저장소에 올리지 못해 일회성 링크로 복사했어요 (설정·토큰 확인)'}}
@@ -655,8 +667,8 @@ function screenList(){const ts=S.store.trips;
   let h=`<div class="hero"><h2>어디로 떠날까요?</h2><div class="muted" style="color:var(--text);opacity:.75">저장된 여행을 선택하거나, 오른쪽 위 ☰ 메뉴에서 새 여행을 추가하세요.</div></div>`;
   if(!ts.length)h+=`<div class="card" style="text-align:center;padding:30px 14px"><div style="font-size:42px">🧳</div><p class="muted">아직 계획한 여행이 없어요.</p><button class="btn" onclick="newTrip()">＋ 새 여행 추가</button></div>`;
   ts.forEach(t=>{const ci=cInfo(t.country);const n=dayCount(t);
-    h+=`<div class="card trip"><div class="th" style="${(t.thumb||t.img)?`background-image:url('${cssUrl(t.thumb||t.img)}')`:''}" onclick="openTrip('${t.id}')">${(t.thumb||t.img)?'':flag(ci.i)}</div>
-    <div class="tb"><div onclick="openTrip('${t.id}')"><b>${esc(t.title||'제목 없음')}</b><span class="muted">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><br><span class="muted">${t.start.slice(5).replace('-','/')} ~ ${t.end.slice(5).replace('-','/')} · ${n}일</span><span class="badge">${ddayBadge(t)}</span></div>
+    h+=`<div class="card trip"><span class="badge tr">${ddayBadge(t)}</span><div class="th" style="${(t.thumb||t.img)?`background-image:url('${cssUrl(t.thumb||t.img)}')`:''}" onclick="openTrip('${t.id}')">${(t.thumb||t.img)?'':flag(ci.i)}</div>
+    <div class="tb"><div onclick="openTrip('${t.id}')"><b class="tt">${esc(t.title||'제목 없음')}</b><span class="muted">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><br><span class="muted">${t.start.slice(5).replace('-','/')} ~ ${t.end.slice(5).replace('-','/')} · ${n}일</span></div>
     <div style="display:flex;gap:4px;margin-top:6px;align-items:center;justify-content:space-between"><button class="btn ghost xs" onclick="go('preview','${t.id}')">프리뷰</button><span style="display:flex;gap:2px"><button class="trash edit" onclick="go('info','${t.id}')" aria-label="여행 정보 편집"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button><button class="trash" onclick="delTrip('${t.id}')" aria-label="여행 삭제"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></span></div></div></div>`});
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
@@ -712,7 +724,7 @@ function itemCard(t,it,i,n){
   const dh=der?Math.floor(dm/60):it.hh,dmn=der?dm%60:it.mm;
   const subs=it.sub||[];
   return `<div class="card item open" id="it-${id}">
-  <div class="ih"><span class="no">${i+1}</span><span class="hdt">${esc(timeTxt(it))}</span><span class="sp" onclick="toggleItem('${id}')"></span>
+  <div class="ih" style="cursor:pointer" onclick="if(!event.target.closest('button'))toggleItem('${id}')"><span class="no">${i+1}</span><span class="hdt">${esc(timeTxt(it))}</span><span class="sp"></span>
     <button class="mini" ${i===0?'disabled':''} onclick="moveItem('${id}',-1)" aria-label="위로 이동">${ICO('<path d="M6 15l6-6 6 6"/>')}</button>
     <button class="mini" ${i===n-1?'disabled':''} onclick="moveItem('${id}',1)" aria-label="아래로 이동">${ICO('<path d="M6 9l6 6 6-6"/>')}</button>
     <button class="mini del" onclick="delItem('${id}')" aria-label="일정 삭제">${ICO('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/>')}</button>
@@ -737,7 +749,7 @@ function itemCard(t,it,i,n){
   </div></div>`}
 function screenPlan(){const t=trip();const a=itemsOf(t,S.day);const d=dateOfDay(t,S.day);
   let h=`<div style="height:6px"></div>${dayTabs(t,S.day,'selDay')}
-  <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${S.day+1}일차 · ${dlabel(d)}</b><div class="muted">${a.length}개 일정</div></div><div style="text-align:right"><div class="muted">하루 예상 금액</div><b id="daytotal">${moneyTxt(t,dayTotal(t,S.day))}</b></div></div>`;
+  <div class="dsum"><div><b>${S.day+1}일차</b><span>${dlabel(d)}</span><div class="muted" style="margin-top:3px">${a.length}개 일정</div></div><div class="dm" id="daytotal">${moneyTxt(t,dayTotal(t,S.day))}</div></div>`;
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">아직 일정이 없어요. 아래 버튼으로 추가하세요.</div>`;
   a.forEach((it,i)=>h+=itemCard(t,it,i,a.length));
   h+=`<div class="row"><button class="btn block" onclick="addItem()">＋ 일정 추가</button>${a.length>1?'<button class="btn ghost fix" onclick="sortItems()">시간순 정렬</button>':''}</div>
@@ -768,15 +780,15 @@ function previewHero(t,ci,n,cnt){
   return `<div class="phero" id="heroimg" ${img?'style="background-image:url(\''+cssUrl(img)+'\')"':''}><div class="pov"></div><div class="pin">
     <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><span class="pchip">${dd}</span></div>
     <h2>${esc(t.title||'나의 여행')}</h2><div class="pdate">${fd(parseD(t.start))} – ${fd(parseD(t.end))}</div></div></div>
-  <div class="pstats"><div><b>${n-1}박 ${n}일</b><small>기간</small></div><div><b>${cnt}곳</b><small>방문 장소</small></div><div><b>₩${fmt(tot)}</b><small>예상 경비<br>${sub}</small></div></div>
+  <div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div><small class="ico">💰</small><b>₩${fmt(tot)}<span class="est">(예상)</span></b><small>${sub}</small></div></div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
   const cnt=Object.keys(t.items).reduce((s,k)=>+k<n?s+t.items[k].filter(it=>it.lat!=null&&it.lng!=null).length:s,0);
   let h=previewHero(t,ci,n,cnt);
-  if(!S.view)h+=`<button class="btn block" onclick="shareLink()" style="margin-bottom:6px">📤 프리뷰 공유하기</button><div style="text-align:center;margin-bottom:12px"><button class="btn ghost xs" onclick="shareFile()">📄 파일로 보내기</button> <button class="btn ghost xs" onclick="showGhSettings()">🔗 고정 링크 설정</button></div>`;
+  if(!S.view)h+=`<button class="btn block" onclick="shareLink()" style="margin-bottom:12px">📤 프리뷰 공유하기</button>`;
   else h+=`<div class="muted" style="text-align:center;margin-bottom:10px">공유된 프리뷰 화면입니다${S.shareId?' · 오른쪽 위 ↻ 로 최신 일정 확인':''}</div>`;
   h+=dayTabs(t,S.pday,'selPDay');
-  h+=`<div class="muted" style="margin:0 2px 8px">${S.pday+1}일차 · ${dlabel(dateOfDay(t,S.pday))} · ${moneyTxt(t,dayTotal(t,S.pday))}</div>`;
+  h+=`<div class="dsum"><div><b>${S.pday+1}일차</b><span>${dlabel(dateOfDay(t,S.pday))}</span></div><div class="dm">${moneyTxt(t,dayTotal(t,S.pday))}</div></div>`;
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">이 날은 등록된 일정이 없어요.</div>`;
   else{const ai=activeIdx(t,S.pday,a);h+='<div class="tl">';a.forEach((it,k)=>{
     const hl=k===ai,hasPin=it.lat!=null||!!it.url;
