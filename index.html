@@ -40,6 +40,7 @@ input:focus,select:focus{border-color:var(--accent)}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent2);color:var(--accent);margin-left:6px}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
+.tabs.fit .tab{flex:1 1 0;min-width:0;padding-left:4px;padding-right:4px}
 .tab{flex:none;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:8px 12px;font-size:13px;cursor:pointer;text-align:center;line-height:1.3}
 .tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .tab small{display:block;opacity:.75;font-size:11px}
@@ -682,7 +683,7 @@ function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
     <div class="row" style="margin-top:0"><input id="cvL" type="number" placeholder="${t.currency}" oninput="cv('L',this.value)"><span class="fix">⇄</span><input id="cvK" type="number" placeholder="KRW" oninput="cv('K',this.value)"></div></div>`}
   else h+=`<div class="card"><h2>💱 환율 정보</h2><div class="muted">국내 여행은 원화(KRW)로 계산돼요.</div></div>`;
   return h+`<button class="btn block" style="padding:14px" onclick="saveNow();go('plan')">저장하고 루트 계획하기 →</button><div class="credit" id="credit">${creditHtml()}</div>`}
-function dayTabs(t,cur,fn){let h='<div class="tabs">';for(let i=0;i<dayCount(t);i++){const d=dateOfDay(t,i);h+=`<button class="tab ${i===cur?'on':''}" onclick="${fn}(${i})">${i+1}일차<small>${dlabel(d)}</small></button>`}return h+'</div>'}
+function dayTabs(t,cur,fn){let h=`<div class="tabs${dayCount(t)<=4?' fit':''}">`;for(let i=0;i<dayCount(t);i++){const d=dateOfDay(t,i);h+=`<button class="tab ${i===cur?'on':''}" onclick="${fn}(${i})">${i+1}일차<small>${dlabel(d)}</small></button>`}return h+'</div>'}
 const ICO=d=>`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 function toggleItem(id){const was=S.open===id;S.open=was?null:id;render();
   if(!was)setTimeout(()=>{const e=$('#it-'+id);e&&e.scrollIntoView({block:'start',behavior:'smooth'})},30)}
