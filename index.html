@@ -641,11 +641,12 @@ async function shareFile(){const t=pub();closeModal();
 /* ---------- 화면 ---------- */
 function ddayBadge(t){const td=new Date().setHours(0,0,0,0),s=parseD(t.start),e=parseD(t.end);
   if(td<s)return 'D-'+Math.round((s-td)/864e5);if(td>e)return '종료';return '여행 중'}
+async function refreshOwn(){persist(true);toast('새로고침 중…');try{await fetchRates(true)}catch(e){}const y=scrollY;render();scrollTo(0,y);toast('새로고침했어요')}
 function header(){const t=trip();const th=document.documentElement.getAttribute('data-theme')==='dark'?'☀️':'🌙';
   const back=S.view||S.screen==='list'?'':`<button class="ib" onclick="go('list')" aria-label="목록">‹</button>`;
   const ttl=S.screen==='list'?'✈️ 내 여행':esc(t?.title||(S.view?'여행 일정':'새 여행'));
   const save=!S.view&&(S.screen==='info'||S.screen==='plan')?`<button class="btn sm" onclick="saveNow()">저장</button>`:'';
-  return `<header class="top">${back}<h1>${ttl}</h1>${save}${S.view?`${S.shareId?'<button class="ib" onclick="refreshShared()" aria-label="새로고침">↻</button>':''}<button class="ib" onclick="toggleTheme()" aria-label="테마">${th}</button>`:`<button class="ib" onclick="openMenu()" aria-label="메뉴" style="position:relative">☰${bkStale()?'<i style="position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:var(--danger)"></i>':''}</button>`}</header>`}
+  return `<header class="top">${back}<h1>${ttl}</h1>${save}${S.view?`${S.shareId?'<button class="ib" onclick="refreshShared()" aria-label="새로고침">↻</button>':'<button class="ib" onclick="location.reload()" aria-label="새로고침">↻</button>'}<button class="ib" onclick="toggleTheme()" aria-label="테마">${th}</button>`:`${S.screen==='plan'||S.screen==='preview'?'<button class="ib" onclick="refreshOwn()" aria-label="새로고침">↻</button>':''}<button class="ib" onclick="openMenu()" aria-label="메뉴" style="position:relative">☰${bkStale()?'<i style="position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:var(--danger)"></i>':''}</button>`}</header>`}
 function nav(){if(S.view||!trip()||S.screen==='list')return'';
   const b=(s,i,l)=>`<button class="${S.screen===s?'on':''}" onclick="go('${s}')"><b>${i}</b>${l}</button>`;
   return `<nav class="bot"><div>${b('info','🧭','여행 정보')}${b('plan','🗓️','루트 계획')}${b('preview','👀','프리뷰')}</div></nav>`}
