@@ -747,7 +747,7 @@ async function initPMap(){const el=$('#lmap');if(!el)return;const t=trip();
     map.fitBounds(b,{padding:[34,34],maxZoom:16});setTimeout(()=>map.invalidateSize(),50)
   }catch(e){el.innerHTML='<div class="muted" style="padding:22px;text-align:center">지도를 불러오지 못했어요. 핀 아이콘을 눌러 구글 지도에서 확인하세요.</div>'}}
 
-function render(){const y=scrollY;
+function render(){const y=scrollY;const jumpToNow=S.screen==='preview'&&!render.scrolled;
   if(S.view&&!S.viewTrip){
     $('#app').innerHTML=header()+`<div class="card" style="text-align:center;padding:30px 14px;margin-top:20px">${S.loadErr?'<div style="font-size:38px">📡</div><p>일정을 불러오지 못했어요.<br><span class="muted">링크가 끊겼거나 네트워크 문제일 수 있어요.</span></p><button class="btn" onclick="retryShared()">다시 시도</button>':'<p class="muted">일정을 불러오는 중…</p>'}</div>`;
     syncBg();return}
@@ -757,7 +757,8 @@ function render(){const y=scrollY;
   syncBg();
   if(S.screen==='preview'){const e=$('#hlnow');if(e&&!render.scrolled){render.scrolled=1;setTimeout(()=>e.scrollIntoView({block:'center',behavior:'smooth'}),100)}}
   else render.scrolled=0;
-  scrollTo(0,y)}
+  // 프리뷰 최초 진입 시에는 현재 진행 일정으로 이동하고, 이후 갱신에서는 기존 스크롤 위치를 유지합니다.
+  if(!jumpToNow)scrollTo(0,y)}
 setInterval(()=>{if(S.screen==='preview'&&!document.querySelector('details[open]'))render()},30000);
 // 공유 링크를 보는 기기는 15초마다 서버의 변경 여부를 확인하고, 변경된 경우에만 화면을 갱신합니다.
 setInterval(()=>{pollShared()},15000);
@@ -769,10 +770,10 @@ setInterval(()=>{pollShared()},15000);
   const h=location.hash;
   const todayIdx=t=>{const td=Math.round((new Date().setHours(0,0,0,0)-parseD(t.start))/864e5);return td>=0&&td<dayCount(t)?td:0};
   if(!window.__SHARED__&&h.startsWith('#s=')){const id=h.slice(3);
-    if(BID.test(id)){S.view=true;S.shareId=id;S.screen='preview';render();await loadShared(id);if(S.viewTrip)S.pday=todayIdx(S.viewTrip);render();return}}
+    if(BID.test(id)){S.view=true;S.shareId=id;S.screen='preview';render.scrolled=0;render();await loadShared(id);if(S.viewTrip)S.pday=todayIdx(S.viewTrip);render.scrolled=0;render();return}}
   let shared=null;
   try{if(window.__SHARED__)shared=cleanTrip(window.__SHARED__);else if(h.startsWith('#v='))shared=cleanTrip(await dec(h.slice(3)))}catch(e){shared=null}
-  if(shared){S.view=true;S.viewTrip=shared;S.shareId=shared.shareId||null;S.screen='preview';S.pday=todayIdx(shared);render();return}
+  if(shared){S.view=true;S.viewTrip=shared;S.shareId=shared.shareId||null;S.screen='preview';S.pday=todayIdx(shared);render.scrolled=0;render();return}
   load();render();
 })();
 </script>
