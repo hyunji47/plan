@@ -60,7 +60,7 @@ input:focus,select:focus{border-color:var(--accent)}
 .inl select{width:auto;flex:none}
 .inl .n{width:54px;max-width:none;flex:none}
 .inl .pinbtn{flex:none}
-.ibody input.memo{background:transparent;border-style:dashed}
+
 .pinst:empty{display:none}
 .pinst{margin-top:6px}
 .ctl{display:flex;gap:6px;justify-content:flex-end;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
@@ -76,11 +76,11 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 .tl:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
 .ev{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:10px}
 .ev:before{content:"";position:absolute;left:-20px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
-.ev.hl{background:var(--hl);border-color:var(--hlb);box-shadow:0 0 0 3px color-mix(in srgb,var(--hlb) 30%,transparent)}
-.ev.hl:before{background:var(--hlb);width:14px;height:14px;left:-22px;top:14px}
-.ev .t{font-weight:700;font-size:13px;color:var(--accent)}.ev.hl .t{color:var(--text)}
+.ev.hl{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 16px 2px color-mix(in srgb,var(--accent) 50%,transparent),0 0 38px 8px color-mix(in srgb,var(--accent) 24%,transparent)}
+.ev.hl:before{background:var(--accent);width:14px;height:14px;left:-22px;top:14px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent),0 0 12px var(--accent)}
+.ev .t{font-weight:700;font-size:13px;color:var(--accent)}
 .ev .p{font-size:16px;font-weight:600;margin:2px 0}
-.nowtag{background:var(--hlb);color:#2b2100;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px}
+.nowtag{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px}
 .kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
 .kv:last-child{border:0}.kv span:first-child{color:var(--sub)}
 #toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99;max-width:90vw}
@@ -97,8 +97,8 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .pinbtn.on{background:var(--accent);color:#fff}
 .phero{position:relative;margin:-12px -14px 0;min-height:230px;background:linear-gradient(135deg,#3560e8,#8fb2ff) center/cover no-repeat;display:flex;align-items:flex-end;border-radius:0 0 26px 26px;overflow:hidden}
 .pov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,12,24,.82),rgba(8,12,24,.2) 62%,rgba(8,12,24,.1))}
-.pin{position:relative;width:100%;padding:56px 18px 40px;color:#fff}
-.pchips{display:flex;gap:6px;flex-wrap:wrap}
+.pin{position:relative;width:100%;padding:56px 18px 40px;color:#fff;text-align:center}
+.pchips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .pchip{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .pin h2{font-size:28px;line-height:1.2;margin:10px 0 6px;color:#fff;text-shadow:none;text-wrap:balance;word-break:keep-all}
 .pdate{font-size:13px;opacity:.92;font-variant-numeric:tabular-nums}
@@ -110,7 +110,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .ev.hasp{padding-right:44px}
 .evpin{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);background:var(--accent2);text-decoration:none}
 .evpin:active{background:var(--accent);color:#fff}
-.ev.hl .evpin{background:var(--card)}
+
 .item input,.item select{padding:6px 8px;font-size:14px;border-radius:8px}
 .item .no{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
 .item.open{border-color:var(--accent)}
@@ -124,6 +124,34 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .s2{font-size:11.5px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sctl{display:flex;flex:none}
 .done{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;margin-left:6px;cursor:pointer;flex:none}
+.g2in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.g2in>div{min-width:0}
+.ev .dur{font-weight:600;color:var(--sub);font-size:12px;margin-left:8px}
+.ev .pn{font-size:12px;color:var(--sub);margin-top:1px}
+.ev .memo{margin-top:6px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.subs{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.sr{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:5px 9px;border-radius:8px;background:color-mix(in srgb,var(--card2) 45%,var(--card));font-size:13px}
+.sr span{min-width:0;overflow-wrap:anywhere}
+.sr b{flex:none;font-weight:400;font-variant-numeric:tabular-nums}
+.sr.tot,.sr.tot b{font-weight:700;color:var(--accent)}
+.ih .hdt{font-weight:700;font-size:13px;margin-left:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ibody .subs{margin-top:0}
+.sr2{display:flex;gap:6px;align-items:center;padding:5px;border-radius:8px;background:var(--card2)}
+.sr2 input{background:var(--card)}
+.sr2 .nm{flex:1;min-width:0}
+.sr2 .am{width:96px;flex:none}
+.subbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.addsub{border:0;background:var(--accent2);color:var(--accent);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;flex:none;white-space:nowrap}
+.rmsub{border:0;background:none;color:var(--danger);width:28px;height:28px;border-radius:8px;font-size:20px;line-height:1;cursor:pointer;flex:none;opacity:.75}
+.subtot{font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;text-align:right}
+.item input:disabled{opacity:.6}
+.item textarea{padding:6px 8px;font-size:14px;border-radius:8px}
+.ibody textarea.memo{background:transparent;border-style:dashed;resize:vertical;min-height:52px;line-height:1.4}
+#lmap.on{height:300px;border-radius:14px;overflow:hidden;isolation:isolate}
+.lpin{width:30px;height:30px;border-radius:50% 50% 50% 0;background:#2f6bff;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.lpin span{transform:rotate(45deg);color:#fff;font-size:12px;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.ev.hl{animation:glow 2.8s ease-in-out infinite}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 1px var(--accent),0 0 12px 1px color-mix(in srgb,var(--accent) 40%,transparent),0 0 28px 5px color-mix(in srgb,var(--accent) 18%,transparent)}50%{box-shadow:0 0 0 1px var(--accent),0 0 20px 4px color-mix(in srgb,var(--accent) 62%,transparent),0 0 46px 12px color-mix(in srgb,var(--accent) 30%,transparent)}}
 .trash.edit:hover,.trash.edit:active{color:var(--accent)}
 #drawer{position:fixed;inset:0;z-index:70;visibility:hidden;background:rgba(0,0,0,0);transition:background .25s,visibility 0s .25s}
 #drawer.on{visibility:visible;background:rgba(0,0,0,.45);transition:background .25s}
@@ -201,7 +229,7 @@ const fmt2=n=>(+n).toLocaleString('ko-KR',{maximumFractionDigits:n<10?3:2});
 const trip=()=>S.view?S.viewTrip:S.store.trips.find(t=>t.id===S.tripId);
 function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.trips)S.store=j}catch(e){}}
 let pt=null;
-function persist(now){if(S.view)return;clearTimeout(pt);const f=()=>{try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){toast('저장 공간이 부족해요. 백업 후 정리해 주세요')}};now?f():pt=setTimeout(f,300)}
+function persist(now){if(S.view)return;clearTimeout(pt);const f=()=>{try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){toast('저장 공간이 부족해요. 백업 후 정리해 주세요')}scheduleSync()};now?f():pt=setTimeout(f,300)}
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)}
 function openModal(h){const m=$('#modal');m.innerHTML='<div class="sheet">'+h+'</div>';m.classList.add('on')}
 function closeModal(){$('#modal').classList.remove('on')}
@@ -218,8 +246,18 @@ function dayCount(t){const n=Math.round((parseD(t.end)-parseD(t.start))/864e5)+1
 function dateOfDay(t,i){const d=parseD(t.start);d.setDate(d.getDate()+i);return d}
 const dlabel=d=>(d.getMonth()+1)+'/'+d.getDate()+'('+WD[d.getDay()]+')';
 function itemsOf(t,i){return (t.items[i]=t.items[i]||[])}
+const hm=s=>{if(!s)return null;const [h,m]=String(s).split(':').map(Number);return isFinite(h)&&isFinite(m)?h*60+m:null};
+const fmtHM=x=>String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');
+function durMin(it){const s=hm(it.time),e=hm(it.end);
+  if(s!=null&&e!=null){let d=e-s;if(d<=0)d+=1440;return d}
+  return (+it.hh||0)*60+(+it.mm||0)}
+function durTxt(m){if(!m)return'';const h=Math.floor(m/60),r=m%60;return (h?h+'시간':'')+(r?(h?' ':'')+r+'분':'')}
+const timeTxt=it=>it.time?(it.end?it.time+' – '+it.end:it.time):'--:--';
 function krwPer(code){if(code==='KRW')return 1;if(RATES&&RATES[code])return 1/RATES[code];return FALLBACK[code]||1}
-function toKRW(t,it){const a=+it.amount||0;return it.cur==='LOCAL'&&t.currency!=='KRW'?a*t.rate:a}
+const subSum=it=>(it.sub||[]).reduce((s,x)=>s+(+x.amt||0),0);
+const itemTotal=it=>(+it.amount||0)+subSum(it);
+const unitOf=(t,it)=>(it.cur==='KRW'||t.currency==='KRW')?'원':t.currency;
+function toKRW(t,it){const a=itemTotal(it);return it.cur==='LOCAL'&&t.currency!=='KRW'?a*t.rate:a}
 function dayTotal(t,i){return itemsOf(t,i).reduce((s,it)=>s+toKRW(t,it),0)}
 function totalAll(t){let s=0;for(let i=0;i<dayCount(t);i++)s+=dayTotal(t,i);return s}
 const moneyTxt=(t,k)=>t.currency!=='KRW'&&t.rate?`₩${fmt(k)} <span class="muted">(≈ ${fmt(k/t.rate)} ${t.currency})</span>`:`₩${fmt(k)}`;
@@ -276,9 +314,9 @@ function newTrip(){const s=new Date(),e=new Date();e.setDate(e.getDate()+2);
   const ci=COUNTRIES[1];const t={id:uid(),country:ci.n,city:ci.cities[0].k,title:'',start:ymd(s),end:ymd(e),currency:ci.c,rate:+krwPer(ci.c).toFixed(4),items:{}};
   S.store.trips.unshift(t);persist(true);S.tripId=t.id;S.day=0;go('info')}
 function openTrip(id){S.day=0;go('plan',id)}
-function dupTrip(id){const t=S.store.trips.find(x=>x.id===id);const n=JSON.parse(JSON.stringify(t));n.id=uid();n.title=(t.title||'여행')+' (복사)';
+function dupTrip(id){const t=S.store.trips.find(x=>x.id===id);const n=JSON.parse(JSON.stringify(t));n.id=uid();delete n.shareId;n.title=(t.title||'여행')+' (복사)';
   Object.values(n.items).forEach(a=>a.forEach(i=>i.id=uid()));S.store.trips.unshift(n);persist(true);render();toast('복제했어요')}
-function delTrip(id){if(!confirm('이 여행을 삭제할까요?'))return;S.store.trips=S.store.trips.filter(t=>t.id!==id);persist(true);render()}
+function delTrip(id){if(!confirm('이 여행을 삭제할까요?'))return;const d=S.store.trips.find(t=>t.id===id);if(d&&d.shareId){try{fetch(BLOB+'/'+d.shareId,{method:'DELETE'}).catch(()=>{})}catch(e){}}S.store.trips=S.store.trips.filter(t=>t.id!==id);persist(true);render()}
 /* ---------- 백업 / 복구 ---------- */
 const BK='tp.lastBackup';
 const lastBk=()=>{try{return +localStorage.getItem(BK)||0}catch(e){return 0}};
@@ -357,39 +395,52 @@ function findItem(id){const t=trip();for(const k in t.items){const a=t.items[k];
 function setItem(id,k,v){const f=findItem(id);if(!f)return;f.it[k]=v;persist()}
 function selDay(i){S.day=i;S.open=null;render()}
 function addItem(){const t=trip(),a=itemsOf(t,S.day);let time='09:00';
-  const l=a[a.length-1];if(l&&l.time){const [h,m]=l.time.split(':').map(Number);let x=h*60+m+(+l.hh||0)*60+(+l.mm||0)+(l.hh||l.mm?0:60);x=Math.min(x,23*60+30);time=String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')}
-  const nid=uid();S.open=nid;a.push({id:nid,time,place:'',hh:'',mm:'',amount:'',cur:t.currency==='KRW'?'KRW':'LOCAL',memo:'',pinText:'',url:'',lat:null,lng:null});persist();render();
+  const l=a[a.length-1];if(l&&hm(l.time)!=null){let x=l.end&&hm(l.end)!=null?hm(l.end):hm(l.time)+(durMin(l)||60);if(x>=1440)x=1439;x=Math.min(x,23*60+30);time=fmtHM(x)}
+  const nid=uid();S.open=nid;a.push({id:nid,time,end:'',place:'',hh:'',mm:'',amount:'',cur:t.currency==='KRW'?'KRW':'LOCAL',memo:'',sub:[],pinName:'',pinText:'',url:'',lat:null,lng:null});persist();render();
   setTimeout(()=>{const e=[...document.querySelectorAll('.item .pl')].pop();if(e){e.closest('.item').scrollIntoView({block:'start',behavior:'smooth'});e.focus({preventScroll:true})}},60)}
 function delItem(id){const f=findItem(id);if(f.it.place&&!confirm('이 일정을 삭제할까요?'))return;f.a.splice(f.i,1);if(S.open===id)S.open=null;persist();render()}
 function moveItem(id,d){const f=findItem(id),j=f.i+d;if(j<0||j>=f.a.length)return;[f.a[f.i],f.a[j]]=[f.a[j],f.a[f.i]];persist();const y=scrollY;render();scrollTo(0,y)}
 function sortItems(){const a=itemsOf(trip(),S.day);a.sort((x,y)=>(x.time||'99').localeCompare(y.time||'99'));persist();render();toast('시간순으로 정렬했어요')}
-function searchMap(id){const f=findItem(id);const t=trip();const q=[f.it.place,t.city,t.country].filter(Boolean).join(' ');
-  if(!f.it.place){toast('먼저 장소를 입력하세요');return}
+const isGmap=u=>/^https:\/\/((www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+|goo\.gl\/maps|maps\.app\.goo\.gl)([\/?#]|$)/.test(u||'');
+function searchMap(id){const f=findItem(id);const t=trip();const it=f.it;
+  const base=(it.pinName||it.place||'').trim();
+  if(!base){toast('먼저 일정이나 구글맵 장소명을 입력하세요');return}
+  const q=it.pinName?it.pinName:[base,t.city,t.country].filter(Boolean).join(' ');
   window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q),'_blank');
-  toast('지도에서 핀을 고른 뒤 링크를 복사해 붙여넣으세요')}
-function parsePin(t){t=(t||'').trim();if(!t)return{};
-  const m=t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||t.match(/[?&](?:q|ll|query|destination)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||t.match(/^\s*(-?\d{1,3}\.\d+)\s*[, ]\s*(-?\d{1,3}\.\d+)\s*$/);
-  const url=/^https?:/.test(t)?t:'';return m?{lat:+m[1],lng:+m[2],url}:{url}}
-function setPin(id,text){const f=findItem(id);const p=parsePin(text);Object.assign(f.it,{pinText:text,lat:p.lat??null,lng:p.lng??null,url:p.url||''});persist();
-  const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(f.it);
-  const b=$('#pb-'+id);if(b)b.classList.toggle('on',f.it.lat!=null);refreshDerived()}
-const pinStatus=it=>it.lat!=null?`📌 핀 지정됨 (${it.lat.toFixed(5)}, ${it.lng.toFixed(5)})`:it.url?'🔗 링크 저장됨 (좌표를 읽지 못해 장소명으로 지도에 표시)':'';
-function ptOf(t,it){if(it.lat!=null)return it.lat+','+it.lng;if(it.place)return it.place+' '+(t.city||t.country);return null}
-function mapEmbed(t,i){const pts=itemsOf(t,i).map(x=>ptOf(t,x)).filter(Boolean);
-  if(!pts.length)return '<div class="muted" style="padding:30px;text-align:center">장소를 입력하면 하루 루트가 지도에 표시됩니다.</div>';
-  const base='https://maps.google.com/maps?hl=ko&output=embed&';
-  const src=pts.length===1?base+'z=14&q='+encodeURIComponent(pts[0]):base+'dirflg='+S.mmode+'&saddr='+encodeURIComponent(pts[0])+'&daddr='+pts.slice(1).map(encodeURIComponent).join('+to:');
-  return `<iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${src}"></iframe>`}
-function mapLink(t,i){const pts=itemsOf(t,i).map(x=>ptOf(t,x)).filter(Boolean);if(!pts.length)return'#';
-  const md={d:'driving',w:'walking',r:'transit'}[S.mmode];
-  if(pts.length===1)return'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(pts[0]);
-  return`https://www.google.com/maps/dir/?api=1&travelmode=${md}&origin=${encodeURIComponent(pts[0])}&destination=${encodeURIComponent(pts[pts.length-1])}`+(pts.length>2?'&waypoints='+pts.slice(1,-1).map(encodeURIComponent).join('%7C'):'')}
-function setMode(v){S.mmode=v;refreshDerived()}
-function refreshDerived(){const t=trip();const m=$('#mapbox');if(m&&S.screen==='plan')m.innerHTML=mapBox(t,S.day);
-  const d=$('#daytotal');if(d)d.innerHTML=moneyTxt(t,dayTotal(t,S.day));
-  const pm=$('#pmap');if(pm&&S.screen==='preview')pm.innerHTML=mapBox(t,S.pday)}
-const modeSel=()=>`<select onchange="setMode(this.value)" style="width:auto"><option value="d" ${S.mmode==='d'?'selected':''}>🚗 자동차</option><option value="r" ${S.mmode==='r'?'selected':''}>🚌 대중교통</option><option value="w" ${S.mmode==='w'?'selected':''}>🚶 도보</option></select>`;
-function mapBox(t,i){return mapEmbed(t,i)+`<div class="row"><a class="btn ghost sm block" style="text-align:center;text-decoration:none" target="_blank" rel="noopener" href="${esc(mapLink(t,i))}">구글 지도 앱에서 열기 ↗</a></div>`}
+  toast('핀을 고른 뒤 공유 링크를 복사해 붙여넣으세요')}
+function parsePin(raw){const t=(raw||'').trim();if(!t)return{};
+  const um=t.match(/https?:\/\/[^\s]+/);const link=um?um[0]:'';const url=isGmap(link)?link:'';
+  const hay=link||t;
+  const m=hay.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||hay.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||hay.match(/[?&](?:q|ll|query|destination)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||t.match(/^\s*(-?\d{1,3}\.\d+)\s*[, ]\s*(-?\d{1,3}\.\d+)\s*$/);
+  let name='';
+  const pm=hay.match(/\/maps\/place\/([^/@?#]+)/);
+  if(pm){try{name=decodeURIComponent(pm[1].replace(/\+/g,' '))}catch(e){name=pm[1].replace(/\+/g,' ')}}
+  else if(um){const pre=t.slice(0,um.index).trim();if(pre)name=pre.split(/\n/)[0].trim()}
+  if(/^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(name)||/[°′″]/.test(name))name='';
+  return m?{lat:+m[1],lng:+m[2],url,name}:{url,name}}
+function setPin(id,text){const f=findItem(id);if(!f)return;const p=parsePin(text);const it=f.it;
+  Object.assign(it,{pinText:text,lat:p.lat??null,lng:p.lng??null,url:p.url||''});
+  if(p.name){it.pinName=p.name;const e=$('#pn-'+id);if(e)e.value=p.name;
+    if(!it.place){it.place=p.name;const pe=$('#pl-'+id);if(pe)pe.value=p.name}}
+  persist();
+  const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(it);
+  const b=$('#pb-'+id);if(b)b.classList.toggle('on',it.lat!=null);refreshDerived()}
+function applyPinName(id){const f=findItem(id);const n=((f&&f.it.pinName)||'').trim();if(!n){toast('적용할 장소명이 없어요');return}
+  f.it.place=n;persist();const pe=$('#pl-'+id);if(pe)pe.value=n;toast('일정 입력란에 적용했어요')}
+const pinStatus=it=>it.lat!=null?`📌 핀 지정됨 (${it.lat.toFixed(5)}, ${it.lng.toFixed(5)})`:it.url?'🔗 링크는 저장됐지만 좌표를 읽지 못해 지도에는 표시되지 않아요. 브라우저에서 연 긴 주소를 붙여넣어 주세요.':'';
+const pinsOf=(t,i)=>itemsOf(t,i).filter(x=>x.lat!=null);
+function mapEmbed(t,i){const all=itemsOf(t,i),ps=all.filter(x=>x.lat!=null),miss=all.length-ps.length;
+  const note=all.length?`<div class="muted" style="margin-top:6px">핀 지정 ${ps.length}곳 표시${miss?` · 핀 미지정 ${miss}곳은 지도에서 제외`:''}</div>`:'';
+  if(!ps.length)return '<div class="muted" style="padding:30px;text-align:center">핀을 지정한 일정이 생기면 하루 루트가 지도에 표시돼요.</div>'+note;
+  const base='https://maps.google.com/maps?hl=ko&output=embed&',c=x=>x.lat+','+x.lng;
+  const src=ps.length===1?base+'z=15&q='+encodeURIComponent(c(ps[0])+'('+(ps[0].pinName||ps[0].place||'')+')'):base+'saddr='+encodeURIComponent(c(ps[0]))+'&daddr='+ps.slice(1).map(x=>encodeURIComponent(c(x))).join('+to:');
+  return `<iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${src}"></iframe>`+note}
+function mapLink(t,i){const ps=pinsOf(t,i);if(!ps.length)return'#';const c=x=>x.lat+','+x.lng;
+  if(ps.length===1)return'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(c(ps[0]));
+  return`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(c(ps[0]))}&destination=${encodeURIComponent(c(ps[ps.length-1]))}`+(ps.length>2?'&waypoints='+ps.slice(1,-1).map(x=>encodeURIComponent(c(x))).join('%7C'):'')}
+function updTotals(){const t=trip();const d=$('#daytotal');if(d)d.innerHTML=moneyTxt(t,dayTotal(t,S.day))}
+function refreshDerived(){const t=trip();const m=$('#mapbox');if(m&&S.screen==='plan')m.innerHTML=mapBox(t,S.day);updTotals()}
+function mapBox(t,i){const lk=mapLink(t,i);return mapEmbed(t,i)+(lk==='#'?'':`<div class="row"><a class="btn ghost sm block" style="text-align:center;text-decoration:none" target="_blank" rel="noopener" href="${esc(lk)}">구글 지도 앱에서 열기 ↗</a></div>`)}
 
 /* ---------- 공유 ---------- */
 const b64u=u=>{let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
@@ -400,16 +451,74 @@ async function enc(o){const json=JSON.stringify(o);
 async function dec(s){const k=s.slice(0,2),b=unb64u(s.slice(2));
   if(k==='g.'){const r=await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();return JSON.parse(new TextDecoder().decode(r))}
   return JSON.parse(new TextDecoder().decode(b))}
-const pub=()=>{const t=JSON.parse(JSON.stringify(trip()));delete t.img;delete t.thumb;return t};
-function shareSheet(){const online=/^https?:/.test(location.protocol);
+const pub=t0=>{const t=JSON.parse(JSON.stringify(t0||trip()));delete t.img;delete t.thumb;return t};
+const BLOB='https://jsonblob.com/api/jsonBlob';
+const BID=/^[A-Za-z0-9-]{8,64}$/;
+const baseUrl=()=>location.href.split('#')[0];
+const JH={'Content-Type':'application/json','Accept':'application/json'};
+async function blobCreate(o){const r=await fetch(BLOB,{method:'POST',headers:JH,body:JSON.stringify(o)});
+  if(!r.ok)throw new Error('create '+r.status);
+  const id=(r.headers.get('x-jsonblob')||r.headers.get('location')||'').split('/').pop().trim();
+  if(!BID.test(id))throw new Error('no id');return id}
+async function blobPut(id,o){const r=await fetch(BLOB+'/'+id,{method:'PUT',headers:JH,body:JSON.stringify(o)});if(!r.ok)throw new Error('put '+r.status)}
+async function blobGet(id){const r=await fetch(BLOB+'/'+id,{headers:{'Accept':'application/json'},cache:'no-store'});if(!r.ok)throw new Error('get '+r.status);return r.json()}
+
+/* 받은 데이터는 신뢰하지 않고 필요한 값만 걸러서 사용 */
+function cleanTrip(j){if(!j||typeof j!=='object')throw new Error('bad');
+  const s=(v,max=300)=>String(v??'').slice(0,max);const num=v=>{v=+v;return isFinite(v)?v:0};
+  const numOrBlank=v=>(v===''||v==null)?'':num(v);const tm=v=>/^\d{2}:\d{2}$/.test(v)?v:'';
+  const dre=/^\d{4}-\d{2}-\d{2}$/;if(!dre.test(j.start)||!dre.test(j.end))throw new Error('bad date');
+  const t={id:s(j.id,40),country:s(j.country,60),city:s(j.city,80),title:s(j.title,120),start:j.start,end:j.end,
+    currency:/^[A-Z]{3}$/.test(j.currency)?j.currency:'KRW',rate:num(j.rate)||1,items:{}};
+  if(BID.test(j.shareId||''))t.shareId=j.shareId;
+  const n=dayCount(t);
+  for(let d=0;d<n;d++){const arr=Array.isArray(j.items&&j.items[d])?j.items[d]:[];
+    t.items[d]=arr.slice(0,100).filter(it=>it&&typeof it==='object').map(it=>({
+      id:s(it.id,40)||uid(),time:tm(it.time),end:tm(it.end),place:s(it.place,200),
+      hh:numOrBlank(it.hh),mm:numOrBlank(it.mm),amount:numOrBlank(it.amount),cur:it.cur==='LOCAL'?'LOCAL':'KRW',
+      memo:s(it.memo,2000),pinName:s(it.pinName,200),url:isGmap(it.url)?s(it.url,2000):'',
+      lat:it.lat!=null&&isFinite(+it.lat)?+it.lat:null,lng:it.lng!=null&&isFinite(+it.lng)?+it.lng:null,
+      sub:(Array.isArray(it.sub)?it.sub:[]).slice(0,50).filter(x=>x&&typeof x==='object').map(x=>({id:s(x.id,20),name:s(x.name,100),amt:num(x.amt)}))}))}
+  return t}
+
+/* 공유 중인 여행은 고칠 때마다 자동으로 링크에 반영 */
+let syncT=null;
+function scheduleSync(){if(S.view)return;const t=S.store.trips.find(x=>x.id===S.tripId);if(!t||!t.shareId)return;clearTimeout(syncT);const id=t.id;syncT=setTimeout(()=>syncShare(id),2500)}
+async function syncShare(tid){const t=S.store.trips.find(x=>x.id===tid);if(!t||!t.shareId)return false;try{await blobPut(t.shareId,pub(t));return true}catch(e){return false}}
+async function pushNow(){const t=trip();toast('반영 중…');const ok=await syncShare(t.id);toast(ok?'공유 링크에 반영했어요 ✓':'반영하지 못했어요. 네트워크를 확인하세요')}
+async function stopShare(){const t=trip();if(!t.shareId)return;
+  if(!confirm('공유 링크를 끄면 받은 사람도 더 이상 일정을 볼 수 없어요. 끌까요?'))return;
+  let ok=true;try{const r=await fetch(BLOB+'/'+t.shareId,{method:'DELETE'});ok=r.ok}catch(e){ok=false}
+  delete t.shareId;persist(true);closeModal();toast(ok?'공유를 중단했어요':'이 기기에서는 공유를 해제했어요 (서버 삭제는 실패)')}
+
+/* 받는 사람 쪽: 불러오기 / 새로고침 */
+async function loadShared(id){try{S.viewTrip=cleanTrip(await blobGet(id));S.viewTrip.shareId=id;S.loadErr=false;return true}catch(e){S.loadErr=true;return false}}
+async function refreshShared(){if(!S.shareId)return;toast('불러오는 중…');
+  const before=JSON.stringify(S.viewTrip);const ok=await loadShared(S.shareId);
+  if(S.viewTrip&&S.pday>=dayCount(S.viewTrip))S.pday=0;render();
+  toast(!ok?'불러오지 못했어요. 네트워크를 확인하세요':JSON.stringify(S.viewTrip)===before?'이미 최신이에요':'최신 일정으로 갱신했어요')}
+async function retryShared(){S.loadErr=false;render();await loadShared(S.shareId);render()}
+
+function shareSheet(){const t=trip();const online=/^https?:/.test(location.protocol);const on=!!t.shareId;
   openModal(`<h2>공유하기</h2><p class="muted" style="margin-top:0">공유되는 화면은 <b>프리뷰만</b> 보이며 편집은 할 수 없어요.</p>
-  ${online?'<button class="btn block" onclick="shareLink()">🔗 프리뷰 링크 공유 / 복사</button><div style="height:8px"></div>':''}
+  ${online?`<button class="btn block" onclick="shareLink()">🔗 ${on?'짧은 링크 복사 · 공유':'짧은 링크 만들기'}</button>
+  ${on?`<p class="muted" style="margin:8px 2px">공유 중이에요. 일정을 고치면 몇 초 안에 링크에 반영되고, 받은 사람은 오른쪽 위 ↻ 버튼이나 새로고침만 하면 돼요.</p><button class="btn ghost block" onclick="pushNow()">지금 바로 반영</button><div style="height:8px"></div><button class="btn danger block" onclick="stopShare()">공유 중단 (링크 끄기)</button>`:''}
+  <div style="height:8px"></div>`:''}
   <button class="btn ${online?'ghost':''} block" onclick="shareFile()">📄 프리뷰 파일(.html) 보내기</button>
   ${online?'':'<p class="muted">현재 파일을 직접 열어 사용 중이라 링크 공유는 웹에 올려 열었을 때 가능해요. 프리뷰 파일은 어디서나 열 수 있어요.</p>'}
   <div style="height:8px"></div><button class="btn danger block" onclick="closeModal()">닫기</button>`)}
-async function shareLink(){const code=await enc(pub());const url=location.href.split('#')[0]+'#v='+code;const t=trip();closeModal();
+async function deliverLink(url,t){
   if(navigator.share){try{await navigator.share({title:t.title||'여행 일정',text:(t.title||'여행')+' 일정 미리보기',url});return}catch(e){if(e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(url);toast('링크를 복사했어요')}catch(e){prompt('링크를 복사하세요',url)}}
+async function shareLink(){const t=trip();closeModal();toast('링크 만드는 중…');let url='';
+  try{
+    if(t.shareId){try{await blobPut(t.shareId,pub(t))}catch(e){delete t.shareId}}
+    if(!t.shareId)t.shareId=await blobCreate(pub(t));
+    persist(true);url=baseUrl()+'#s='+t.shareId;
+  }catch(e){
+    delete t.shareId;const code=await enc(pub(t));url=baseUrl()+'#v='+code;
+    toast('단축 서비스에 연결하지 못해 긴 링크로 만들었어요')}
+  await deliverLink(url,t)}
 async function shareFile(){const t=pub();closeModal();
   const json=JSON.stringify(t).replace(/</g,'\\u003c');
   const html=SRC.replace(/<script id="shared">[\s\S]*?<\/script>/,'').replace('<head>','<head><script id="shared">window.__SHARED__='+json+'<\/script>');
@@ -423,9 +532,9 @@ function ddayBadge(t){const td=new Date().setHours(0,0,0,0),s=parseD(t.start),e=
   if(td<s)return 'D-'+Math.round((s-td)/864e5);if(td>e)return '종료';return '여행 중'}
 function header(){const t=trip();const th=document.documentElement.getAttribute('data-theme')==='dark'?'☀️':'🌙';
   const back=S.view||S.screen==='list'?'':`<button class="ib" onclick="go('list')" aria-label="목록">‹</button>`;
-  const ttl=S.screen==='list'?'✈️ 내 여행':esc(t?.title||'새 여행');
+  const ttl=S.screen==='list'?'✈️ 내 여행':esc(t?.title||(S.view?'여행 일정':'새 여행'));
   const save=!S.view&&(S.screen==='info'||S.screen==='plan')?`<button class="btn sm" onclick="saveNow()">저장</button>`:'';
-  return `<header class="top">${back}<h1>${ttl}</h1>${save}${S.view?`<button class="ib" onclick="toggleTheme()" aria-label="테마">${th}</button>`:`<button class="ib" onclick="openMenu()" aria-label="메뉴" style="position:relative">☰${bkStale()?'<i style="position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:var(--danger)"></i>':''}</button>`}</header>`}
+  return `<header class="top">${back}<h1>${ttl}</h1>${save}${S.view?`${S.shareId?'<button class="ib" onclick="refreshShared()" aria-label="새로고침">↻</button>':''}<button class="ib" onclick="toggleTheme()" aria-label="테마">${th}</button>`:`<button class="ib" onclick="openMenu()" aria-label="메뉴" style="position:relative">☰${bkStale()?'<i style="position:absolute;top:3px;right:3px;width:9px;height:9px;border-radius:50%;background:var(--danger)"></i>':''}</button>`}</header>`}
 function nav(){if(S.view||!trip()||S.screen==='list')return'';
   const b=(s,i,l)=>`<button class="${S.screen===s?'on':''}" onclick="go('${s}')"><b>${i}</b>${l}</button>`;
   return `<nav class="bot"><div>${b('info','🧭','여행 정보')}${b('plan','🗓️','루트 계획')}${b('preview','👀','프리뷰')}</div></nav>`}
@@ -439,12 +548,13 @@ function screenList(){const ts=S.store.trips;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   const unit=t.rate<1?100:1;
-  const cityOpts=ci.cities.map(c=>`<option value="${esc(c.k)}">`).join('');
   let h=`<div class="hero"><h2>${flag(ci.i)} 여행 정보</h2></div><div class="card">
-  <label class="f" style="margin-top:0">여행지 (나라)</label>
-  <select onchange="setCountry(this.value)">${COUNTRIES.map(c=>`<option ${c.n===t.country?'selected':''}>${esc(c.n)}</option>`).join('')}</select>
-  <label class="f">도시 / 지역 (배경 사진에 사용)</label>
-  <input list="cities" value="${esc(t.city)}" placeholder="예: 도쿄" onchange="setField('city',this.value);syncBg()"><datalist id="cities">${cityOpts}</datalist>
+  <div class="g2in">
+    <div><label class="f" style="margin-top:0">여행지</label>
+    <select onchange="setCountry(this.value)">${COUNTRIES.map(c=>`<option ${c.n===t.country?'selected':''}>${esc(c.n)}</option>`).join('')}</select></div>
+    <div><label class="f" style="margin-top:0">도시 / 지역</label>
+    <input id="cityin" value="${esc(t.city)}" placeholder="예: 도쿄" autocomplete="off" onchange="setField('city',this.value.trim());syncBg()"></div>
+  </div>
   <label class="f">여행 타이틀</label>
   <input value="${esc(t.title)}" placeholder="예: 가을 도쿄 맛집 여행" oninput="setField('title',this.value);document.querySelector('header h1').textContent=this.value||'새 여행'">
   <label class="f">여행 기간</label>
@@ -466,34 +576,52 @@ function dayTabs(t,cur,fn){let h='<div class="tabs">';for(let i=0;i<dayCount(t);
 const ICO=d=>`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 function toggleItem(id){const was=S.open===id;S.open=was?null:id;render();
   if(!was)setTimeout(()=>{const e=$('#it-'+id);e&&e.scrollIntoView({block:'start',behavior:'smooth'})},30)}
+function setTime(id,k,v){const f=findItem(id);if(!f)return;f.it[k]=v;persist();render()}
+function addSub(id){const f=findItem(id);if(!f)return;(f.it.sub=f.it.sub||[]).push({id:uid(),name:'',amt:''});persist();render();
+  setTimeout(()=>{const l=[...document.querySelectorAll('#it-'+id+' .sr2 .nm')].pop();l&&l.focus()},40)}
+function delSub(id,sid){const f=findItem(id);if(!f)return;f.it.sub=(f.it.sub||[]).filter(x=>x.id!==sid);persist();render()}
+function setSub(id,sid,k,v){const f=findItem(id);if(!f)return;const s=(f.it.sub||[]).find(x=>x.id===sid);if(!s)return;s[k]=v;persist();updSubTot(id)}
+function updSubTot(id){const f=findItem(id);if(!f)return;const t=trip();const e=$('#stot-'+id);if(e){e.textContent=fmt2(subSum(f.it))+' '+unitOf(t,f.it);e.parentElement.hidden=!(subSum(f.it)>0)}updTotals()}
 function itemSummary(t,it,i,n){const id=it.id;
-  const dur=(+it.hh?it.hh+'시간':'')+(+it.mm?(+it.hh?' ':'')+it.mm+'분':'');
-  const amt=+it.amount?fmt2(+it.amount)+(it.cur==='KRW'?'원':' '+t.currency):'';
-  const meta=[dur&&'⏱ '+dur,amt&&'💰 '+amt,(it.lat!=null||it.url)&&'📍 핀',it.memo&&'📝 '+esc(it.memo)].filter(Boolean).join(' · ');
+  const dur=durTxt(durMin(it));const tot=itemTotal(it);
+  const memo1=(it.memo||'').split('\n').find(x=>x.trim())||'';
+  const meta=[dur&&'⏱ '+dur,tot>0&&'💰 '+fmt2(tot)+' '+unitOf(t,it),(it.lat!=null||it.url)&&'📍 핀',memo1&&'📝 '+esc(memo1)].filter(Boolean).join(' · ');
   return `<div class="card item sum" id="it-${id}" onclick="toggleItem('${id}')">
     <span class="no">${i+1}</span>
-    <div class="sbody"><div class="s1"><b class="st">${it.time||'--:--'}</b><span class="spl ${it.place?'':'ph'}">${esc(it.place||'장소 미입력')}</span></div>${meta?`<div class="s2">${meta}</div>`:''}</div>
+    <div class="sbody"><div class="s1"><b class="st">${esc(timeTxt(it))}</b><span class="spl ${it.place?'':'ph'}">${esc(it.place||'일정 입력')}</span></div>${meta?`<div class="s2">${meta}</div>`:''}</div>
     <div class="sctl" onclick="event.stopPropagation()">
       <button class="mini" ${i===0?'disabled':''} onclick="moveItem('${id}',-1)" aria-label="위로 이동">${ICO('<path d="M6 15l6-6 6 6"/>')}</button>
       <button class="mini" ${i===n-1?'disabled':''} onclick="moveItem('${id}',1)" aria-label="아래로 이동">${ICO('<path d="M6 9l6 6 6-6"/>')}</button></div></div>`}
 function itemCard(t,it,i,n){
   if(S.open!==it.id)return itemSummary(t,it,i,n);
-  const lc=t.currency,id=it.id;
+  const lc=t.currency,id=it.id,unit=unitOf(t,it);
+  const der=!!(hm(it.time)!=null&&hm(it.end)!=null),dm=durMin(it);
+  const dh=der?Math.floor(dm/60):it.hh,dmn=der?dm%60:it.mm;
+  const subs=it.sub||[];
   return `<div class="card item open" id="it-${id}">
-  <div class="ih"><span class="no">${i+1}</span><input class="tm" type="time" value="${it.time||''}" onchange="setItem('${id}','time',this.value)" aria-label="시작 시간"><span class="sp" onclick="toggleItem('${id}')"></span>
+  <div class="ih"><span class="no">${i+1}</span><span class="hdt">${esc(timeTxt(it))}</span><span class="sp" onclick="toggleItem('${id}')"></span>
     <button class="mini" ${i===0?'disabled':''} onclick="moveItem('${id}',-1)" aria-label="위로 이동">${ICO('<path d="M6 15l6-6 6 6"/>')}</button>
     <button class="mini" ${i===n-1?'disabled':''} onclick="moveItem('${id}',1)" aria-label="아래로 이동">${ICO('<path d="M6 9l6 6 6-6"/>')}</button>
     <button class="mini del" onclick="delItem('${id}')" aria-label="일정 삭제">${ICO('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/>')}</button>
     <button class="done" onclick="toggleItem('${id}')">완료</button></div>
   <div class="ibody">
-    <input class="pl" placeholder="장소 (예: 센소지)" value="${esc(it.place)}" oninput="setItem('${id}','place',this.value)" onchange="refreshDerived()">
+    <input class="pl" id="pl-${id}" placeholder="일정 입력" value="${esc(it.place)}" oninput="setItem('${id}','place',this.value)" onchange="refreshDerived()">
     <div class="g2">
-      <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${it.hh}" onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${it.mm}" onchange="setItem('${id}','mm',this.value)"><small>분</small></div></div>
-      <div class="fld"><span>금액</span><div class="inl"><input type="number" inputmode="decimal" placeholder="0" value="${it.amount}" oninput="setItem('${id}','amount',this.value)" onchange="refreshDerived()"><select onchange="setItem('${id}','cur',this.value);refreshDerived()"><option value="KRW" ${it.cur==='KRW'?'selected':''}>₩ 원</option>${lc!=='KRW'?`<option value="LOCAL" ${it.cur==='LOCAL'?'selected':''}>${lc}</option>`:''}</select></div></div>
+      <div class="fld"><span>시작 시간</span><input type="time" value="${it.time||''}" onchange="setTime('${id}','time',this.value)" aria-label="시작 시간"></div>
+      <div class="fld"><span>종료 시간 (선택)</span><div class="inl"><input type="time" value="${it.end||''}" onchange="setTime('${id}','end',this.value)" aria-label="종료 시간">${it.end?`<button class="rmsub" onclick="setTime('${id}','end','')" aria-label="종료 시간 지우기">×</button>`:''}</div></div>
     </div>
-    <div class="fld"><span>지도 위치</span><div class="inl"><input placeholder="구글맵 링크 / 좌표 붙여넣기" value="${esc(it.pinText||'')}" onchange="setPin('${id}',this.value)"><button class="pinbtn ${it.lat!=null?'on':''}" id="pb-${id}" onclick="searchMap('${id}')" title="구글맵에서 검색 · 핀 지정" aria-label="구글맵에서 검색 · 핀 지정"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></button></div>
+    <div class="g2">
+      <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${dh}" ${der?'disabled':''} onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${dmn}" ${der?'disabled':''} onchange="setItem('${id}','mm',this.value)"><small>분</small></div>${der?'<div class="muted" style="margin-top:3px">시작·종료로 자동 계산</div>':''}</div>
+      <div class="fld"><span>금액</span><div class="inl"><input type="number" inputmode="decimal" placeholder="0" value="${it.amount}" oninput="setItem('${id}','amount',this.value);updSubTot('${id}')" onchange="refreshDerived()"><select onchange="setItem('${id}','cur',this.value);refreshDerived();updSubTot('${id}')"><option value="KRW" ${it.cur==='KRW'?'selected':''}>₩ 원</option>${lc!=='KRW'?`<option value="LOCAL" ${it.cur==='LOCAL'?'selected':''}>${lc}</option>`:''}</select></div></div>
+    </div>
+    <div class="fld"><span>지도 위치</span>
+      <div class="inl"><input id="pt-${id}" placeholder="구글맵 링크 / 좌표 붙여넣기" value="${esc(it.pinText||'')}" onchange="setPin('${id}',this.value)"><button class="pinbtn ${it.lat!=null?'on':''}" id="pb-${id}" onclick="searchMap('${id}')" title="구글맵에서 검색 · 핀 지정" aria-label="구글맵에서 검색 · 핀 지정"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></button></div>
+      <div class="inl" style="margin-top:6px"><input id="pn-${id}" placeholder="구글맵 장소명 (링크에서 자동 입력)" value="${esc(it.pinName||'')}" oninput="setItem('${id}','pinName',this.value)" onchange="refreshDerived()"><button class="addsub" onclick="applyPinName('${id}')" title="일정 입력란에 이 이름을 넣어요">일정명에 적용</button></div>
       <div class="pinst" id="pin-${id}">${pinStatus(it)}</div></div>
-    <input class="memo" placeholder="메모 (선택)" value="${esc(it.memo)}" oninput="setItem('${id}','memo',this.value)">
+    <div class="fld"><span>메모</span><textarea class="memo" rows="2" placeholder="메모 (줄바꿈 가능)" oninput="setItem('${id}','memo',this.value)">${esc(it.memo)}</textarea></div>
+    <div class="fld"><span>상세 일정</span>
+      ${subs.length?`<div class="subs">${subs.map(s=>`<div class="sr2"><input class="nm" placeholder="상세 내용" value="${esc(s.name)}" oninput="setSub('${id}','${s.id}','name',this.value)"><input class="am" type="number" inputmode="decimal" placeholder="금액 (선택)" value="${s.amt}" oninput="setSub('${id}','${s.id}','amt',this.value)"><button class="rmsub" onclick="delSub('${id}','${s.id}')" aria-label="상세 일정 삭제">−</button></div>`).join('')}</div>`:''}
+      <div class="subbar"><button class="addsub" onclick="addSub('${id}')">＋ 상세 일정 추가</button>${subs.length?`<span class="subtot" ${subSum(it)>0?'':'hidden'}>금액 합계 <span id="stot-${id}">${fmt2(subSum(it))} ${unit}</span></span>`:''}</div></div>
   </div></div>`}
 function screenPlan(){const t=trip();const a=itemsOf(t,S.day);const d=dateOfDay(t,S.day);
   let h=`<div style="height:6px"></div>${dayTabs(t,S.day,'selDay')}
@@ -501,10 +629,21 @@ function screenPlan(){const t=trip();const a=itemsOf(t,S.day);const d=dateOfDay(
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">아직 일정이 없어요. 아래 버튼으로 추가하세요.</div>`;
   a.forEach((it,i)=>h+=itemCard(t,it,i,a.length));
   h+=`<div class="row"><button class="btn block" onclick="addItem()">＋ 일정 추가</button>${a.length>1?'<button class="btn ghost fix" onclick="sortItems()">시간순 정렬</button>':''}</div>
-  <div class="card" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h2 style="margin:0">🗺️ ${S.day+1}일차 루트 지도</h2>${modeSel()}</div><div id="mapbox">${mapBox(t,S.day)}</div></div>`;
+  <div class="card" style="margin-top:14px"><h2 style="margin:0 0 10px">🗺️ ${S.day+1}일차 루트 지도</h2><div id="mapbox">${mapBox(t,S.day)}</div></div>`;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
-function hlInfo(t,i,it){if(!it.time)return null;const [h,m]=it.time.split(':').map(Number);const d=dateOfDay(t,i);d.setHours(h,m,0,0);
-  const diff=Date.now()-d.getTime();return Math.abs(diff)<=3600e3?{before:diff<0}:null}
+/* 지금 진행 중인 일정의 순번 (오늘 날짜이고 현재 시각이 시작~끝 사이일 때만) */
+function activeIdx(t,day,a){
+  const d0=dateOfDay(t,day),n=new Date();
+  if(d0.getFullYear()!==n.getFullYear()||d0.getMonth()!==n.getMonth()||d0.getDate()!==n.getDate())return -1;
+  const nm=n.getHours()*60+n.getMinutes();
+  for(let k=0;k<a.length;k++){
+    const s=hm(a[k].time);if(s==null)continue;
+    let e;
+    if(hm(a[k].end)!=null){e=hm(a[k].end);if(e<=s)e+=1440}
+    else if(durMin(a[k])>0)e=s+durMin(a[k]);
+    else{let nx=null;for(let j=k+1;j<a.length;j++){const x=hm(a[j].time);if(x!=null&&x>s){nx=x;break}}e=nx!=null?nx:s+60}
+    if(nm>=s&&nm<e)return k}
+  return -1}
 function selPDay(i){S.pday=i;render()}
 const cssUrl=u=>String(u).replace(/['"()\s\\]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase().padStart(2,'0'));
 function previewHero(t,ci,n,cnt){
@@ -517,25 +656,58 @@ function previewHero(t,ci,n,cnt){
   return `<div class="phero" id="heroimg" ${img?'style="background-image:url(\''+cssUrl(img)+'\')"':''}><div class="pov"></div><div class="pin">
     <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><span class="pchip">${dd}</span></div>
     <h2>${esc(t.title||'나의 여행')}</h2><div class="pdate">${fd(parseD(t.start))} – ${fd(parseD(t.end))}</div></div></div>
-  <div class="pstats"><div><b>${n-1}박 ${n}일</b><small>기간</small></div><div><b>${cnt}곳</b><small>방문 장소</small></div><div><b>₩${fmt(tot)}</b><small>예상 경비 · ${sub}</small></div></div>
+  <div class="pstats"><div><b>${n-1}박 ${n}일</b><small>기간</small></div><div><b>${cnt}곳</b><small>방문 장소</small></div><div><b>₩${fmt(tot)}</b><small>예상 경비<br>${sub}</small></div></div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
   const cnt=Object.keys(t.items).reduce((s,k)=>+k<n?s+t.items[k].length:s,0);
   let h=previewHero(t,ci,n,cnt);
   if(!S.view)h+=`<button class="btn block" onclick="shareSheet()" style="margin-bottom:12px">📤 프리뷰 공유하기</button>`;
-  else h+=`<div class="muted" style="text-align:center;margin-bottom:10px">공유된 프리뷰 화면입니다</div>`;
+  else h+=`<div class="muted" style="text-align:center;margin-bottom:10px">공유된 프리뷰 화면입니다${S.shareId?' · 오른쪽 위 ↻ 로 최신 일정 확인':''}</div>`;
   h+=dayTabs(t,S.pday,'selPDay');
   h+=`<div class="muted" style="margin:0 2px 8px">${S.pday+1}일차 · ${dlabel(dateOfDay(t,S.pday))} · ${moneyTxt(t,dayTotal(t,S.pday))}</div>`;
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">이 날은 등록된 일정이 없어요.</div>`;
-  else{h+='<div class="tl">';a.forEach(it=>{const hl=hlInfo(t,S.pday,it);const pin=(it.lat!=null||it.url)&&ptOf(t,it);const dur=(+it.hh?it.hh+'시간 ':'')+(+it.mm?it.mm+'분':'');
-    const amt=+it.amount?`${fmt2(+it.amount)} ${it.cur==='KRW'?'원':t.currency}`:'';
-    h+=`<div class="ev ${hl?'hl':''}${pin?' hasp':''}" ${hl?'id="hlnow"':''}>${pin?`<a class="evpin" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pin)}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`:''}<div class="t">${it.time||'--:--'}${hl?`<span class="nowtag">${hl.before?'곧 시작':'지금 진행'}</span>`:''}</div>
-    <div class="p">${esc(it.place||'(장소 미입력)')}</div>
-    <div class="muted">${[dur&&'⏱ '+dur,amt&&'💰 '+amt].filter(Boolean).join(' · ')}</div>${it.memo?`<div style="margin-top:4px;font-size:13px">${esc(it.memo)}</div>`:''}</div>`});h+='</div>'}
-  h+=`<details class="card"><summary>🗺️ ${S.pday+1}일차 루트 지도 보기</summary><div style="margin:8px 0">${modeSel()}</div><div id="pmap">${mapBox(t,S.pday)}</div></details>`;
+  else{const ai=activeIdx(t,S.pday,a);h+='<div class="tl">';a.forEach((it,k)=>{
+    const hl=k===ai,hasPin=it.lat!=null||!!it.url;
+    const pinHref=it.url||('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.lat+','+it.lng));
+    const dur=durTxt(durMin(it)),unit=unitOf(t,it),tot=itemTotal(it);
+    const subs=(it.sub||[]).filter(s=>s.name||+s.amt);
+    const ss=subSum(it);
+    const meta=(!ss&&tot>0)?`<div class="muted">💰 ${fmt2(tot)} ${unit}</div>`:'';
+    const subHtml=subs.length?`<div class="subs">${ss&&+it.amount?`<div class="sr"><span>기본 금액</span><b>${fmt2(+it.amount)} ${unit}</b></div>`:''}${subs.map(s=>`<div class="sr"><span>${esc(s.name||'상세 일정')}</span>${+s.amt?`<b>${fmt2(+s.amt)} ${unit}</b>`:''}</div>`).join('')}${ss?`<div class="sr tot"><span>합계</span><b>${fmt2(tot)} ${unit}</b></div>`:''}</div>`:'';
+    h+=`<div class="ev${hl?' hl':''}${hasPin?' hasp':''}" ${hl?'id="hlnow"':''}>${hasPin?`<a class="evpin" href="${esc(pinHref)}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`:''}<div class="t">${esc(timeTxt(it))}${dur?`<span class="dur">⏱ ${dur}</span>`:''}${hl?'<span class="nowtag">지금 진행</span>':''}</div>
+    <div class="p">${esc(it.place||'(일정 미입력)')}</div>${it.pinName&&it.pinName!==it.place?`<div class="pn">📍 ${esc(it.pinName)}</div>`:''}${meta}${it.memo?`<div class="memo">${esc(it.memo)}</div>`:''}${subHtml}</div>`});h+='</div>'}
+  h+=`<details class="card" ontoggle="if(this.open)initPMap()"><summary>🗺️ ${S.pday+1}일차 핀 지도 보기</summary><div id="lmap" style="margin-top:8px"></div></details>`;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 
+/* 프리뷰 지도: 핀을 지정한 장소만 고정 마커로 표시 (Leaflet + OpenStreetMap) */
+let LLP=null,PMAP=null;
+function loadLeaflet(){if(window.L)return Promise.resolve(window.L);
+  return LLP||(LLP=new Promise((res,rej)=>{
+    const l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';document.head.appendChild(l);
+    const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
+    s.onload=()=>res(window.L);s.onerror=()=>{LLP=null;rej(new Error('leaflet'))};document.head.appendChild(s)}))}
+async function initPMap(){const el=$('#lmap');if(!el)return;const t=trip();
+  const ps=pinsOf(t,S.pday);
+  if(!ps.length){el.innerHTML='<div class="muted" style="padding:22px;text-align:center">이 날은 핀을 지정한 일정이 없어요.</div>';return}
+  el.innerHTML='<div class="muted" style="padding:22px;text-align:center">지도를 불러오는 중…</div>';
+  try{const L=await loadLeaflet();if($('#lmap')!==el)return;
+    if(PMAP){try{PMAP.remove()}catch(e){}PMAP=null}
+    el.innerHTML='';el.classList.add('on');
+    const map=L.map(el,{scrollWheelZoom:false});PMAP=map;
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    const b=[];
+    ps.forEach((it,i)=>{
+      const ic=L.divIcon({className:'',html:`<div class="lpin"><span>${i+1}</span></div>`,iconSize:[30,30],iconAnchor:[15,36],popupAnchor:[0,-34]});
+      const href=it.url||('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.lat+','+it.lng));
+      L.marker([it.lat,it.lng],{icon:ic}).addTo(map).bindPopup(`<b>${esc(it.pinName||it.place||'핀')}</b><br>${esc(timeTxt(it))}<br><a href="${esc(href)}" target="_blank" rel="noopener">구글 지도에서 열기</a>`);
+      b.push([it.lat,it.lng])});
+    map.fitBounds(b,{padding:[34,34],maxZoom:16});setTimeout(()=>map.invalidateSize(),50)
+  }catch(e){el.innerHTML='<div class="muted" style="padding:22px;text-align:center">지도를 불러오지 못했어요. 핀 아이콘을 눌러 구글 지도에서 확인하세요.</div>'}}
+
 function render(){const y=scrollY;
+  if(S.view&&!S.viewTrip){
+    $('#app').innerHTML=header()+`<div class="card" style="text-align:center;padding:30px 14px;margin-top:20px">${S.loadErr?'<div style="font-size:38px">📡</div><p>일정을 불러오지 못했어요.<br><span class="muted">링크가 끊겼거나 네트워크 문제일 수 있어요.</span></p><button class="btn" onclick="retryShared()">다시 시도</button>':'<p class="muted">일정을 불러오는 중…</p>'}</div>`;
+    syncBg();return}
   const t=trip();if(S.screen!=='list'&&!t)S.screen='list';
   const body={list:screenList,info:screenInfo,plan:screenPlan,preview:screenPreview}[S.screen]();
   $('#app').innerHTML=header()+body+nav();
@@ -543,17 +715,19 @@ function render(){const y=scrollY;
   if(S.screen==='preview'){const e=$('#hlnow');if(e&&!render.scrolled){render.scrolled=1;setTimeout(()=>e.scrollIntoView({block:'center',behavior:'smooth'}),100)}}
   else render.scrolled=0;
   scrollTo(0,y)}
-setInterval(()=>{if(S.screen==='preview'&&!document.activeElement?.closest('details[open]'))render()},30000);
+setInterval(()=>{if(S.screen==='preview'&&!document.querySelector('details[open]'))render()},30000);
 
 /* ---------- 시작 ---------- */
 (async function init(){
   try{setTheme(localStorage.getItem(THEME_KEY)||'light')}catch(e){}
   fetchRates().then(()=>{if(S.screen==='info')render()});
-  let shared=window.__SHARED__||null;
-  if(!shared&&location.hash.startsWith('#v=')){try{shared=await dec(location.hash.slice(3))}catch(e){}}
-  if(shared){S.view=true;S.viewTrip=shared;S.screen='preview';
-    shared.items=shared.items||{};const td=Math.round((new Date().setHours(0,0,0,0)-parseD(shared.start))/864e5);S.pday=td>=0&&td<dayCount(shared)?td:0;
-    render();return}
+  const h=location.hash;
+  const todayIdx=t=>{const td=Math.round((new Date().setHours(0,0,0,0)-parseD(t.start))/864e5);return td>=0&&td<dayCount(t)?td:0};
+  if(!window.__SHARED__&&h.startsWith('#s=')){const id=h.slice(3);
+    if(BID.test(id)){S.view=true;S.shareId=id;S.screen='preview';render();await loadShared(id);if(S.viewTrip)S.pday=todayIdx(S.viewTrip);render();return}}
+  let shared=null;
+  try{if(window.__SHARED__)shared=cleanTrip(window.__SHARED__);else if(h.startsWith('#v='))shared=cleanTrip(await dec(h.slice(3)))}catch(e){shared=null}
+  if(shared){S.view=true;S.viewTrip=shared;S.shareId=shared.shareId||null;S.screen='preview';S.pday=todayIdx(shared);render();return}
   load();render();
 })();
 </script>
