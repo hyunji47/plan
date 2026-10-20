@@ -408,7 +408,7 @@ function setItem(id,k,v){const f=findItem(id);if(!f)return;f.it[k]=v;persist()}
 function selDay(i){S.day=i;S.open=null;render()}
 function addItem(){const t=trip(),a=itemsOf(t,S.day);let time='09:00';
   const l=a[a.length-1];if(l&&hm(l.time)!=null){let x=l.end&&hm(l.end)!=null?hm(l.end):hm(l.time)+(durMin(l)||60);if(x>=1440)x=1439;x=Math.min(x,23*60+30);time=fmtHM(x)}
-  const nid=uid();S.open=nid;a.push({id:nid,time,end:'',place:'',hh:'',mm:'',amount:'',cur:t.currency==='KRW'?'KRW':'LOCAL',memo:'',sub:[],pinName:'',pinText:'',url:'',lat:null,lng:null});persist();render();
+  const endMin=Math.min(hm(time)+60,1439);const end=fmtHM(endMin);const nid=uid();S.open=nid;a.push({id:nid,time,end,place:'',hh:'',mm:'',amount:'',cur:t.currency==='KRW'?'KRW':'LOCAL',memo:'',sub:[],pinName:'',pinText:'',url:'',lat:null,lng:null});persist();render();
   setTimeout(()=>{const e=[...document.querySelectorAll('.item .pl')].pop();if(e){e.closest('.item').scrollIntoView({block:'start',behavior:'smooth'});e.focus({preventScroll:true})}},60)}
 function delItem(id){const f=findItem(id);if(f.it.place&&!confirm('이 일정을 삭제할까요?'))return;f.a.splice(f.i,1);if(S.open===id)S.open=null;persist();render()}
 function moveItem(id,d){const f=findItem(id),j=f.i+d;if(j<0||j>=f.a.length)return;[f.a[f.i],f.a[j]]=[f.a[j],f.a[f.i]];persist();const y=scrollY;render();scrollTo(0,y)}
@@ -689,7 +689,22 @@ function dayTabs(t,cur,fn){let h=`<div class="tabs${dayCount(t)<=4?' fit':''}">`
 const ICO=d=>`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 function toggleItem(id){const was=S.open===id;S.open=was?null:id;render();
   if(!was)setTimeout(()=>{const e=$('#it-'+id);e&&e.scrollIntoView({block:'start',behavior:'smooth'})},30)}
-function setTime(id,k,v){const f=findItem(id);if(!f)return;f.it[k]=v;persist();render()}
+function setTime(id,k,v){
+  const f=findItem(id);if(!f)return;f.it[k]=v;persist();
+  // 시간 선택기를 닫지 않도록 전체 화면을 다시 렌더링하지 않고 필요한 표시만 갱신합니다.
+  const head=document.querySelector('#it-'+id+' .hdt');if(head)head.textContent=timeTxt(f.it);
+  const card=document.querySelector('#it-'+id);
+  if(card){
+    const dur=durMin(f.it),der=hm(f.it.time)!=null&&hm(f.it.end)!=null;
+    const fields=card.querySelectorAll('.g2 .fld input[type=number]');
+    if(fields.length>=2){fields[0].value=der?Math.floor(dur/60):(f.it.hh||'');fields[1].value=der?dur%60:(f.it.mm||'');fields[0].disabled=fields[1].disabled=der}
+    const note=card.querySelector('.g2 .fld .muted');if(note)note.remove();
+    const durationField=card.querySelector('.g2 .fld');
+    if(der&&durationField){const note=document.createElement('div');note.className='muted';note.style.marginTop='3px';note.textContent='시작·종료로 자동 계산';durationField.appendChild(note)}
+    const endClear=card.querySelector('[aria-label="종료 시간 지우기"]');if(endClear)endClear.hidden=!f.it.end;
+  }
+  const total=document.querySelector('#daytotal');if(total)total.innerHTML=moneyTxt(trip(),dayTotal(trip(),S.day));
+}
 function addSub(id){const f=findItem(id);if(!f)return;(f.it.sub=f.it.sub||[]).push({id:uid(),name:'',amt:''});persist();render();
   setTimeout(()=>{const l=[...document.querySelectorAll('#it-'+id+' .sr2 .nm')].pop();l&&l.focus()},40)}
 function delSub(id,sid){const f=findItem(id);if(!f)return;f.it.sub=(f.it.sub||[]).filter(x=>x.id!==sid);persist();render()}
@@ -721,7 +736,7 @@ function itemCard(t,it,i,n){
     <input class="pl" id="pl-${id}" placeholder="일정 입력" value="${esc(it.place)}" oninput="setItem('${id}','place',this.value)" onchange="refreshDerived()">
     <div class="g2in">
       <div class="fld"><span>시작 시간</span><input type="time" value="${it.time||''}" onchange="setTime('${id}','time',this.value)" aria-label="시작 시간"></div>
-      <div class="fld"><span>종료 시간 (선택)</span><div class="inl"><input type="time" value="${it.end||''}" onchange="setTime('${id}','end',this.value)" aria-label="종료 시간">${it.end?`<button class="rmsub" onclick="setTime('${id}','end','')" aria-label="종료 시간 지우기">×</button>`:''}</div></div>
+      <div class="fld"><span>종료 시간 (선택)</span><div class="inl"><input type="time" value="${it.end||''}" onchange="setTime('${id}','end',this.value)" aria-label="종료 시간"><button class="rmsub" ${it.end?'':'hidden'} onclick="setTime('${id}','end','')" aria-label="종료 시간 지우기">×</button></div></div>
     </div>
     <div class="g2">
       <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${dh}" ${der?'disabled':''} onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${dmn}" ${der?'disabled':''} onchange="setItem('${id}','mm',this.value)"><small>분</small></div>${der?'<div class="muted" style="margin-top:3px">시작·종료로 자동 계산</div>':''}</div>
