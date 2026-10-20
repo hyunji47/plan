@@ -293,6 +293,7 @@ async function wiki(q){try{const j=await (await fetch('https://en.wikipedia.org/
 async function findImages(qs){for(const q of qs){const l=await commons(q);if(l.length)return l}
   for(const q of qs.slice(-2)){const l=await wiki(q);if(l.length)return l}return[]}
 async function loadBg(qs,key,t){
+  if(t&&t.thumb){S.bgKey=key;S.bgUrl=t.thumb;S.credit=null;const b=$('#bg');if(b){b.style.backgroundImage='url("'+cssUrl(t.thumb)+'")';b.style.opacity=1}const hh=$('#heroimg');if(hh)hh.style.backgroundImage='url("'+cssUrl(t.thumb)+'")';const c=$('#credit');if(c)c.innerHTML=creditHtml();return}
   S.bgKey=key;S.bgUrl=null;const imgs=await findImages(qs);if(S.bgKey!==key||!imgs.length)return;
   if(PICK[key]==null)PICK[key]=Math.random();
   const im=imgs[Math.floor(PICK[key]*imgs.length)];
@@ -312,7 +313,7 @@ function syncBg(){
     if(!S.listKey){const ts=S.store.trips;const tt=ts.length?ts[Math.floor(Math.random()*ts.length)]:null;
       S.listKey=tt?'t:'+tt.id:'d';S.listQ=tt?placeQueries(tt):[DEFAULT_CITIES[Math.floor(Math.random()*DEFAULT_CITIES.length)]+' skyline']}
     if(S.bgKey!==S.listKey)loadBg(S.listQ,S.listKey,null);
-  }else{const k='t:'+t.id+':'+t.country+t.city;if(S.bgKey!==k)loadBg(placeQueries(t),k,t)}
+  }else{const k='t:'+t.id+':'+t.country+t.city+(t.thumb?'T'+t.thumb.length:'');if(S.bgKey!==k)loadBg(placeQueries(t),k,t)}
 }
 
 /* ---------- 네비게이션 ---------- */
