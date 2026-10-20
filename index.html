@@ -407,7 +407,7 @@ function searchMap(id){
   const it=f.it;
   // URL이 있으면 해당 URL로, URL 없이 좌표만 있으면 좌표 위치로, 둘 다 없으면 검색 없는 구글맵 기본 화면으로 이동
   const target=it.url||(it.lat!=null&&it.lng!=null
-    ?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.lat+','+it.lng)
+    ?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent((it.pinName||it.place||'')+' '+it.lat+','+it.lng)
     :'https://www.google.com/maps');
   window.open(target,'_blank','noopener');
 }
@@ -426,22 +426,34 @@ async function setPin(id,text){const f=findItem(id);if(!f)return;const p=parsePi
   persist();
   const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(it);
   const b=$('#pb-'+id);if(b)b.classList.toggle('on',it.lat!=null);refreshDerived();
-  // Google Maps의 장소 URL에는 좌표가 없는 경우가 있어 장소명을 추출해 좌표 검색을 시도합니다.
+  // 장소 URL에 좌표가 없으면 URL에서 장소명을 뽑아 지오코딩합니다.
+  // Nominatim 한 곳에서 검색 결과가 없거나 요청이 실패할 수 있어 Photon도 대체로 시도합니다.
   if(it.url&&it.lat==null&&p.name){
     if(e)e.innerHTML='⏳ 장소 좌표를 확인하는 중…';
     try{
-      const endpoint='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q='+encodeURIComponent(p.name);
-      const res=await fetch(endpoint,{headers:{'Accept':'application/json'}});
-      if(!res.ok)throw new Error('geocode failed');
-      const rows=await res.json();
-      const hit=rows&&rows[0];
+      const queries=[p.name, p.name+', South Korea'];
+      let hit=null;
+      for(const q of queries){
+        try{
+          const r=await fetch('https://photon.komoot.io/api/?limit=1&lang=default&q='+encodeURIComponent(q));
+          if(r.ok){const j=await r.json();const ft=j&&j.features&&j.features[0];if(ft&&ft.geometry&&ft.geometry.coordinates){const xy=ft.geometry.coordinates;hit={lat:xy[1],lon:xy[0],name:(ft.properties&&ft.properties.name)||p.name};break;}}
+        }catch(_){/* try next provider/query */}
+      }
+      if(!hit){
+        for(const q of queries){
+          try{
+            const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=ko,en&q='+encodeURIComponent(q));
+            if(r.ok){const rows=await r.json();if(rows&&rows[0]){hit=rows[0];break;}}
+          }catch(_){/* try next query */}
+        }
+      }
       const latest=findItem(id);
       if(hit&&latest&&latest.it.pinText===text){
-        latest.it.lat=Number(hit.lat);latest.it.lng=Number(hit.lon);latest.it.pinName=p.name;
+        latest.it.lat=Number(hit.lat);latest.it.lng=Number(hit.lon);latest.it.pinName=hit.name||p.name;
         persist();const el=$('#pin-'+id);if(el)el.innerHTML=pinStatus(latest.it);
         const btn=$('#pb-'+id);if(btn)btn.classList.toggle('on',latest.it.lat!=null);refreshDerived();
-      }else if(e)e.innerHTML=pinStatus(it)||'⚠️ 좌표를 찾지 못했어요. 좌표가 포함된 지도 URL이나 위도, 경도를 입력해 주세요.';
-    }catch(err){const el=$('#pin-'+id);if(el)el.innerHTML='⚠️ 좌표 자동 확인에 실패했어요. 좌표가 포함된 지도 URL이나 위도, 경도를 입력해 주세요.'}
+      }else if(e)e.innerHTML='⚠️ 장소 좌표를 찾지 못했어요. 정확한 좌표를 붙여넣거나 장소명을 포함한 구글맵 링크를 확인해 주세요.';
+    }catch(err){const el=$('#pin-'+id);if(el)el.innerHTML='⚠️ 좌표 자동 확인에 실패했어요. 네트워크를 확인하거나 위도, 경도를 직접 입력해 주세요.'}
   }
 }
 function applyPinName(id){const f=findItem(id);const n=((f&&f.it.pinName)||'').trim();if(!n){toast('적용할 장소명이 없어요');return}
@@ -454,7 +466,7 @@ function mapEmbed(t,i){const all=itemsOf(t,i),ps=all.filter(x=>x.lat!=null),miss
   const base='https://maps.google.com/maps?hl=ko&output=embed&',c=x=>x.lat+','+x.lng;
   const src=ps.length===1?base+'z=15&q='+encodeURIComponent(c(ps[0])+'('+(ps[0].pinName||ps[0].place||'')+')'):base+'saddr='+encodeURIComponent(c(ps[0]))+'&daddr='+ps.slice(1).map(x=>encodeURIComponent(c(x))).join('+to:');
   return `<iframe class="map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${src}"></iframe>`+note}
-function mapLink(t,i){const ps=pinsOf(t,i);if(!ps.length)return'#';const c=x=>x.lat+','+x.lng;
+function mapLink(t,i){const ps=pinsOf(t,i);if(!ps.length)return'#';const c=x=>((x.pinName||x.place||'')+' '+x.lat+','+x.lng).trim();
   if(ps.length===1)return'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(c(ps[0]));
   return`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(c(ps[0]))}&destination=${encodeURIComponent(c(ps[ps.length-1]))}`+(ps.length>2?'&waypoints='+ps.slice(1,-1).map(x=>encodeURIComponent(c(x))).join('%7C'):'')}
 function updTotals(){const t=trip();const d=$('#daytotal');if(d)d.innerHTML=moneyTxt(t,dayTotal(t,S.day))}
@@ -518,26 +530,17 @@ async function refreshShared(){if(!S.shareId)return;toast('불러오는 중…')
   toast(!ok?'불러오지 못했어요. 네트워크를 확인하세요':JSON.stringify(S.viewTrip)===before?'이미 최신이에요':'최신 일정으로 갱신했어요')}
 async function retryShared(){S.loadErr=false;render();await loadShared(S.shareId);render()}
 
-function shareSheet(){const t=trip();const online=/^https?:/.test(location.protocol);const on=!!t.shareId;
-  openModal(`<h2>공유하기</h2><p class="muted" style="margin-top:0">공유되는 화면은 <b>프리뷰만</b> 보이며 편집은 할 수 없어요.</p>
-  ${online?`<button class="btn block" onclick="shareLink()">🔗 ${on?'짧은 링크 복사 · 공유':'짧은 링크 만들기'}</button>
-  ${on?`<p class="muted" style="margin:8px 2px">공유 중이에요. 일정을 고치면 몇 초 안에 링크에 반영되고, 받은 사람은 오른쪽 위 ↻ 버튼이나 새로고침만 하면 돼요.</p><button class="btn ghost block" onclick="pushNow()">지금 바로 반영</button><div style="height:8px"></div><button class="btn danger block" onclick="stopShare()">공유 중단 (링크 끄기)</button>`:''}
-  <div style="height:8px"></div>`:''}
-  <button class="btn ${online?'ghost':''} block" onclick="shareFile()">📄 프리뷰 파일(.html) 보내기</button>
-  ${online?'':'<p class="muted">현재 파일을 직접 열어 사용 중이라 링크 공유는 웹에 올려 열었을 때 가능해요. 프리뷰 파일은 어디서나 열 수 있어요.</p>'}
+function shareSheet(){const t=trip();
+  openModal(`<h2>공유하기</h2><p class="muted" style="margin-top:0">일정 데이터가 포함된 URL을 공유합니다. 받는 사람은 프리뷰로 확인할 수 있어요.</p>
+  <button class="btn block" onclick="shareLink()">🔗 URL 복사 · 공유</button>
+  <div style="height:8px"></div><button class="btn ghost block" onclick="shareFile()">📄 프리뷰 파일(.html) 보내기</button>
   <div style="height:8px"></div><button class="btn danger block" onclick="closeModal()">닫기</button>`)}
 async function deliverLink(url,t){
-  if(navigator.share){try{await navigator.share({title:t.title||'여행 일정',text:(t.title||'여행')+' 일정 미리보기',url});return}catch(e){if(e.name==='AbortError')return}}
-  try{await navigator.clipboard.writeText(url);toast('링크를 복사했어요')}catch(e){prompt('링크를 복사하세요',url)}}
-async function shareLink(){const t=trip();closeModal();toast('링크 만드는 중…');let url='';
-  try{
-    if(t.shareId){try{await blobPut(t.shareId,pub(t))}catch(e){delete t.shareId}}
-    if(!t.shareId)t.shareId=await blobCreate(pub(t));
-    persist(true);url=baseUrl()+'#s='+t.shareId;
-  }catch(e){
-    delete t.shareId;const code=await enc(pub(t));url=baseUrl()+'#v='+code;
-    toast('단축 서비스에 연결하지 못해 긴 링크로 만들었어요')}
-  await deliverLink(url,t)}
+  if(navigator.share){try{await navigator.share({title:t.title||'여행 일정',text:(t.title||'여행')+' 일정 프리뷰',url});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(url);toast('URL을 복사했어요')}catch(e){prompt('URL을 복사하세요',url)}}
+async function shareLink(){const t=trip();closeModal();toast('공유 URL 만드는 중…');
+  try{const code=await enc(pub(t));const url=baseUrl()+'#v='+code;await deliverLink(url,t)}
+  catch(e){toast('URL을 만들지 못했어요. 다시 시도해 주세요')}}
 async function shareFile(){const t=pub();closeModal();
   const json=JSON.stringify(t).replace(/</g,'\\u003c');
   const html=SRC.replace(/<script id="shared">[\s\S]*?<\/script>/,'').replace('<head>','<head><script id="shared">window.__SHARED__='+json+'<\/script>');
