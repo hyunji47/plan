@@ -403,7 +403,13 @@ function moveItem(id,d){const f=findItem(id),j=f.i+d;if(j<0||j>=f.a.length)retur
 function sortItems(){const a=itemsOf(trip(),S.day);a.sort((x,y)=>(x.time||'99').localeCompare(y.time||'99'));persist();render();toast('시간순으로 정렬했어요')}
 const isGmap=u=>/^https:\/\/((www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+|goo\.gl\/maps|maps\.app\.goo\.gl)([\/?#]|$)/.test(u||'');
 function searchMap(id){
-  window.open('https://www.google.com/maps','_blank','noopener');
+  const f=findItem(id);if(!f)return;
+  const it=f.it;
+  // URL이 있으면 해당 URL로, URL 없이 좌표만 있으면 좌표 위치로, 둘 다 없으면 검색 없는 구글맵 기본 화면으로 이동
+  const target=it.url||(it.lat!=null&&it.lng!=null
+    ?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.lat+','+it.lng)
+    :'https://www.google.com/maps');
+  window.open(target,'_blank','noopener');
 }
 function parsePin(raw){const t=(raw||'').trim();if(!t)return{};
   const um=t.match(/https?:\/\/[^\s]+/);const link=um?um[0]:'';const url=isGmap(link)?link:'';
