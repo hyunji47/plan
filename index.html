@@ -41,7 +41,28 @@ input:focus,select:focus{border-color:var(--accent)}
 .tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .tab small{display:block;opacity:.75;font-size:11px}
 .item{position:relative}
-.item .tm{flex:none;width:112px}
+.card.item{padding:0;overflow:hidden}
+.ih{display:flex;align-items:center;gap:6px;padding:8px 8px 8px 12px;background:var(--card2);border-bottom:1px solid var(--line)}
+.ih .no{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.ih .tm{width:auto;flex:none;padding:6px 8px;font-weight:700;background:var(--card)}
+.ih .sp{flex:1}
+.mini{border:0;background:none;color:var(--sub);width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.mini:active{background:var(--line)}
+.mini:disabled{opacity:.25;cursor:default}
+.mini.del{opacity:.55}.mini.del:active{color:var(--danger);opacity:1}
+.ibody{padding:12px;display:flex;flex-direction:column;gap:12px}
+.ibody input.pl{font-size:16px;font-weight:600}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.fld{min-width:0}
+.fld>span{display:block;font-size:11px;font-weight:600;color:var(--sub);margin-bottom:5px}
+.inl{display:flex;gap:6px;align-items:center}
+.inl small{color:var(--sub);font-size:12px;flex:none}
+.inl select{width:auto;flex:none}
+.inl .n{width:62px;max-width:none;flex:none}
+.inl .pinbtn{flex:none}
+.ibody input.memo{background:transparent;border-style:dashed}
+.pinst:empty{display:none}
+.pinst{margin-top:6px}
 .ctl{display:flex;gap:6px;justify-content:flex-end;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
 .pinst{font-size:12px;color:var(--sub);margin-top:6px;word-break:break-all}
 .n{max-width:74px;flex:none}
@@ -72,6 +93,20 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .trash{border:0;background:none;color:var(--sub);opacity:.5;width:36px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .trash:hover,.trash:active{opacity:.9;color:var(--danger);background:var(--card2)}
+.pinbtn{border:0;background:var(--accent2);color:var(--accent);width:40px;height:40px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pinbtn.on{background:var(--accent);color:#fff}
+.phero{position:relative;margin:-12px -14px 0;min-height:230px;background:linear-gradient(135deg,#3560e8,#8fb2ff) center/cover no-repeat;display:flex;align-items:flex-end;border-radius:0 0 26px 26px;overflow:hidden}
+.pov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,12,24,.82),rgba(8,12,24,.2) 62%,rgba(8,12,24,.1))}
+.pin{position:relative;width:100%;padding:56px 18px 40px;color:#fff}
+.pchips{display:flex;gap:6px;flex-wrap:wrap}
+.pchip{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.pin h2{font-size:28px;line-height:1.2;margin:10px 0 6px;color:#fff;text-shadow:none;text-wrap:balance;word-break:keep-all}
+.pdate{font-size:13px;opacity:.92;font-variant-numeric:tabular-nums}
+.pstats{position:relative;margin:-26px 0 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.pstats>div{padding:12px 6px;text-align:center;border-right:1px solid var(--line);min-width:0}
+.pstats>div:last-child{border-right:0}
+.pstats b{display:block;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.pstats small{display:block;font-size:11px;color:var(--sub);margin-top:3px}
 .trash.edit:hover,.trash.edit:active{color:var(--accent)}
 #drawer{position:fixed;inset:0;z-index:70;visibility:hidden;background:rgba(0,0,0,0);transition:background .25s,visibility 0s .25s}
 #drawer.on{visibility:visible;background:rgba(0,0,0,.45);transition:background .25s}
@@ -194,12 +229,12 @@ async function wiki(q){try{const j=await (await fetch('https://en.wikipedia.org/
 async function findImages(qs){for(const q of qs){const l=await commons(q);if(l.length)return l}
   for(const q of qs.slice(-2)){const l=await wiki(q);if(l.length)return l}return[]}
 async function loadBg(qs,key,t){
-  S.bgKey=key;const imgs=await findImages(qs);if(S.bgKey!==key||!imgs.length)return;
+  S.bgKey=key;S.bgUrl=null;const imgs=await findImages(qs);if(S.bgKey!==key||!imgs.length)return;
   if(PICK[key]==null)PICK[key]=Math.random();
   const im=imgs[Math.floor(PICK[key]*imgs.length)];
   const pre=new Image();pre.onload=()=>{if(S.bgKey!==key)return;const b=$('#bg');b.style.opacity=0;setTimeout(()=>{b.style.backgroundImage=`url("${im.url}")`;b.style.opacity=1},200);
     if(t&&!S.view){t.img=im.url;persist()}
-    S.credit=im;const c=$('#credit');if(c)c.innerHTML=creditHtml()};
+    S.credit=im;S.bgUrl=im.url;const hh=$('#heroimg');if(hh)hh.style.backgroundImage='url("'+cssUrl(im.url)+'")';const c=$('#credit');if(c)c.innerHTML=creditHtml()};
   pre.src=im.url;
 }
 const creditHtml=()=>S.credit?`사진: <a href="${esc(S.credit.page||'#')}" target="_blank" rel="noopener">${esc(S.credit.title)}</a> · Wikimedia Commons`:'';
@@ -307,7 +342,7 @@ function selDay(i){S.day=i;render()}
 function addItem(){const t=trip(),a=itemsOf(t,S.day);let time='09:00';
   const l=a[a.length-1];if(l&&l.time){const [h,m]=l.time.split(':').map(Number);let x=h*60+m+(+l.hh||0)*60+(+l.mm||0)+(l.hh||l.mm?0:60);x=Math.min(x,23*60+30);time=String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')}
   a.push({id:uid(),time,place:'',hh:'',mm:'',amount:'',cur:t.currency==='KRW'?'KRW':'LOCAL',memo:'',pinText:'',url:'',lat:null,lng:null});persist();render();
-  setTimeout(()=>{const e=$('#app .item:last-of-type .pl');e&&e.focus()},50)}
+  setTimeout(()=>{const e=[...document.querySelectorAll('.item .pl')].pop();e&&e.focus()},50)}
 function delItem(id){const f=findItem(id);f.a.splice(f.i,1);persist();render()}
 function moveItem(id,d){const f=findItem(id),j=f.i+d;if(j<0||j>=f.a.length)return;[f.a[f.i],f.a[j]]=[f.a[j],f.a[f.i]];persist();const y=scrollY;render();scrollTo(0,y)}
 function sortItems(){const a=itemsOf(trip(),S.day);a.sort((x,y)=>(x.time||'99').localeCompare(y.time||'99'));persist();render();toast('시간순으로 정렬했어요')}
@@ -319,7 +354,8 @@ function parsePin(t){t=(t||'').trim();if(!t)return{};
   const m=t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||t.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||t.match(/[?&](?:q|ll|query|destination)=(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||t.match(/^\s*(-?\d{1,3}\.\d+)\s*[, ]\s*(-?\d{1,3}\.\d+)\s*$/);
   const url=/^https?:/.test(t)?t:'';return m?{lat:+m[1],lng:+m[2],url}:{url}}
 function setPin(id,text){const f=findItem(id);const p=parsePin(text);Object.assign(f.it,{pinText:text,lat:p.lat??null,lng:p.lng??null,url:p.url||''});persist();
-  const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(f.it);refreshDerived()}
+  const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(f.it);
+  const b=$('#pb-'+id);if(b)b.classList.toggle('on',f.it.lat!=null);refreshDerived()}
 const pinStatus=it=>it.lat!=null?`📌 핀 지정됨 (${it.lat.toFixed(5)}, ${it.lng.toFixed(5)})`:it.url?'🔗 링크 저장됨 (좌표를 읽지 못해 장소명으로 지도에 표시)':'';
 function ptOf(t,it){if(it.lat!=null)return it.lat+','+it.lng;if(it.place)return it.place+' '+(t.city||t.country);return null}
 function mapEmbed(t,i){const pts=itemsOf(t,i).map(x=>ptOf(t,x)).filter(Boolean);
@@ -380,7 +416,7 @@ function screenList(){const ts=S.store.trips;
   let h=`<div class="hero"><h2>어디로 떠날까요?</h2><div class="muted" style="color:var(--text);opacity:.75">저장된 여행을 선택하거나, 오른쪽 위 ☰ 메뉴에서 새 여행을 추가하세요.</div></div>`;
   if(!ts.length)h+=`<div class="card" style="text-align:center;padding:30px 14px"><div style="font-size:42px">🧳</div><p class="muted">아직 계획한 여행이 없어요.</p><button class="btn" onclick="newTrip()">＋ 새 여행 추가</button></div>`;
   ts.forEach(t=>{const ci=cInfo(t.country);const n=dayCount(t);
-    h+=`<div class="card trip"><div class="th" style="${(t.thumb||t.img)?`background-image:url('${esc(t.thumb||t.img)}')`:''}" onclick="openTrip('${t.id}')">${(t.thumb||t.img)?'':flag(ci.i)}</div>
+    h+=`<div class="card trip"><div class="th" style="${(t.thumb||t.img)?`background-image:url('${cssUrl(t.thumb||t.img)}')`:''}" onclick="openTrip('${t.id}')">${(t.thumb||t.img)?'':flag(ci.i)}</div>
     <div class="tb"><div onclick="openTrip('${t.id}')"><b>${esc(t.title||'제목 없음')}</b><span class="muted">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><br><span class="muted">${t.start.slice(5).replace('-','/')} ~ ${t.end.slice(5).replace('-','/')} · ${n}일</span><span class="badge">${ddayBadge(t)}</span></div>
     <div style="display:flex;gap:4px;margin-top:6px;align-items:center;justify-content:space-between"><button class="btn ghost xs" onclick="go('preview','${t.id}')">프리뷰</button><span style="display:flex;gap:2px"><button class="trash edit" onclick="go('info','${t.id}')" aria-label="여행 정보 편집"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button><button class="trash" onclick="delTrip('${t.id}')" aria-label="여행 삭제"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></span></div></div></div>`});
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
@@ -397,7 +433,7 @@ function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   <label class="f">여행 기간</label>
   <div class="row" style="margin-top:0"><input type="date" value="${t.start}" onchange="setField('start',this.value)"><span class="fix">~</span><input type="date" value="${t.end}" onchange="setField('end',this.value)"></div>
   <div class="muted" style="margin-top:6px">${n-1}박 ${n}일</div></div>
-  <div class="card"><h2>🖼️ 대표 썸네일</h2><div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:90px;border-radius:12px;background:var(--accent2) center/cover;flex:none;display:flex;align-items:center;justify-content:center;font-size:30px;${(t.thumb||t.img)?`background-image:url('${esc(t.thumb||t.img)}')`:''}">${(t.thumb||t.img)?'':flag(ci.i)}</div><div style="flex:1;min-width:0"><div class="muted">${t.thumb?'내가 등록한 사진을 사용 중이에요':t.img?'도시 사진이 자동으로 쓰이고 있어요':'등록하지 않으면 도시 사진이 자동으로 쓰여요'}</div><div class="row"><button class="btn ghost sm" onclick="pickThumb()">사진 등록</button>${t.thumb?'<button class="btn danger sm" onclick="clearThumb()">제거</button>':''}</div></div></div></div>`;
+  <div class="card"><h2>🖼️ 대표 썸네일</h2><div style="display:flex;gap:12px;align-items:center"><div style="width:120px;height:90px;border-radius:12px;background:var(--accent2) center/cover;flex:none;display:flex;align-items:center;justify-content:center;font-size:30px;${(t.thumb||t.img)?`background-image:url('${cssUrl(t.thumb||t.img)}')`:''}">${(t.thumb||t.img)?'':flag(ci.i)}</div><div style="flex:1;min-width:0"><div class="muted">${t.thumb?'내가 등록한 사진을 사용 중이에요':t.img?'도시 사진이 자동으로 쓰이고 있어요':'등록하지 않으면 도시 사진이 자동으로 쓰여요'}</div><div class="row"><button class="btn ghost sm" onclick="pickThumb()">사진 등록</button>${t.thumb?'<button class="btn danger sm" onclick="clearThumb()">제거</button>':''}</div></div></div></div>`;
   if(t.currency!=='KRW'){
     h+=`<div class="card"><h2>💱 환율 정보 (${t.currency})</h2>
     <div style="font-size:22px;font-weight:800">1${unit>1?'00':''} ${t.currency} ≈ ${fmt2(krwPer(t.currency)*unit)} KRW</div>
@@ -410,17 +446,23 @@ function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   else h+=`<div class="card"><h2>💱 환율 정보</h2><div class="muted">국내 여행은 원화(KRW)로 계산돼요.</div></div>`;
   return h+`<button class="btn block" style="padding:14px" onclick="saveNow();go('plan')">저장하고 루트 계획하기 →</button><div class="credit" id="credit">${creditHtml()}</div>`}
 function dayTabs(t,cur,fn){let h='<div class="tabs">';for(let i=0;i<dayCount(t);i++){const d=dateOfDay(t,i);h+=`<button class="tab ${i===cur?'on':''}" onclick="${fn}(${i})">${i+1}일차<small>${dlabel(d)}</small></button>`}return h+'</div>'}
-function itemCard(t,it,i,n){const lc=t.currency;
-  return `<div class="card item" id="it-${it.id}">
-  <div class="row" style="margin-top:0"><input class="tm" type="time" value="${it.time||''}" onchange="setItem('${it.id}','time',this.value)"><input class="pl" placeholder="장소 (예: 센소지)" value="${esc(it.place)}" oninput="setItem('${it.id}','place',this.value)" onchange="refreshDerived()"></div>
-  <div class="row"><span class="muted fix">소요</span><input class="n" type="number" min="0" placeholder="0" value="${it.hh}" onchange="setItem('${it.id}','hh',this.value)"><span class="muted fix">시간</span><input class="n" type="number" min="0" max="59" placeholder="0" value="${it.mm}" onchange="setItem('${it.id}','mm',this.value)"><span class="muted fix">분</span></div>
-  <div class="row"><input type="number" inputmode="decimal" placeholder="금액" value="${it.amount}" oninput="setItem('${it.id}','amount',this.value)" onchange="refreshDerived()">
-  <select class="fix" style="width:auto" onchange="setItem('${it.id}','cur',this.value);refreshDerived()"><option value="KRW" ${it.cur==='KRW'?'selected':''}>₩ 원(KRW)</option>${lc!=='KRW'?`<option value="LOCAL" ${it.cur==='LOCAL'?'selected':''}>${lc}</option>`:''}</select></div>
-  <div class="row"><button class="btn ghost sm block" onclick="searchMap('${it.id}')">📍 구글맵에서 검색 · 핀 지정</button></div>
-  <div class="row"><input placeholder="구글맵 링크 / 좌표 붙여넣기" value="${esc(it.pinText||'')}" onchange="setPin('${it.id}',this.value)"></div>
-  <div class="pinst" id="pin-${it.id}">${pinStatus(it)}</div>
-  <div class="row"><input placeholder="메모 (선택)" value="${esc(it.memo)}" oninput="setItem('${it.id}','memo',this.value)"></div>
-  <div class="ctl"><button class="ib" ${i===0?'disabled style="opacity:.3"':''} onclick="moveItem('${it.id}',-1)">↑</button><button class="ib" ${i===n-1?'disabled style="opacity:.3"':''} onclick="moveItem('${it.id}',1)">↓</button><button class="ib" style="color:var(--danger)" onclick="delItem('${it.id}')">🗑</button></div></div>`}
+function itemCard(t,it,i,n){const lc=t.currency,id=it.id;
+  const ic=d=>`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  return `<div class="card item" id="it-${id}">
+  <div class="ih"><span class="no">${i+1}</span><input class="tm" type="time" value="${it.time||''}" onchange="setItem('${id}','time',this.value)" aria-label="시작 시간"><span class="sp"></span>
+    <button class="mini" ${i===0?'disabled':''} onclick="moveItem('${id}',-1)" aria-label="위로 이동">${ic('<path d="M6 15l6-6 6 6"/>')}</button>
+    <button class="mini" ${i===n-1?'disabled':''} onclick="moveItem('${id}',1)" aria-label="아래로 이동">${ic('<path d="M6 9l6 6 6-6"/>')}</button>
+    <button class="mini del" onclick="delItem('${id}')" aria-label="일정 삭제">${ic('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/>')}</button></div>
+  <div class="ibody">
+    <input class="pl" placeholder="장소 (예: 센소지)" value="${esc(it.place)}" oninput="setItem('${id}','place',this.value)" onchange="refreshDerived()">
+    <div class="g2">
+      <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${it.hh}" onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${it.mm}" onchange="setItem('${id}','mm',this.value)"><small>분</small></div></div>
+      <div class="fld"><span>금액</span><div class="inl"><input type="number" inputmode="decimal" placeholder="0" value="${it.amount}" oninput="setItem('${id}','amount',this.value)" onchange="refreshDerived()"><select onchange="setItem('${id}','cur',this.value);refreshDerived()"><option value="KRW" ${it.cur==='KRW'?'selected':''}>₩ 원</option>${lc!=='KRW'?`<option value="LOCAL" ${it.cur==='LOCAL'?'selected':''}>${lc}</option>`:''}</select></div></div>
+    </div>
+    <div class="fld"><span>지도 위치</span><div class="inl"><input placeholder="구글맵 링크 / 좌표 붙여넣기" value="${esc(it.pinText||'')}" onchange="setPin('${id}',this.value)"><button class="pinbtn ${it.lat!=null?'on':''}" id="pb-${id}" onclick="searchMap('${id}')" title="구글맵에서 검색 · 핀 지정" aria-label="구글맵에서 검색 · 핀 지정"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></button></div>
+      <div class="pinst" id="pin-${id}">${pinStatus(it)}</div></div>
+    <input class="memo" placeholder="메모 (선택)" value="${esc(it.memo)}" oninput="setItem('${id}','memo',this.value)">
+  </div></div>`}
 function screenPlan(){const t=trip();const a=itemsOf(t,S.day);const d=dateOfDay(t,S.day);
   let h=`<div style="height:6px"></div>${dayTabs(t,S.day,'selDay')}
   <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>${S.day+1}일차 · ${dlabel(d)}</b><div class="muted">${a.length}개 일정</div></div><div style="text-align:right"><div class="muted">하루 예상 금액</div><b id="daytotal">${moneyTxt(t,dayTotal(t,S.day))}</b></div></div>`;
@@ -432,13 +474,22 @@ function screenPlan(){const t=trip();const a=itemsOf(t,S.day);const d=dateOfDay(
 function hlInfo(t,i,it){if(!it.time)return null;const [h,m]=it.time.split(':').map(Number);const d=dateOfDay(t,i);d.setHours(h,m,0,0);
   const diff=Date.now()-d.getTime();return Math.abs(diff)<=3600e3?{before:diff<0}:null}
 function selPDay(i){S.pday=i;render()}
+const cssUrl=u=>String(u).replace(/['"()\s\\]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase().padStart(2,'0'));
+function previewHero(t,ci,n,cnt){
+  const fd=d=>d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+'('+WD[d.getDay()]+')';
+  const td=Math.round((new Date().setHours(0,0,0,0)-parseD(t.start))/864e5);
+  const dd=td<0?'D-'+(-td):td>=n?'여행 종료':'여행 '+(td+1)+'일차';
+  const img=t.thumb||t.img||S.bgUrl||'';
+  const tot=totalAll(t);
+  const sub=t.currency!=='KRW'&&t.rate?'≈ '+fmt(tot/t.rate)+' '+t.currency:'원화 기준';
+  return `<div class="phero" id="heroimg" ${img?'style="background-image:url(\''+cssUrl(img)+'\')"':''}><div class="pov"></div><div class="pin">
+    <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><span class="pchip">${dd}</span></div>
+    <h2>${esc(t.title||'나의 여행')}</h2><div class="pdate">${fd(parseD(t.start))} – ${fd(parseD(t.end))}</div></div></div>
+  <div class="pstats"><div><b>${n-1}박 ${n}일</b><small>기간</small></div><div><b>${cnt}곳</b><small>방문 장소</small></div><div><b>₩${fmt(tot)}</b><small>예상 경비 · ${sub}</small></div></div>
+  ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
   const cnt=Object.keys(t.items).reduce((s,k)=>+k<n?s+t.items[k].length:s,0);
-  let h=`<div class="hero"><h2>${flag(ci.i)} ${esc(t.title||'여행')}</h2><div style="opacity:.8">${esc(t.country)}${t.city?' · '+esc(t.city):''}</div></div>
-  <div class="card"><div class="kv"><span>기간</span><b>${t.start.replace(/-/g,'.')} ~ ${t.end.replace(/-/g,'.')}</b></div>
-  <div class="kv"><span>일정</span><b>${n-1}박 ${n}일 · ${cnt}개 장소</b></div>
-  ${t.currency!=='KRW'?`<div class="kv"><span>환율</span><b>1 ${t.currency} = ${fmt2(t.rate)} KRW</b></div>`:''}
-  <div class="kv"><span>예상 총 경비</span><b>${moneyTxt(t,totalAll(t))}</b></div></div>`;
+  let h=previewHero(t,ci,n,cnt);
   if(!S.view)h+=`<button class="btn block" onclick="shareSheet()" style="margin-bottom:12px">📤 프리뷰 공유하기</button>`;
   else h+=`<div class="muted" style="text-align:center;margin-bottom:10px">공유된 프리뷰 화면입니다</div>`;
   h+=dayTabs(t,S.pday,'selPDay');
