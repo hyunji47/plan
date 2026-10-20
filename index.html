@@ -107,6 +107,10 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .pstats>div:last-child{border-right:0}
 .pstats b{display:block;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .pstats small{display:block;font-size:11px;color:var(--sub);margin-top:3px}
+.ev.hasp{padding-right:44px}
+.evpin{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);background:var(--accent2);text-decoration:none}
+.evpin:active{background:var(--accent);color:#fff}
+.ev.hl .evpin{background:var(--card)}
 .item input,.item select{padding:6px 8px;font-size:14px;border-radius:8px}
 .item .no{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
 .item.open{border-color:var(--accent)}
@@ -523,11 +527,11 @@ function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   h+=dayTabs(t,S.pday,'selPDay');
   h+=`<div class="muted" style="margin:0 2px 8px">${S.pday+1}일차 · ${dlabel(dateOfDay(t,S.pday))} · ${moneyTxt(t,dayTotal(t,S.pday))}</div>`;
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">이 날은 등록된 일정이 없어요.</div>`;
-  else{h+='<div class="tl">';a.forEach(it=>{const hl=hlInfo(t,S.pday,it);const dur=(+it.hh?it.hh+'시간 ':'')+(+it.mm?it.mm+'분':'');
+  else{h+='<div class="tl">';a.forEach(it=>{const hl=hlInfo(t,S.pday,it);const pin=(it.lat!=null||it.url)&&ptOf(t,it);const dur=(+it.hh?it.hh+'시간 ':'')+(+it.mm?it.mm+'분':'');
     const amt=+it.amount?`${fmt2(+it.amount)} ${it.cur==='KRW'?'원':t.currency}`:'';
-    h+=`<div class="ev ${hl?'hl':''}" ${hl?'id="hlnow"':''}><div class="t">${it.time||'--:--'}${hl?`<span class="nowtag">${hl.before?'곧 시작':'지금 진행'}</span>`:''}</div>
+    h+=`<div class="ev ${hl?'hl':''}${pin?' hasp':''}" ${hl?'id="hlnow"':''}>${pin?`<a class="evpin" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(pin)}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`:''}<div class="t">${it.time||'--:--'}${hl?`<span class="nowtag">${hl.before?'곧 시작':'지금 진행'}</span>`:''}</div>
     <div class="p">${esc(it.place||'(장소 미입력)')}</div>
-    <div class="muted">${[dur&&'⏱ '+dur,amt&&'💰 '+amt,it.lat!=null||it.url?'📌 핀':''].filter(Boolean).join(' · ')}</div>${it.memo?`<div style="margin-top:4px;font-size:13px">${esc(it.memo)}</div>`:''}</div>`});h+='</div>'}
+    <div class="muted">${[dur&&'⏱ '+dur,amt&&'💰 '+amt].filter(Boolean).join(' · ')}</div>${it.memo?`<div style="margin-top:4px;font-size:13px">${esc(it.memo)}</div>`:''}</div>`});h+='</div>'}
   h+=`<details class="card"><summary>🗺️ ${S.pday+1}일차 루트 지도 보기</summary><div style="margin:8px 0">${modeSel()}</div><div id="pmap">${mapBox(t,S.pday)}</div></details>`;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 
