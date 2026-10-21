@@ -123,10 +123,15 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .imt button{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:0;background:rgba(20,24,36,.78);color:#fff;font-size:14px;line-height:1;cursor:pointer;padding:0}
 .imadd{width:76px;height:76px;border-radius:10px;border:1.5px dashed var(--line);background:transparent;color:var(--sub);font-size:22px;line-height:1;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .imadd small{font-size:11px}
-.evimgs{display:grid;gap:6px;margin-top:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.evimgs{display:grid;gap:6px;margin:14px 0 12px;grid-template-columns:repeat(3,minmax(0,1fr))}
 .evimgs.n1{grid-template-columns:1fr}.evimgs.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .evimgs img{width:100%;height:96px;object-fit:cover;border-radius:10px;display:block;cursor:zoom-in;background:var(--card2)}
 .evimgs.n1 img{height:auto;max-height:220px}
+.mapd{margin:26px 0 8px;padding:14px 16px;border-radius:16px;background:var(--accent2);border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent)}
+.mapd summary{font-weight:700;color:var(--accent);cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+.mapd summary::-webkit-details-marker{display:none}
+.mapd summary:after{content:"＋";margin-left:auto;font-size:18px;line-height:1}
+.mapd[open] summary:after{content:"−"}
 .pstats small.ico{margin:0 0 3px;font-size:12px}
 .pstats small{display:block;font-size:11px;color:var(--sub);margin-top:3px}
 .ev.hasp{padding-right:44px}
@@ -152,7 +157,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .g2in .inl{position:relative}
 .g2in .inl input{flex:1 1 auto;width:100%;padding-right:30px}
 .g2in .inl .rmsub{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:var(--card)}
-.ev.hasp .subs{margin-right:-34px}
+.ev.hasp .subs,.ev.hasp .evimgs{margin-right:-34px}
 .ev .dur{font-weight:600;color:var(--sub);font-size:12px;margin-left:8px}
 .ev .pn{font-size:12px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev .memo{margin-top:6px;font-size:13px;color:var(--sub);opacity:.82;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -910,7 +915,7 @@ function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
     const subHtml=subs.length?`<div class="subs">${ss&&+it.amount?`<div class="sr"><span>기본 금액</span><b>${fmt2(+it.amount)} ${unit}</b></div>`:''}${subs.map(s=>`<div class="sr"><span>${esc(s.name||'상세 일정')}</span>${+s.amt?`<b>${fmt2(+s.amt)} ${unit}</b>`:''}</div>`).join('')}${ss?`<div class="sr tot"><span>합계</span><b>${fmt2(tot)} ${unit}</b></div>`:''}</div>`:'';
     h+=`<div class="ev${hl?' hl':''}${hasPin?' hasp':''}" ${hl?'id="hlnow"':''}>${hasPin?`<a class="evpin" href="${esc(pinHref)}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`:''}<div class="t">${esc(timeTxt(it))}${dur?`<span class="dur">⏱ ${dur}</span>`:''}${hl?'<span class="nowtag">지금 진행</span>':''}</div>
     <div class="p">${esc(it.place||'(일정 미입력)')}</div>${meta}${it.memo?`<div class="memo">${esc(it.memo)}</div>`:''}${(it.imgs&&it.imgs.length)?`<div class="evimgs n${it.imgs.length}">${it.imgs.filter(okImg).map(src=>`<img src="${src}" alt="" loading="lazy" onclick="zoomImg(this.src)">`).join('')}</div>`:''}${subHtml}</div>`});h+='</div>'}
-  h+=`<details class="card" ontoggle="if(this.open)initPMap()"><summary>🗺️ ${S.pday+1}일차 핀 지도 보기</summary><div id="lmap" style="margin-top:8px"></div></details>`;
+  h+=`<details class="mapd" ontoggle="if(this.open)initPMap()"><summary>🗺️ ${S.pday+1}일차 핀 지도 보기</summary><div id="lmap" style="margin-top:8px"></div></details>`;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 
 /* 프리뷰 지도: 핀을 지정한 장소만 고정 마커로 표시 (Leaflet + OpenStreetMap) */
