@@ -132,10 +132,16 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .mapd summary::-webkit-details-marker{display:none}
 .mapd summary:after{content:"＋";margin-left:auto;font-size:18px;line-height:1}
 .mapd[open] summary:after{content:"−"}
+.pinrow+.pinrow{margin-top:8px}
+.plabel{flex:0 0 31%;min-width:0;width:31%}
+.pcnt{position:absolute;top:-4px;right:-4px;min-width:15px;height:15px;border-radius:8px;background:var(--accent);color:#fff;font:700 10px/15px system-ui;font-style:normal;text-align:center;padding:0 3px;box-sizing:border-box}
+.pickpin{display:flex;align-items:center;gap:8px;padding:13px 14px;border-radius:12px;background:var(--card2);color:var(--text);text-decoration:none;border:1px solid var(--line)}
+.pickpin b{font-size:15px}.pickpin small{color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pickpin span{margin-left:auto;color:var(--sub);font-size:18px}
 .pstats small.ico{margin:0 0 3px;font-size:12px}
 .pstats small{display:block;font-size:11px;color:var(--sub);margin-top:3px}
-.ev.hasp{padding-right:44px}
-.evpin{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);background:var(--accent2);text-decoration:none}
+.ev.hasp{padding-right:var(--pr,44px)}
+.evpin{position:absolute;top:8px;right:8px;border:0;padding:0;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);background:var(--accent2);text-decoration:none}
 .evpin:active{background:var(--accent);color:#fff}
 
 .item input,.item select{padding:6px 8px;font-size:14px;border-radius:8px}
@@ -157,7 +163,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .g2in .inl{position:relative}
 .g2in .inl input{flex:1 1 auto;width:100%;padding-right:30px}
 .g2in .inl .rmsub{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:var(--card)}
-.ev.hasp .subs,.ev.hasp .evimgs{margin-right:-34px}
+.ev.hasp .subs,.ev.hasp .evimgs{margin-right:calc(10px - var(--pr,44px))}
 .ev .dur{font-weight:600;color:var(--sub);font-size:12px;margin-left:8px}
 .ev .pn{font-size:12px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev .memo{margin-top:6px;font-size:13px;color:var(--sub);opacity:.82;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -469,9 +475,9 @@ function googleMapHref(it){
   }
   return (it&&it.url)||'https://www.google.com/maps';
 }
-function searchMap(id){
-  const f=findItem(id);if(!f)return;
-  window.open(googleMapHref(f.it),'_blank','noopener');
+function searchMap(id,k){
+  const f=findItem(id);if(!f)return;const p=k==null?f.it:(f.it.more||[])[k];if(!p)return;
+  window.open(googleMapHref(Object.assign({place:f.it.place},p)),'_blank','noopener');
 }
 /* 플러스 코드(Open Location Code) / 도분초(DMS) 좌표 해석 */
 const OLC='23456789CFGHJMPQRVWX',OLCRES=[20,1,0.05,0.0025,0.000125];
@@ -526,52 +532,58 @@ async function reverseGeocode(lat,lng){
   for(const fn of providers){try{const name=await fn();if(name&&name.trim())return name.trim()}catch(_){} }
   return '';
 }
-async function setPin(id,text){const f=findItem(id);if(!f)return;const p=parsePin(text);const it=f.it;
+async function setPin(id,text,k){
+  if(!findItem(id))return;
+  const tg=()=>{const f=findItem(id);if(!f)return null;return k==null?f.it:((f.it.more||[])[k]||null)};
+  const sfx=k==null?'':'-'+k,el=()=>$('#pin-'+id+sfx);
+  const upd=()=>{const t0=tg();if(!t0)return;const e=el();if(e)e.innerHTML=pinStatus(t0);const b=$('#pb-'+id+sfx);if(b)b.classList.toggle('on',t0.lat!=null);refreshDerived()};
+  const p=parsePin(text);const it=tg();if(!it)return;
   Object.assign(it,{pinText:text,lat:p.lat??null,lng:p.lng??null,url:p.url||'',pinName:p.name||it.pinName||''});
-  persist();
-  const e=$('#pin-'+id);if(e)e.innerHTML=pinStatus(it);
-  const b=$('#pb-'+id);if(b)b.classList.toggle('on',it.lat!=null);refreshDerived();
+  persist();upd();
   // 좌표가 직접 입력되었거나 URL에서 좌표를 추출한 경우 장소명을 역지오코딩합니다.
   if(it.lat!=null&&it.lng!=null&&!p.name){
-    if(e)e.innerHTML='⏳ 좌표의 장소명을 확인하는 중…';
-    const lat=it.lat,lng=it.lng;
-    const name=await reverseGeocode(lat,lng);
-    const latest=findItem(id);
-    if(name&&latest&&latest.it.pinText===text&&latest.it.lat===lat&&latest.it.lng===lng){
-      latest.it.pinName=name;persist();
-      const el=$('#pin-'+id);if(el)el.innerHTML=pinStatus(latest.it);
-      refreshDerived();
-    }else if(e)e.innerHTML=pinStatus(it)+(name?'': ' · 장소명 확인 실패(좌표 핀은 사용 가능)');
+    const e=el();if(e)e.innerHTML='⏳ 좌표의 장소명을 확인하는 중…';
+    const lat=it.lat,lng=it.lng;const name=await reverseGeocode(lat,lng);const t0=tg();
+    if(name&&t0&&t0.pinText===text&&t0.lat===lat&&t0.lng===lng){t0.pinName=name;persist();upd()}
+    else{const e2=el();if(e2&&t0)e2.innerHTML=pinStatus(t0)+(name?'':' · 장소명 확인 실패(좌표 핀은 사용 가능)')}
   }
   // 짧은 플러스 코드: 기준 위치로 전체 좌표를 복원
   if(it.lat==null&&p.plus){
-    if(e)e.innerHTML='⏳ 플러스 코드 위치를 확인하는 중…';
-    const ref=await plusRef(id,p.plus);const ll=ref&&olcRecover(p.plus.code,ref);
-    const latest=findItem(id);
-    if(ll&&latest&&latest.it.pinText===text){
-      latest.it.lat=ll.lat;latest.it.lng=ll.lng;persist();const el=$('#pin-'+id);if(el)el.innerHTML=pinStatus(latest.it);
-      const btn=$('#pb-'+id);if(btn)btn.classList.toggle('on',true);refreshDerived();
-      const nm=await reverseGeocode(ll.lat,ll.lng);const l2=findItem(id);
-      if(nm&&l2&&l2.it.pinText===text){l2.it.pinName=nm;persist();const e2=$('#pin-'+id);if(e2)e2.innerHTML=pinStatus(l2.it);refreshDerived()}
-    }else if(e)e.innerHTML='⚠️ 플러스 코드 위치를 찾지 못했어요. 코드 뒤에 도시명을 같이 붙여넣거나(예: MM8W+C9 후쿠오카), 8자리 전체 코드나 좌표를 입력해 주세요.';
+    const e=el();if(e)e.innerHTML='⏳ 플러스 코드 위치를 확인하는 중…';
+    const ref=await plusRef(id,p.plus);const ll=ref&&olcRecover(p.plus.code,ref);const t0=tg();
+    if(ll&&t0&&t0.pinText===text){
+      t0.lat=ll.lat;t0.lng=ll.lng;persist();upd();
+      const nm=await reverseGeocode(ll.lat,ll.lng);const t1=tg();
+      if(nm&&t1&&t1.pinText===text){t1.pinName=nm;persist();upd()}
+    }else{const e2=el();if(e2)e2.innerHTML='⚠️ 플러스 코드 위치를 찾지 못했어요. 코드 뒤에 도시명을 같이 붙여넣거나(예: MM8W+C9 후쿠오카), 8자리 전체 코드나 좌표를 입력해 주세요.'}
   }
   // URL에 좌표가 없으면 URL에서 읽은 장소명을 지오코딩해 핀을 지정합니다.
   if(it.url&&it.lat==null&&p.name){
-    if(e)e.innerHTML='⏳ 장소 좌표를 확인하는 중…';
+    const e=el();if(e)e.innerHTML='⏳ 장소 좌표를 확인하는 중…';
     const queries=[p.name, p.name+', Japan', p.name+', South Korea'];let hit=null;
     for(const q of queries){try{const r=await fetch('https://photon.komoot.io/api/?limit=1&lang=en&q='+encodeURIComponent(q));if(r.ok){const j=await r.json();const ft=j&&j.features&&j.features[0];if(ft&&ft.geometry&&ft.geometry.coordinates){const xy=ft.geometry.coordinates;hit={lat:xy[1],lng:xy[0],name:(ft.properties&&ft.properties.name)||p.name};break;}}}catch(_){}}
     if(!hit){for(const q of queries){try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=en&q='+encodeURIComponent(q));if(r.ok){const rows=await r.json();if(rows&&rows[0]){hit={lat:Number(rows[0].lat),lng:Number(rows[0].lon),name:rows[0].name||p.name};break;}}}catch(_){}}}
-    const latest=findItem(id);
-    if(hit&&latest&&latest.it.pinText===text){latest.it.lat=Number(hit.lat);latest.it.lng=Number(hit.lng);latest.it.pinName=hit.name||p.name;persist();const el=$('#pin-'+id);if(el)el.innerHTML=pinStatus(latest.it);const btn=$('#pb-'+id);if(btn)btn.classList.toggle('on',latest.it.lat!=null);refreshDerived();}
-    else if(e)e.innerHTML='⚠️ 장소 좌표를 찾지 못했어요. 정확한 좌표를 붙여넣거나 장소명을 포함한 구글맵 링크를 확인해 주세요.';
+    const t0=tg();
+    if(hit&&t0&&t0.pinText===text){t0.lat=Number(hit.lat);t0.lng=Number(hit.lng);t0.pinName=hit.name||p.name;persist();upd()}
+    else{const e2=el();if(e2)e2.innerHTML='⚠️ 장소 좌표를 찾지 못했어요. 정확한 좌표를 붙여넣거나 장소명을 포함한 구글맵 링크를 확인해 주세요.'}
   }
 }
+function setPinLabel(id,k,v){const f=findItem(id);if(!f)return;const p=k==null?f.it:(f.it.more||[])[k];if(!p)return;p.pinLabel=v.slice(0,30);persist()}
+function openPinPicker(id){const f=findItem(id);if(!f)return;const pl=pinListOf(f.it);if(!pl.length)return;
+  openModal('<h2 style="margin-top:0">📍 어느 핀으로 갈까요?</h2><div style="display:flex;flex-direction:column;gap:8px">'+pl.map((p,i)=>{const nm=(p.pinLabel||'').trim()||(p.pinName||'').trim()||('핀 '+(i+1));const sub=(p.pinLabel||'').trim()&&p.pinName?p.pinName:'';
+    return `<a class="pickpin" href="${esc(googleMapHref(p))}" target="_blank" rel="noopener" onclick="setTimeout(closeModal,200)"><b>${esc(nm)}</b>${sub?`<small>${esc(sub)}</small>`:''}<span>›</span></a>`}).join('')+'</div><div style="height:10px"></div><button class="btn ghost block" onclick="closeModal()">닫기</button>')}
+function addPin(id){const f=findItem(id);if(!f)return;const m=f.it.more=f.it.more||[];if(m.length>=8){toast('핀은 일정당 최대 9개까지예요');return}
+  m.push({id:uid(),pinLabel:'',pinText:'',lat:null,lng:null,url:'',pinName:''});persist(true);render();
+  setTimeout(()=>{const e=$('#pt-'+id+'-'+(m.length-1));e&&e.focus()},40)}
+function delPin(id,k){const f=findItem(id);if(!f||!f.it.more)return;f.it.more.splice(k,1);persist(true);render()}
 function applyPinName(id){const f=findItem(id);const n=((f&&f.it.pinName)||'').trim();if(!n){toast('적용할 장소명이 없어요');return}
   f.it.place=n;persist();const pe=$('#pl-'+id);if(pe)pe.value=n;toast('일정 입력란에 적용했어요')}
 const pinStatus=it=>it.lat!=null?`📌 핀 지정됨 (${it.lat.toFixed(5)}, ${it.lng.toFixed(5)})`:it.url?'🔗 URL 저장됨 · 좌표 확인이 필요해요. 장소 URL이면 자동 확인을 시도합니다.':'';
-const pinsOf=(t,i)=>itemsOf(t,i).filter(x=>x.lat!=null);
-function mapEmbed(t,i){const all=itemsOf(t,i),ps=all.filter(x=>x.lat!=null),miss=all.length-ps.length;
-  const note=all.length?`<div class="muted" style="margin-top:6px">핀 지정 ${ps.length}곳 표시${miss?` · 핀 미지정 ${miss}곳은 지도에서 제외`:''}</div>`:'';
+const pinsFlat=it=>[it,...(it.more||[])].filter(p=>p&&p.lat!=null&&p.lng!=null).map(p=>({lat:p.lat,lng:p.lng,url:p.url,pinName:p.pinName,place:it.place,time:it.time,end:it.end}));
+const pinListOf=it=>[it,...(it.more||[])].filter(p=>p&&(p.lat!=null||p.url)).map(p=>Object.assign({place:it.place},p));
+const pinsOf=(t,i)=>itemsOf(t,i).flatMap(pinsFlat);
+function mapEmbed(t,i){const all=itemsOf(t,i),ps=pinsOf(t,i),miss=all.filter(x=>!pinsFlat(x).length).length;
+  const note=all.length?`<div class="muted" style="margin-top:6px">핀 ${ps.length}곳 표시${miss?` · 핀 미지정 일정 ${miss}개는 지도에서 제외`:''}</div>`:'';
   if(!ps.length)return '<div class="muted" style="padding:30px;text-align:center">핀을 지정한 일정이 생기면 하루 루트가 지도에 표시돼요.</div>'+note;
   const base='https://maps.google.com/maps?hl=ko&output=embed&',c=x=>x.lat+','+x.lng;
   const src=ps.length===1?base+'z=15&q='+encodeURIComponent(c(ps[0])+'('+(ps[0].pinName||ps[0].place||'')+')'):base+'saddr='+encodeURIComponent(c(ps[0]))+'&daddr='+ps.slice(1).map(x=>encodeURIComponent(c(x))).join('+to:');
@@ -696,8 +708,9 @@ function cleanTrip(j){if(!j||typeof j!=='object')throw new Error('bad');
     t.items[d]=arr.slice(0,100).filter(it=>it&&typeof it==='object').map(it=>({
       id:s(it.id,40)||uid(),time:tm(it.time),end:tm(it.end),place:s(it.place,200),
       hh:numOrBlank(it.hh),mm:numOrBlank(it.mm),amount:numOrBlank(it.amount),cur:it.cur==='LOCAL'?'LOCAL':'KRW',
-      memo:s(it.memo,2000),pinName:s(it.pinName,200),url:isGmap(it.url)?s(it.url,2000):'',
+      memo:s(it.memo,2000),pinName:s(it.pinName,200),pinLabel:s(it.pinLabel,30),url:isGmap(it.url)?s(it.url,2000):'',
       lat:it.lat!=null&&isFinite(+it.lat)?+it.lat:null,lng:it.lng!=null&&isFinite(+it.lng)?+it.lng:null,
+      more:(Array.isArray(it.more)?it.more:[]).slice(0,8).filter(x=>x&&typeof x==='object').map(x=>({id:s(x.id,40)||uid(),pinLabel:s(x.pinLabel,30),pinText:s(x.pinText,500),pinName:s(x.pinName,200),url:isGmap(x.url)?s(x.url,2000):'',lat:x.lat!=null&&isFinite(+x.lat)?+x.lat:null,lng:x.lng!=null&&isFinite(+x.lng)?+x.lng:null})),
       imgs:(Array.isArray(it.imgs)?it.imgs:[]).slice(0,3).filter(okImg),sub:(Array.isArray(it.sub)?it.sub:[]).slice(0,50).filter(x=>x&&typeof x==='object').map(x=>({id:s(x.id,20),name:s(x.name,100),amt:num(x.amt)}))}))}
   return t}
 
@@ -831,6 +844,9 @@ function itemSummary(t,it,i,n){const id=it.id;
     <div class="sctl" onclick="event.stopPropagation()">
       <button class="mini" ${i===0?'disabled':''} onclick="moveItem('${id}',-1)" aria-label="위로 이동">${ICO('<path d="M6 15l6-6 6 6"/>')}</button>
       <button class="mini" ${i===n-1?'disabled':''} onclick="moveItem('${id}',1)" aria-label="아래로 이동">${ICO('<path d="M6 9l6 6 6-6"/>')}</button></div></div>`}
+const PINSVG='<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+function pinRow(p,id,k){const sfx=k==null?'':'-'+k,kk=k==null?'':','+k;
+  return `<div class="pinrow"><div class="inl"><input class="plabel" id="pl2-${id}${sfx}" placeholder="핀 이름" maxlength="30" value="${esc(p.pinLabel||'')}" oninput="setPinLabel('${id}'${kk||',null'},this.value)" aria-label="핀 이름"><input id="pt-${id}${sfx}" placeholder="구글맵 링크 / 좌표 / 플러스 코드" value="${esc(p.pinText||'')}" onchange="setPin('${id}',this.value${kk})"><button class="pinbtn ${p.lat!=null?'on':''}" id="pb-${id}${sfx}" onclick="searchMap('${id}'${kk})" title="구글맵에서 검색 · 핀 지정" aria-label="구글맵에서 검색 · 핀 지정">${PINSVG}</button>${k==null?'':`<button class="rmsub" onclick="delPin('${id}',${k})" aria-label="핀 삭제">×</button>`}</div><div class="pinst" id="pin-${id}${sfx}">${pinStatus(p)}</div></div>`}
 function itemCard(t,it,i,n){
   if(S.open!==it.id)return itemSummary(t,it,i,n);
   const lc=t.currency,id=it.id,unit=unitOf(t,it);
@@ -853,9 +869,9 @@ function itemCard(t,it,i,n){
       <div class="fld"><span>소요시간</span><div class="inl"><input class="n" type="number" inputmode="numeric" min="0" placeholder="0" value="${dh}" ${der?'disabled':''} onchange="setItem('${id}','hh',this.value)"><small>시간</small><input class="n" type="number" inputmode="numeric" min="0" max="59" placeholder="0" value="${dmn}" ${der?'disabled':''} onchange="setItem('${id}','mm',this.value)"><small>분</small></div>${der?'<div class="muted" style="margin-top:3px">시작·종료로 자동 계산</div>':''}</div>
       <div class="fld"><span>금액</span><div class="inl"><input type="number" inputmode="decimal" placeholder="0" value="${it.amount}" oninput="setItem('${id}','amount',this.value);updSubTot('${id}')" onchange="refreshDerived()"><select onchange="setItem('${id}','cur',this.value);refreshDerived();updSubTot('${id}')"><option value="KRW" ${it.cur==='KRW'?'selected':''}>₩ 원</option>${lc!=='KRW'?`<option value="LOCAL" ${it.cur==='LOCAL'?'selected':''}>${lc}</option>`:''}</select></div></div>
     </div>
-    <div class="fld"><span>지도 위치</span>
-      <div class="inl"><input id="pt-${id}" placeholder="구글맵 링크 / 좌표 / 플러스 코드" value="${esc(it.pinText||'')}" onchange="setPin('${id}',this.value)"><button class="pinbtn ${it.lat!=null?'on':''}" id="pb-${id}" onclick="searchMap('${id}')" title="구글맵에서 검색 · 핀 지정" aria-label="구글맵에서 검색 · 핀 지정"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></button></div>
-      <div class="pinst" id="pin-${id}">${pinStatus(it)}</div></div>
+    <div class="fld"><span>지도 위치 (핀 여러 개 가능)</span>
+      ${pinRow(it,id,null)}${(it.more||[]).map((m,k)=>pinRow(m,id,k)).join('')}
+      <div class="subbar"><button class="addsub" onclick="addPin('${id}')">＋ 핀 추가</button></div></div>
     <div class="fld"><span>메모</span><textarea class="memo" rows="2" placeholder="메모 (줄바꿈 가능)" oninput="setItem('${id}','memo',this.value)">${esc(it.memo)}</textarea></div>
     <div class="fld"><span>이미지 (최대 ${MAXIMG}장)</span>
       <div class="imgs">${(it.imgs||[]).map((src,k)=>`<div class="imt" style="background-image:url('${cssUrl(src)}')"><button onclick="delImg('${id}',${k})" aria-label="이미지 삭제">×</button></div>`).join('')}${(it.imgs||[]).length<MAXIMG?`<button class="imadd" onclick="pickImg('${id}')" aria-label="이미지 추가">＋<small>사진</small></button>`:''}</div></div>
@@ -898,7 +914,7 @@ function previewHero(t,ci,n,cnt){
   <div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div><small class="ico">💰<span class="est">(예상)</span></small><b>₩${fmt(tot)}</b><small>${sub}</small></div></div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
-  const cnt=(()=>{const u=new Set();Object.keys(t.items).forEach(k=>{if(+k<n)t.items[k].forEach(it=>{if(it.lat!=null&&it.lng!=null)u.add((+it.lat).toFixed(4)+','+(+it.lng).toFixed(4))})});return u.size})();
+  const cnt=(()=>{const u=new Set();Object.keys(t.items).forEach(k=>{if(+k<n)t.items[k].forEach(it=>pinsFlat(it).forEach(p=>u.add((+p.lat).toFixed(4)+','+(+p.lng).toFixed(4))))});return u.size})();
   let h=previewHero(t,ci,n,cnt);
   if(!S.view)h+=`<button class="btn block" onclick="shareLink()" style="margin-bottom:12px">📤 프리뷰 공유하기</button>`;
   else h+=`<div class="muted" style="text-align:center;margin-bottom:10px">공유된 프리뷰 화면입니다${S.shareId?' · 오른쪽 위 ↻ 로 최신 일정 확인':''}</div>`;
@@ -906,14 +922,13 @@ function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   h+=`<div class="dsum"><div><b>${S.pday+1}일차</b><span>${dlabel(dateOfDay(t,S.pday))}</span></div><div class="dm">${moneyTxt(t,dayTotal(t,S.pday))}</div></div>`;
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">이 날은 등록된 일정이 없어요.</div>`;
   else{const ai=activeIdx(t,S.pday,a);h+='<div class="tl">';a.forEach((it,k)=>{
-    const hl=k===ai,hasPin=it.lat!=null||!!it.url;
-    const pinHref=googleMapHref(it);
+    const hl=k===ai,pl=pinListOf(it),hasPin=pl.length>0;
     const dur=durTxt(durMin(it)),unit=unitOf(t,it),tot=itemTotal(it);
     const subs=(it.sub||[]).filter(s=>s.name||+s.amt);
     const ss=subSum(it);
     const meta=(!ss&&tot>0)?`<div class="muted">💰 ${fmt2(tot)} ${unit}</div>`:'';
     const subHtml=subs.length?`<div class="subs">${ss&&+it.amount?`<div class="sr"><span>기본 금액</span><b>${fmt2(+it.amount)} ${unit}</b></div>`:''}${subs.map(s=>`<div class="sr"><span>${esc(s.name||'상세 일정')}</span>${+s.amt?`<b>${fmt2(+s.amt)} ${unit}</b>`:''}</div>`).join('')}${ss?`<div class="sr tot"><span>합계</span><b>${fmt2(tot)} ${unit}</b></div>`:''}</div>`:'';
-    h+=`<div class="ev${hl?' hl':''}${hasPin?' hasp':''}" ${hl?'id="hlnow"':''}>${hasPin?`<a class="evpin" href="${esc(pinHref)}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`:''}<div class="t">${esc(timeTxt(it))}${dur?`<span class="dur">⏱ ${dur}</span>`:''}${hl?'<span class="nowtag">지금 진행</span>':''}</div>
+    h+=`<div class="ev${hl?' hl':''}${hasPin?' hasp':''}" ${hl?'id="hlnow"':''}>${hasPin?(pl.length>1?`<button class="evpin" onclick="openPinPicker('${it.id}')" aria-label="핀 선택" title="핀 선택"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><i class="pcnt">${pl.length}</i></button>`:`<a class="evpin" href="${esc(googleMapHref(pl[0]))}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`):''}<div class="t">${esc(timeTxt(it))}${dur?`<span class="dur">⏱ ${dur}</span>`:''}${hl?'<span class="nowtag">지금 진행</span>':''}</div>
     <div class="p">${esc(it.place||'(일정 미입력)')}</div>${meta}${it.memo?`<div class="memo">${esc(it.memo)}</div>`:''}${(it.imgs&&it.imgs.length)?`<div class="evimgs n${it.imgs.length}">${it.imgs.filter(okImg).map(src=>`<img src="${src}" alt="" loading="lazy" onclick="zoomImg(this.src)">`).join('')}</div>`:''}${subHtml}</div>`});h+='</div>'}
   h+=`<details class="mapd" ontoggle="if(this.open)initPMap()"><summary>🗺️ ${S.pday+1}일차 핀 지도 보기</summary><div id="lmap" style="margin-top:8px"></div></details>`;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
