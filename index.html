@@ -133,11 +133,12 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .mapd summary:after{content:"＋";margin-left:auto;font-size:18px;line-height:1}
 .mapd[open] summary:after{content:"−"}
 .pinrow+.pinrow{margin-top:8px}
-.plabel{flex:0 0 31%;min-width:0;width:31%}
+.plabel{flex:0 0 42%;min-width:0;width:42%}
 .pcnt{position:absolute;top:-4px;right:-4px;min-width:15px;height:15px;border-radius:8px;background:var(--accent);color:#fff;font:700 10px/15px system-ui;font-style:normal;text-align:center;padding:0 3px;box-sizing:border-box}
 .pickpin{display:flex;align-items:center;gap:8px;padding:13px 14px;border-radius:12px;background:var(--card2);color:var(--text);text-decoration:none;border:1px solid var(--line)}
-.pickpin b{font-size:15px}.pickpin small{color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.pickpin span{margin-left:auto;color:var(--sub);font-size:18px}
+.pickpin b{font-size:15px;flex:0 1 auto;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pickpin small{flex:1 1 0;color:var(--sub);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pickpin span{margin-left:auto;flex:none;color:var(--sub);font-size:18px}
 .pstats small.ico{margin:0 0 3px;font-size:12px}
 .pstats small{display:block;font-size:11px;color:var(--sub);margin-top:3px}
 .ev.hasp{padding-right:var(--pr,44px)}
