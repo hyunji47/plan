@@ -269,11 +269,26 @@ const uid=()=>Math.random().toString(36).slice(2,9);
 const fmt=n=>Math.round(n).toLocaleString('ko-KR');
 const fmt2=n=>(+n).toLocaleString('ko-KR',{maximumFractionDigits:n<10?3:2});
 const trip=()=>S.view?S.viewTrip:S.store.trips.find(t=>t.id===S.tripId);
-function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.trips)S.store=j}catch(e){}lastSnap=snap()}
+/* 저장소: 브라우저 용량이 훨씬 큰 IndexedDB 사용 (localStorage는 약 5MB 제한). 사용할 수 없으면 localStorage로 대체 */
+let IDBP=null;
+function idbOpen(){return IDBP||(IDBP=new Promise((res,rej)=>{try{const r=indexedDB.open('travelplanner',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error('blocked'))}catch(e){rej(e)}}))}
+const idbGet=k=>idbOpen().then(db=>new Promise((res,rej)=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}));
+const idbSet=(k,v)=>idbOpen().then(db=>new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)}));
+async function saveStore(){
+  try{await idbSet(KEY,S.store);try{localStorage.removeItem(KEY)}catch(e){}return}catch(e){}
+  try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){toast('저장 공간이 부족해요. 백업 후 정리해 주세요')}}
+async function load(){let j=null;
+  try{j=await idbGet(KEY)}catch(e){}
+  if(!(j&&j.trips)){j=null;try{const l=JSON.parse(localStorage.getItem(KEY));if(l&&l.trips)j=l}catch(e){}
+    if(j){S.store=j;await saveStore()}}
+  else S.store=j;
+  try{localStorage.removeItem(KEY+'.bak')}catch(e){}
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  lastSnap=snap()}
 let lastSnap='';
 const snap=()=>JSON.stringify(S.store.trips,(k,v)=>k==='img'?undefined:v);
 let pt=null;
-function persist(now){if(S.view)return;clearTimeout(pt);const f=()=>{const sn=snap();if(sn!==lastSnap){lastSnap=sn;S.store.updatedAt=Date.now();cloudSchedule()}try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){toast('저장 공간이 부족해요. 백업 후 정리해 주세요')}scheduleSync()};now?f():pt=setTimeout(f,300)}
+function persist(now){if(S.view)return;clearTimeout(pt);const f=()=>{const sn=snap();if(sn!==lastSnap){lastSnap=sn;S.store.updatedAt=Date.now();cloudSchedule()}saveStore();scheduleSync()};now?f():pt=setTimeout(f,300)}
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)}
 function openModal(h){const m=$('#modal');m.innerHTML='<div class="sheet">'+h+'</div>';m.classList.add('on')}
 function closeModal(){$('#modal').classList.remove('on')}
@@ -675,9 +690,9 @@ async function cloudPull(){const src=cloudSrc(),g=gh();if(!src||!g)throw new Err
   const r=await fetch(ghUrl(src)+'?t='+Date.now(),{headers:{'Accept':'application/vnd.github.raw+json','Authorization':'Bearer '+g.token},cache:'no-store'});
   if(r.status===404)return null;if(!r.ok)throw new Error('pull '+r.status);return r.json()}
 function applyRemote(rem){
-  try{localStorage.setItem(KEY+'.bak',JSON.stringify(S.store))}catch(e){}
+  idbSet(KEY+'.bak',S.store).catch(()=>{});
   S.store={trips:rem.trips.filter(t=>t&&typeof t==='object'&&t.id&&t.items&&t.start&&t.end),updatedAt:rem.updatedAt};
-  try{localStorage.setItem(KEY,JSON.stringify(S.store))}catch(e){}
+  saveStore();
   lastSnap=snap();
   if(S.tripId&&!S.store.trips.some(t=>t.id===S.tripId)){S.tripId=null;S.screen='list'}
   S.listKey=null;S.bgKey=null;render()}
@@ -989,7 +1004,7 @@ setInterval(()=>{pollShared()},30000);
   let shared=null;
   try{if(window.__SHARED__)shared=cleanTrip(window.__SHARED__);else if(h.startsWith('#v='))shared=cleanTrip(await dec(h.slice(3)))}catch(e){shared=null}
   if(shared){S.view=true;S.viewTrip=shared;S.shareId=shared.shareId||null;S.screen='preview';S.pday=todayIdx(shared);render.scrolled=0;render();return}
-  load();render();
+  await load();render();
   if(gh())cloudSync(false);
 })();
 </script>
