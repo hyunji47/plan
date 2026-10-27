@@ -99,8 +99,16 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 #expfull.on{display:block}
 #expfull .xin{max-width:480px;margin:0 auto;padding:0 14px 40px}
 #expfull .xin header.top{position:sticky;top:0;margin:0 -14px 0}
-.exd2{padding:6px 14px}
-.exd2 .exh{display:flex;justify-content:space-between;padding:10px 0 4px}
+.exd2{padding:8px 18px;margin-bottom:14px}
+.exd2 .exh b small{margin-left:8px;color:var(--sub);font-weight:500;font-size:12px}
+.xtabs{position:sticky;top:57px;z-index:15;background:var(--bg);padding:8px 0 2px}
+.fchips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none}
+.fchips::-webkit-scrollbar{display:none}
+.fchip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:99px;padding:6px 11px;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.fchip span{margin-left:6px;color:var(--sub);font-size:11.5px}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.fchip.on span{color:rgba(255,255,255,.85)}
+.exd2 .exh{display:flex;justify-content:space-between;padding:12px 0 8px}
 .exd2 .exh span{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
 .exd2 .exr:first-of-type{border-top:0}
 #modal .sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
@@ -153,12 +161,12 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .cchip{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:6px 0;font-size:11px;line-height:1.2;cursor:pointer;text-align:center;white-space:nowrap}
 .cchip b{display:block;font-size:16px;font-weight:400;margin-bottom:1px}
 .cchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
-.exr{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.exr{display:flex;align-items:center;gap:12px;padding:16px 0;border-top:1px solid var(--line)}
 .exr:first-of-type{border-top:0}
 .exr .ec{font-size:20px;flex:none}
 .exr .em{flex:1;min-width:0}
 .exr .em b{display:block;font-size:14px}
-.exr .em small,.exr .ea small{display:block;color:var(--sub);font-size:12px;overflow-wrap:anywhere}
+.exr .em small,.exr .ea small{display:block;color:var(--sub);font-size:12px;overflow-wrap:anywhere;margin-top:3px}
 .exr .ea{text-align:right;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;flex:none}
 .expc .ext{font-size:20px;font-weight:700;margin-bottom:10px}
 .cb{display:grid;grid-template-columns:78px 1fr auto;gap:10px;align-items:center;padding:5px 0;font-size:13px}
@@ -170,7 +178,6 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .exd summary::-webkit-details-marker{display:none}
 .exd summary span{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
 .pstats .tap{cursor:pointer}
-.pstats .tap b:after{content:' ›';color:var(--sub);font-weight:400}
 .pstats .tap:active{background:var(--card2)}
 .exd .exh{display:flex;justify-content:space-between;padding:8px 0 2px}
 .exd .exh span{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -325,7 +332,7 @@ let lastSnap='';
 const snap=()=>JSON.stringify(S.store.trips,(k,v)=>k==='img'?undefined:v);
 let pt=null;
 function persist(now){if(S.view)return;clearTimeout(pt);const f=()=>{const sn=snap();if(sn!==lastSnap){lastSnap=sn;S.store.updatedAt=Date.now();cloudSchedule()}saveStore();scheduleSync()};now?f():pt=setTimeout(f,300)}
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),1800)}
+function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),ms||1800)}
 function openModal(h){const m=$('#modal');m.innerHTML='<div class="sheet">'+h+'</div>';m.classList.add('on')}
 function closeModal(){$('#modal').classList.remove('on')}
 
@@ -418,7 +425,7 @@ const BK='tp.lastBackup';
 const lastBk=()=>{try{return +localStorage.getItem(BK)||0}catch(e){return 0}};
 const bkStale=()=>S.store.trips.length>0&&(Date.now()-lastBk()>14*864e5);
 const bkText=()=>{const t=lastBk();return t?'마지막 백업: '+new Date(t).toLocaleDateString('ko-KR'):'아직 백업한 적이 없어요'};
-async function saveNow(){persist(true);if(gh()){toast('저장 중…');const ok=await cloudPush();toast(ok?'저장되었어요 · 클라우드에도 올렸어요 ✓':'이 기기에는 저장됐지만 클라우드 저장은 실패했어요')}else toast('저장되었어요 ✓'+(bkStale()?' · 백업한 지 오래됐어요':''))}
+async function saveNow(){persist(true);if(gh()){toast('저장 중…');const ok=await cloudPush();toast(ok?'저장되었어요 · 클라우드에도 올렸어요 ✓':'이 기기에는 저장됐어요. 클라우드 저장 실패: '+S.cloudErr,ok?1800:5000)}else toast('저장되었어요 ✓'+(bkStale()?' · 백업한 지 오래됐어요':''))}
 async function exportBackup(){
   const data=JSON.stringify({app:'travel-planner',v:1,exported:new Date().toISOString(),trips:S.store.trips},null,1);
   const name='여행플래너_백업_'+ymd(new Date())+'.json';
@@ -483,7 +490,7 @@ function openMenu(){
   <button class="mi" onclick="menuDo('export')"><span class="ic">💾</span>백업 내보내기</button>
   <button class="mi" onclick="menuDo('import')"><span class="ic">📥</span>백업 가져오기</button>
   <div class="mh">클라우드 동기화</div>
-  <div class="muted" style="padding:0 8px 4px">${gh()?(S.cloudAt?'마지막 동기화: '+new Date(S.cloudAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'켜져 있어요 · 일정을 고치면 자동으로 올라가요'):'꺼져 있어요 · 아래 설정에서 GitHub를 연결하세요'}</div>
+  <div class="muted" style="padding:0 8px 4px">${gh()?(S.cloudAt?'마지막 동기화: '+new Date(S.cloudAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):(S.cloudErr?'⚠️ 마지막 저장 실패: '+S.cloudErr:'켜져 있어요 · 일정을 고치면 자동으로 올라가요')):'꺼져 있어요 · 아래 설정에서 GitHub를 연결하세요'}</div>
   ${gh()?'<button class="mi" onclick="menuDo(\'cloud\')"><span class="ic">☁️</span>지금 동기화</button>':''}
   <div class="mh">공유</div>
   <button class="mi" onclick="menuDo('gh')"><span class="ic">🔗</span>GitHub 연결 · 고정 링크 설정</button>
@@ -726,13 +733,22 @@ function saveGh(){const o=$('#ghO').value.trim(),r=$('#ghR').value.trim().replac
 function clearGh(){try{localStorage.removeItem(GHK)}catch(e){}closeModal();toast('설정을 해제했어요')}
 
 /* ---------- 내 모든 일정 클라우드(GitHub) 동기화 ---------- */
+function ghHint(e){const m=String((e&&e.message)||e||'');const c=(m.match(/\b(\d{3})\b/)||[])[1];
+  if(/no token|no cfg/.test(m))return 'GitHub 연결 정보가 없어요';
+  if(c==='401')return '토큰이 올바르지 않거나 만료됐어요 (401)';
+  if(c==='403')return '토큰에 쓰기 권한이 없거나 GitHub 호출 한도를 넘었어요 (403)';
+  if(c==='404')return '저장소를 찾지 못했거나 토큰에 그 저장소 권한(Contents 읽기/쓰기)이 없어요 (404)';
+  if(c==='413'||c==='422')return '저장할 데이터가 너무 크거나 형식이 맞지 않아요 ('+c+')';
+  if(/conflict/.test(m))return '다른 기기에서 동시에 저장해서 충돌했어요. 잠시 뒤 다시 시도하세요';
+  if(/Failed to fetch|NetworkError|Load failed/i.test(m))return '네트워크가 끊겼거나 보안 설정이 연결을 막았어요';
+  return '알 수 없는 오류: '+m.slice(0,60)}
 const SYNCRE=/^([A-Za-z0-9_.-]{1,100})\/([A-Za-z0-9_.-]{1,100})$/;
 function cloudSrc(){const g=gh();if(!g)return null;const m=SYNCRE.exec((g.syncRepo||'').trim());return {o:m?m[1]:g.owner,r:m?m[2]:g.repo,path:'data/store.json'}}
 let cloudT=null,cloudBusy=false;
-function cloudSchedule(){if(S.view||!gh())return;clearTimeout(cloudT);cloudT=setTimeout(()=>cloudPush().then(ok=>{if(!ok)toast('클라우드에 저장하지 못했어요. 네트워크·토큰을 확인하세요')}),3000)}
+function cloudSchedule(){if(S.view||!gh())return;clearTimeout(cloudT);cloudT=setTimeout(()=>cloudPush().then(ok=>{if(!ok)toast('클라우드 저장 실패: '+S.cloudErr,5000)}),3000)}
 function cloudPayload(){return {app:'travel-planner',v:1,updatedAt:S.store.updatedAt||Date.now(),trips:S.store.trips.map(t=>{const c=JSON.parse(JSON.stringify(t));delete c.img;return c})}}
 async function cloudPush(){const src=cloudSrc();if(!src)return false;clearTimeout(cloudT);cloudT=null;
-  try{if(!S.store.updatedAt)S.store.updatedAt=Date.now();await ghPut(src,cloudPayload());S.cloudAt=Date.now();return true}catch(e){return false}}
+  try{if(!S.store.updatedAt)S.store.updatedAt=Date.now();await ghPut(src,cloudPayload());S.cloudAt=Date.now();S.cloudErr='';return true}catch(e){S.cloudErr=ghHint(e);return false}}
 async function cloudPull(){const src=cloudSrc(),g=gh();if(!src||!g)throw new Error('no cfg');
   const r=await fetch(ghUrl(src)+'?t='+Date.now(),{headers:{'Accept':'application/vnd.github.raw+json','Authorization':'Bearer '+g.token},cache:'no-store'});
   if(r.status===404)return null;if(!r.ok)throw new Error('pull '+r.status);return r.json()}
@@ -752,9 +768,9 @@ async function cloudSync(manual){
       applyRemote(rem);S.cloudAt=Date.now();toast('다른 기기의 최신 일정을 불러왔어요 ✓')}
     else if(!rem||lu>(+rem.updatedAt||0)){
       if(!S.store.trips.length&&!rem){if(manual)toast('저장할 일정이 없어요')}
-      else{const ok=await cloudPush();if(manual||!ok)toast(ok?'클라우드에 저장했어요 ✓':'클라우드에 저장하지 못했어요. 토큰·저장소를 확인하세요')}}
+      else{const ok=await cloudPush();if(manual||!ok)toast(ok?'클라우드에 저장했어요 ✓':'클라우드 저장 실패: '+S.cloudErr,ok?1800:5000)}}
     else{S.cloudAt=Date.now();if(manual)toast('이미 최신이에요 ✓')}
-  }catch(e){if(manual)toast('동기화하지 못했어요. 네트워크·토큰을 확인하세요')}
+  }catch(e){S.cloudErr=ghHint(e);if(manual)toast('동기화 실패: '+S.cloudErr,5000)}
   finally{cloudBusy=false}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!S.view&&gh()&&!cloudT)cloudSync(false)});
 
@@ -899,21 +915,30 @@ function screenExp(){const t=trip();const n=dayCount(t);
     <button class="btn block" style="margin-top:10px" onclick="addExp()">저장</button></div>
   <div class="card"><h2 style="margin:0 0 6px">${expLabel(k)} 지출 ${list.length?`<span class="muted" style="font-size:13px;font-weight:500">${list.length}건</span>`:''}</h2>
     ${list.length?list.map(e=>{const c=catOf(e.cat);return `<div class="exr"><span class="ec">${c[2]}</span><div class="em"><b>${c[1]}</b>${e.memo?`<small>${esc(e.memo)}</small>`:''}</div><div class="ea">${expAmtTxt(t,e)}</div><button class="rmsub" onclick="delExp('${e.id}')" aria-label="삭제">×</button></div>`}).join(''):'<div class="muted" style="padding:14px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}</div>`}
-function openExpModal(){S.xday='all';drawExpFull();$('#expfull').classList.add('on');$('#expfull').scrollTop=0}
+function openExpModal(){S.xday='all';S.xcat='all';drawExpFull();$('#expfull').classList.add('on');$('#expfull').scrollTop=0}
 function closeExpFull(){const e=$('#expfull');if(e)e.classList.remove('on')}
 function selXDay(k){S.xday=k;drawExpFull();$('#expfull').scrollTop=0}
-function drawExpFull(){const t=trip();if(!t)return;const keys=expKeys(t),cur=S.xday;
+function selXCat(c){S.xcat=S.xcat===c?'all':c;const y=$('#expfull').scrollTop;drawExpFull();$('#expfull').scrollTop=y}
+function drawExpFull(){const t=trip();if(!t)return;const keys=expKeys(t),cur=S.xday,fc=S.xcat||'all';
   const tab=(k,l,sm)=>`<button class="tab ${k===cur?'on':''}" onclick="selXDay(${typeof k==='string'?`'${k}'`:k})">${l}<small>${sm}</small></button>`;
   const tabs=`<div class="tabs">${tab('all','전체','모든 날')}${keys.map(k=>tab(k,expLabel(k),k==='pre'?'출발 전':dlabel(dateOfDay(t,k)))).join('')}</div>`;
-  const rows=k=>expGet(t,k).map(e=>`<div class="exr ro"><div class="em"><b>${esc(e.memo||catOf(e.cat)[1])}</b>${e.memo?`<small>${catOf(e.cat)[1]}</small>`:''}</div><div class="ea">${expAmtTxt(t,e)}</div></div>`).join('');
-  let body;
-  if(cur==='all'){const days=keys.filter(k=>expGet(t,k).length);
-    body=expTotal(t)>0?`<div class="dsum"><div><b>전체</b><span>${days.length}일 · ${keys.reduce((n,k)=>n+expGet(t,k).length,0)}건</span></div><div class="dm">${expMoney(t,expTotal(t))}</div></div>`
-      +days.map(k=>`<div class="card exd2"><div class="exh"><b>${expLabel(k)}</b><span>₩${fmt(expDayTotal(t,k))}</span></div>${rows(k)}</div>`).join(''):'<div class="muted" style="padding:30px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}
-  else{const l=expGet(t,cur);
-    body=`<div class="dsum"><div><b>${expLabel(cur)}</b><span>${cur==='pre'?'출발 전':dlabel(dateOfDay(t,cur))}</span></div><div class="dm">${expMoney(t,expDayTotal(t,cur))}</div></div>`
-      +(l.length?`<div class="card exd2">${rows(cur)}</div>`:'<div class="muted" style="padding:30px 0;text-align:center">이 날은 입력한 지출이 없어요.</div>')}
-  $('#expfull').innerHTML=`<div class="xin"><header class="top"><button class="ib" onclick="closeExpFull()" aria-label="닫기">‹</button><h1>💳 지출 내역</h1></header><div style="height:6px"></div>${tabs}${body}</div>`}
+  const scope=cur==='all'?keys:[cur];
+  const inScope=scope.flatMap(k=>expGet(t,k));
+  const byCat={};inScope.forEach(e=>{const c=catOf(e.cat)[0];byCat[c]=(byCat[c]||0)+expKRW(t,e)});
+  const shown=k=>expGet(t,k).filter(e=>fc==='all'||catOf(e.cat)[0]===fc);
+  const sum=k=>shown(k).reduce((a,e)=>a+expKRW(t,e),0);
+  const total=scope.reduce((a,k)=>a+sum(k),0),count=scope.reduce((a,k)=>a+shown(k).length,0);
+  const fcn=fc==='all'?'':catOf(fc)[1];
+  const row=e=>{const c=catOf(e.cat);return `<div class="exr ro"><div class="em"><b>${esc(e.memo||c[1])}</b><small>${c[2]} ${c[1]}</small></div><div class="ea">${expAmtTxt(t,e)}</div></div>`};
+  const cats=CATS.filter(c=>byCat[c[0]]>0);
+  const chips=cats.length>1||fc!=='all'?`<div class="fchips"><button class="fchip ${fc==='all'?'on':''}" onclick="selXCat('${fc}')">전체</button>${cats.map(c=>`<button class="fchip ${fc===c[0]?'on':''}" onclick="selXCat('${c[0]}')">${c[2]} ${c[1]}<span>₩${fmt(byCat[c[0]])}</span></button>`).join('')}</div>`:'';
+  const head=cur==='all'?`<b>전체</b><span>${fcn||'모든 지출'} · ${count}건</span>`:`<b>${expLabel(cur)}</b><span>${cur==='pre'?'출발 전':dlabel(dateOfDay(t,cur))}${fcn?' · '+fcn:''} · ${count}건</span>`;
+  let body=`<div class="dsum"><div>${head}</div><div class="dm">${expMoney(t,total)}</div></div>${chips}`;
+  const days=scope.filter(k=>shown(k).length);
+  if(!days.length)body+=`<div class="muted" style="padding:30px 0;text-align:center">${inScope.length?'이 카테고리의 지출이 없어요.':(cur==='all'?'아직 입력한 지출이 없어요.':'이 날은 입력한 지출이 없어요.')}</div>`;
+  else if(cur==='all')body+=days.map(k=>`<div class="card exd2"><div class="exh"><b>${expLabel(k)}<small>${k==='pre'?'출발 전':dlabel(dateOfDay(t,k))}</small></b><span>₩${fmt(sum(k))}</span></div>${shown(k).map(row).join('')}</div>`).join('');
+  else body+=`<div class="card exd2">${shown(cur).map(row).join('')}</div>`;
+  $('#expfull').innerHTML=`<div class="xin"><header class="top"><button class="ib" onclick="closeExpFull()" aria-label="닫기">‹</button><h1>💳 지출 내역</h1></header><div class="xtabs">${tabs}</div>${body}</div>`}
 function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   const unit=t.rate<1?100:1;
   let h=`<div class="hero"><h2>${flag(ci.i)} 여행 정보</h2></div><div class="card">
@@ -1025,11 +1050,12 @@ function previewHero(t,ci,n,cnt){
   const dd=td<0?'D-'+(-td):td>=n?'여행 종료':'여행 '+(td+1)+'일차';
   const img=t.thumb||t.img||S.bgUrl||'';
   const tot=totalAll(t);
+  const spent=expTotal(t),ended=new Date().setHours(0,0,0,0)>parseD(t.end).getTime(),final=ended&&spent>0;
   const sub=t.currency!=='KRW'&&t.rate?'≈ '+fmt(tot/t.rate)+' '+t.currency:'원화 기준';
   return `<div class="phero" id="heroimg" ${img?'style="background-image:url(\''+cssUrl(img)+'\')"':''}><div class="pov"></div><div class="pin">
     <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><span class="pchip">${dd}</span></div>
     <h2>${esc(t.title||'나의 여행')}</h2><div class="pdate">${fd(parseD(t.start))} – ${fd(parseD(t.end))}</div></div></div>
-  <div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div class="tap" onclick="openExpModal()" role="button" tabindex="0"><small class="ico">💰<span class="est">(예상)</span></small><b>₩${fmt(tot)}</b><small>${sub}</small></div></div>
+  <div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div class="tap" onclick="openExpModal()" role="button" tabindex="0"><small class="ico">💰<span class="est">(${final?'최종':'예상'})</span></small><b>₩${fmt(final?spent:tot)}</b><small>지출내역 ›</small></div></div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
   const cnt=(()=>{const u=new Set();Object.keys(t.items).forEach(k=>{if(+k<n)t.items[k].forEach(it=>pinsFlat(it).forEach(p=>u.add((+p.lat).toFixed(4)+','+(+p.lng).toFixed(4))))});return u.size})();
