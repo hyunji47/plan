@@ -458,11 +458,23 @@ function shrinkImg(file){return new Promise((res,rej)=>{const url=URL.createObje
   im.onload=()=>{const max=640,k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
     const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',.72))};
   im.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('img'))};im.src=url})}
-async function onItemImgs(inp){const id=S.imgTarget;const files=[...inp.files].filter(f=>/^image\//.test(f.type));inp.value='';
-  const f=findItem(id);if(!f||!files.length)return;f.it.imgs=f.it.imgs||[];
+async function addImgFiles(id,files){files=[...files].filter(f=>/^image\//.test(f.type));
+  const f=findItem(id);if(!f||!files.length)return false;f.it.imgs=f.it.imgs||[];
+  if(f.it.imgs.length>=MAXIMG){toast('이미지는 일정당 '+MAXIMG+'장까지 넣을 수 있어요');return false}
   let added=0;for(const file of files){if(f.it.imgs.length>=MAXIMG)break;try{f.it.imgs.push(await shrinkImg(file));added++}catch(e){}}
-  if(!added){toast('이미지를 불러오지 못했어요');return}
-  persist(true);render();toast(added+'장 추가했어요 ✓'+(files.length>added?' (최대 '+MAXIMG+'장)':''))}
+  if(!added){toast('이미지를 불러오지 못했어요');return false}
+  persist(true);render();toast(added+'장 추가했어요 ✓'+(files.length>added?' (최대 '+MAXIMG+'장)':''));return true}
+async function onItemImgs(inp){const id=S.imgTarget;const files=[...inp.files];inp.value='';await addImgFiles(id,files)}
+/* 복사한 이미지 붙여넣기: 일정이 펼쳐져 있을 때 Ctrl/Cmd+V (또는 길게 눌러 붙여넣기) */
+document.addEventListener('paste',e=>{if(S.view||S.screen!=='plan'||!S.open)return;
+  const items=[...((e.clipboardData&&e.clipboardData.items)||[])].filter(x=>x.kind==='file'&&/^image\//.test(x.type));
+  if(!items.length)return;e.preventDefault();addImgFiles(S.open,items.map(x=>x.getAsFile()).filter(Boolean))});
+async function pasteImgBtn(id){
+  try{const its=await navigator.clipboard.read();const files=[];
+    for(const it of its){const ty=it.types.find(t=>/^image\//.test(t));if(ty){const b=await it.getType(ty);files.push(new File([b],'paste.'+ty.split('/')[1],{type:ty}))}}
+    if(!files.length){toast('복사된 이미지가 없어요');return}
+    await addImgFiles(id,files)
+  }catch(e){toast('붙여넣기를 허용하지 않았거나 지원하지 않는 브라우저예요. 이미지 복사 후 키보드로 붙여넣기(Ctrl+V)를 해보세요',4000)}}
 function delImg(id,i){const f=findItem(id);if(!f||!f.it.imgs)return;f.it.imgs.splice(i,1);persist(true);render()}
 function zoomImg(src){if(!okImg(src))return;openModal('<img src="'+src+'" style="width:100%;border-radius:12px;display:block"><div style="height:8px"></div><button class="btn block" onclick="closeModal()">닫기</button>')}
 function onThumbFile(inp){const f=inp.files[0];inp.value='';if(!f)return;
@@ -1016,8 +1028,8 @@ function itemCard(t,it,i,n){
       ${pinRow(it,id,null)}${(it.more||[]).map((m,k)=>pinRow(m,id,k)).join('')}
       <div class="subbar"><button class="addsub" onclick="addPin('${id}')">＋ 핀 추가</button></div></div>
     <div class="fld"><span>메모</span><textarea class="memo" rows="2" placeholder="메모 (줄바꿈 가능)" oninput="setItem('${id}','memo',this.value)">${esc(it.memo)}</textarea></div>
-    <div class="fld"><span>이미지 (최대 ${MAXIMG}장)</span>
-      <div class="imgs">${(it.imgs||[]).map((src,k)=>`<div class="imt" style="background-image:url('${cssUrl(src)}')"><button onclick="delImg('${id}',${k})" aria-label="이미지 삭제">×</button></div>`).join('')}${(it.imgs||[]).length<MAXIMG?`<button class="imadd" onclick="pickImg('${id}')" aria-label="이미지 추가">＋<small>사진</small></button>`:''}</div></div>
+    <div class="fld"><span>이미지 (최대 ${MAXIMG}장 · 복사한 이미지 붙여넣기 가능)</span>
+      <div class="imgs">${(it.imgs||[]).map((src,k)=>`<div class="imt" style="background-image:url('${cssUrl(src)}')"><button onclick="delImg('${id}',${k})" aria-label="이미지 삭제">×</button></div>`).join('')}${(it.imgs||[]).length<MAXIMG?`<button class="imadd" onclick="pickImg('${id}')" aria-label="이미지 추가">＋<small>사진</small></button><button class="imadd" onclick="pasteImgBtn('${id}')" aria-label="복사한 이미지 붙여넣기">📋<small>붙여넣기</small></button>`:''}</div></div>
     <div class="fld"><span>상세 일정</span>
       ${subs.length?`<div class="subs">${subs.map(s=>`<div class="sr2"><input class="nm" placeholder="상세 내용" value="${esc(s.name)}" oninput="setSub('${id}','${s.id}','name',this.value)"><input class="am" type="number" inputmode="decimal" placeholder="금액 (선택)" value="${s.amt}" oninput="setSub('${id}','${s.id}','amt',this.value)"><button class="rmsub" onclick="delSub('${id}','${s.id}')" aria-label="상세 일정 삭제">−</button></div>`).join('')}</div>`:''}
       <div class="subbar"><button class="addsub" onclick="addSub('${id}')">＋ 상세 일정 추가</button>${subs.length?`<span class="subtot" ${subSum(it)>0?'':'hidden'}>금액 합계 <span id="stot-${id}">${fmt2(subSum(it))} ${unit}</span></span>`:''}</div></div>
