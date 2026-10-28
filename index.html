@@ -109,8 +109,9 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 .fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .fchip.on span{color:rgba(255,255,255,.85)}
 .xcard{padding:20px 22px}
+.exd2 .exh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .exd2 .exh{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 14px}
-.exd2 .exh span{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.exd2 .exh span{white-space:nowrap;flex:none;margin-left:10px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
 .exd2 .exh+.exr{border-top:1px solid var(--line)}
 #modal .sheet{background:var(--card);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
 .credit{font-size:10px;color:var(--sub);text-align:center;margin-top:18px;opacity:.8}
@@ -230,6 +231,8 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .subbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
 .addsub{border:0;background:var(--accent2);color:var(--accent);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;flex:none;white-space:nowrap}
 .rmsub{border:0;background:none;color:var(--danger);width:28px;height:28px;border-radius:8px;font-size:20px;line-height:1;cursor:pointer;flex:none;opacity:.75}
+.exr .rmsub{color:var(--sub);opacity:.5;font-size:18px;width:24px;height:28px;padding:0;margin-left:-8px}
+.exr .rmsub:first-of-type{margin-left:0}
 .subtot{font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;text-align:right}
 .item input:disabled{opacity:.6}
 .item textarea{padding:6px 8px;font-size:14px;border-radius:8px}
@@ -910,27 +913,32 @@ const expAmtTxt=(t,e)=>e.cur==='LOCAL'&&t.currency!=='KRW'?`${fmt2(+e.amount)} $
 const expMoney=(t,k)=>`₩${fmt(k)}`+(t.currency!=='KRW'&&t.rate?`<small style="display:block;font-weight:500;color:var(--sub);font-size:12px">≈ ${fmt(k/t.rate)} ${t.currency}</small>`:'');
 function expTabs(t,cur,fn){const keys=expKeys(t);let h=`<div class="tabs${keys.length<=4?' fit':''}">`;
   keys.forEach(k=>{h+=`<button class="tab ${k===cur?'on':''}" onclick="${fn}(${k==='pre'?"'pre'":k})">${expLabel(k)}<small>${k==='pre'?'출발 전':dlabel(dateOfDay(t,k))}</small></button>`});return h+'</div>'}
-function selEDay(k){S.eday=k;render()}
+function selEDay(k){S.eday=k;S.eedit=null;render()}
 function setECat(c){S.ecat=c;document.querySelectorAll('.cchip').forEach(b=>b.classList.toggle('on',b.dataset.c===c))}
 function setECur(c){S.ecur=c}
 function addExp(){const t=trip();const k=S.eday;const a=+(($('#expAmt')||{}).value||'');
   if(!(a>0)){toast('금액을 입력하세요');return}
   const cur=t.currency==='KRW'?'KRW':(S.ecur||'LOCAL');
-  (t.exp=t.exp||{});(t.exp[k]=t.exp[k]||[]).push({id:uid(),cat:S.ecat||'food',amount:a,cur,memo:(($('#expMemo')||{}).value||'').trim().slice(0,60)});
-  persist(true);render();toast('저장했어요 ✓')}
+  (t.exp=t.exp||{});const memo=(($('#expMemo')||{}).value||'').trim().slice(0,60);
+  const ed=S.eedit&&(t.exp[k]||[]).find(e=>e.id===S.eedit);
+  if(ed){Object.assign(ed,{cat:S.ecat||'food',amount:a,cur,memo});S.eedit=null}
+  else(t.exp[k]=t.exp[k]||[]).push({id:uid(),cat:S.ecat||'food',amount:a,cur,memo});
+  persist(true);render();toast(ed?'수정했어요 ✓':'저장했어요 ✓')}
+function editExp(id){const t=trip();const e=(t.exp&&t.exp[S.eday]||[]).find(x=>x.id===id);if(!e)return;S.eedit=id;S.ecat=e.cat;S.ecur=e.cur;render();const a=$('#expAmt'),m=$('#expMemo');if(a)a.value=e.amount;if(m)m.value=e.memo||'';window.scrollTo(0,0)}
+function cancelEdit(){S.eedit=null;render()}
 function delExp(id){const t=trip();const k=S.eday;if(!t.exp||!t.exp[k])return;t.exp[k]=t.exp[k].filter(e=>e.id!==id);persist(true);render()}
 function screenExp(){const t=trip();const n=dayCount(t);
   if(S.eday!=='pre'&&!(S.eday>=0&&S.eday<n))S.eday='pre';
   const k=S.eday,list=expGet(t,k),cat=S.ecat||'food',foreign=t.currency!=='KRW',cur=foreign?(S.ecur||'LOCAL'):'KRW';
   return `<div style="height:6px"></div>${expTabs(t,k,'selEDay')}
   <div class="dsum"><div><b>${expLabel(k)}</b><span>${k==='pre'?'출발 전':dlabel(dateOfDay(t,k))}</span><div class="muted" style="margin-top:3px">전체 지출 ₩${fmt(expTotal(t))}</div></div><div class="dm">${expMoney(t,expDayTotal(t,k))}</div></div>
-  <div class="card xcard"><h2 style="margin:0 0 12px">지출 입력</h2>
+  <div class="card xcard"><h2 style="margin:0 0 12px">${S.eedit?'지출 수정':'지출 입력'}</h2>
     <div class="cchips">${CATS.map(c=>`<button class="cchip ${c[0]===cat?'on':''}" data-c="${c[0]}" onclick="setECat('${c[0]}')"><b>${c[2]}</b>${c[1]}</button>`).join('')}</div>
     <div class="inl" style="margin-top:10px"><input id="expAmt" type="number" inputmode="decimal" placeholder="금액" onkeydown="if(event.key==='Enter')addExp()">${foreign?`<select onchange="setECur(this.value)"><option value="LOCAL" ${cur==='LOCAL'?'selected':''}>${esc(t.currency)}</option><option value="KRW" ${cur==='KRW'?'selected':''}>원(KRW)</option></select>`:'<small>원</small>'}</div>
     <input id="expMemo" style="margin-top:8px" placeholder="내용 (선택)" maxlength="60" onkeydown="if(event.key==='Enter')addExp()">
-    <button class="btn block" style="margin-top:10px" onclick="addExp()">저장</button></div>
+    <button class="btn block" style="margin-top:10px" onclick="addExp()">${S.eedit?'수정 저장':'저장'}</button>${S.eedit?'<button class="btn block ghost" style="margin-top:8px" onclick="cancelEdit()">취소</button>':''}</div>
   <div class="card xcard"><h2 style="margin:0 0 6px">${expLabel(k)} 지출 ${list.length?`<span class="muted" style="font-size:13px;font-weight:500">${list.length}건</span>`:''}</h2>
-    ${list.length?list.map(e=>{const c=catOf(e.cat);return `<div class="exr"><span class="clab" data-c="${c[0]}">${c[1]}</span><div class="em"><b>${esc(e.memo||'')}</b></div><div class="ea">${expAmtTxt(t,e)}</div><button class="rmsub" onclick="delExp('${e.id}')" aria-label="삭제">×</button></div>`}).join(''):'<div class="muted" style="padding:14px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}</div>`}
+    ${list.length?list.map(e=>{const c=catOf(e.cat);return `<div class="exr"><span class="clab" data-c="${c[0]}">${c[1]}</span><div class="em"><b>${esc(e.memo||'')}</b></div><div class="ea">${expAmtTxt(t,e)}</div><button class="rmsub" onclick="editExp('${e.id}')" aria-label="수정">✎</button><button class="rmsub" onclick="delExp('${e.id}')" aria-label="삭제">×</button></div>`}).join(''):'<div class="muted" style="padding:14px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}</div>`}
 function openExpModal(){S.xday='all';S.xcat='all';drawExpFull();$('#expfull').classList.add('on');$('#expfull').scrollTop=0}
 function closeExpFull(){const e=$('#expfull');if(e)e.classList.remove('on')}
 function selXDay(k){S.xday=k;drawExpFull();$('#expfull').scrollTop=0}
@@ -947,9 +955,9 @@ function drawExpFull(){const t=trip();if(!t)return;const keys=expKeys(t),cur=S.x
   const fcn=fc==='all'?'':catOf(fc)[1];
   const row=e=>{const c=catOf(e.cat);return `<div class="exr ro"><span class="clab" data-c="${c[0]}">${c[1]}</span><div class="em"><b>${esc(e.memo||'')}</b></div><div class="ea">${expAmtTxt(t,e)}</div></div>`};
   const cats=CATS.filter(c=>byCat[c[0]]>0);
-  const chips=cats.length>1||fc!=='all'?`<div class="fchips"><button class="fchip ${fc==='all'?'on':''}" onclick="selXCat('${fc}')">전체</button>${cats.map(c=>`<button class="fchip ${fc===c[0]?'on':''}" onclick="selXCat('${c[0]}')">${c[2]} ${c[1]}<span>₩${fmt(byCat[c[0]])}</span></button>`).join('')}</div>`:'';
+  const chips=cats.length>1||fc!=='all'?`<div class="fchips"><button class="fchip ${fc==='all'?'on':''}" onclick="selXCat('${fc}')">전체</button>${cats.map(c=>`<button class="fchip ${fc===c[0]?'on':''}" onclick="selXCat('${c[0]}')">${c[2]} ${c[1]}</button>`).join('')}</div>`:'';
   const head=cur==='all'?`<b>전체</b><span>${fcn||'모든 지출'} · ${count}건</span>`:`<b>${expLabel(cur)}</b><span>${cur==='pre'?'출발 전':dlabel(dateOfDay(t,cur))}${fcn?' · '+fcn:''} · ${count}건</span>`;
-  let body=`<div class="dsum"><div>${head}</div><div class="dm">${expMoney(t,total)}</div></div>${chips}`;
+  let body=`<div class="dsum"><div>${head}</div><div class="dm" style="white-space:nowrap">${expMoney(t,total).replace('display:block','display:inline;margin-left:6px')}</div></div>${chips}`;
   const days=scope.filter(k=>shown(k).length);
   if(!days.length)body+=`<div class="muted" style="padding:30px 0;text-align:center">${inScope.length?'이 카테고리의 지출이 없어요.':(cur==='all'?'아직 입력한 지출이 없어요.':'이 날은 입력한 지출이 없어요.')}</div>`;
   else if(cur==='all')body+=days.map(k=>`<div class="card exd2"><div class="exh"><b>${expLabel(k)}<small>${k==='pre'?'출발 전':dlabel(dateOfDay(t,k))}</small></b><span>₩${fmt(sum(k))}</span></div>${shown(k).map(row).join('')}</div>`).join('');
