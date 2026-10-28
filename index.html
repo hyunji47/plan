@@ -2,7 +2,7 @@
 <html lang="ko" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://tile.openstreetmap.org https://*.wikimedia.org; connect-src https://api.github.com https://photon.komoot.io https://nominatim.openstreetmap.org https://commons.wikimedia.org https://en.wikipedia.org https://open.er-api.com https://jsonblob.com https://raw.githubusercontent.com; frame-src https://maps.google.com https://www.google.com; font-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://tile.openstreetmap.org https://*.wikimedia.org; connect-src https://api.open-meteo.com https://api.github.com https://photon.komoot.io https://nominatim.openstreetmap.org https://commons.wikimedia.org https://en.wikipedia.org https://open.er-api.com https://jsonblob.com https://raw.githubusercontent.com; frame-src https://maps.google.com https://www.google.com; font-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>나의 여행 플래너</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -131,6 +131,13 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .pstats{position:relative;margin:-26px 0 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
 .pstats>div{display:flex;flex-direction:column;justify-content:center;padding:12px 6px;text-align:center;border-right:1px solid var(--line);min-width:0}
 .pstats>div:last-child{border-right:0}
+.wx{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0 0 14px;box-shadow:var(--shadow)}
+.wx .wi{font-size:34px;line-height:1;flex:none}
+.wx .wt{flex:1;min-width:0}
+.wx .wt b{font-size:22px;font-variant-numeric:tabular-nums}
+.wx .wt span{margin-left:8px;font-size:13.5px;font-weight:600}
+.wx .wt small{display:block;color:var(--sub);font-size:12px;margin-top:3px;line-height:1.5}
+.wx.mut{color:var(--sub);font-size:13px;justify-content:center}
 .pstats b{display:block;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .pstats .est{font-size:10px;font-weight:500;color:var(--sub);opacity:.75;margin-left:3px;vertical-align:middle}
 .dsum{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 16px;padding:14px 16px;background:var(--card2);border:1px solid transparent;border-radius:14px}
@@ -206,7 +213,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .st{font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums;flex:none}
 .spl{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .spl.ph{font-weight:400;color:var(--sub);font-style:italic}
-.s2{font-size:11.5px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s2{font-size:11.5px;color:var(--sub);margin-top:3px;line-height:1.5}
 .sctl{display:flex;flex:none}
 .done{border:0;background:var(--accent);color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;margin-left:6px;cursor:pointer;flex:none}
 .g2in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
@@ -1090,7 +1097,27 @@ function previewHero(t,ci,n,cnt){
     <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><span class="pchip">${dd}</span></div>
     <h2>${esc(t.title||'나의 여행')}</h2><div class="pdate">${fd(parseD(t.start))} – ${fd(parseD(t.end))}</div></div></div>
   <div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div class="tap" onclick="openExpModal()" role="button" tabindex="0"><small class="ico">💰<span class="est">(${final?'최종':'예상'})</span></small><b>₩${fmt(final?spent:tot)}</b><small>지출내역 ›</small></div></div>
+  <div id="wx" class="wx mut">⏳ 현재 날씨 불러오는 중…</div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
+const WXC=c=>c===0?['☀️','맑음']:c<=2?['🌤️','구름 조금']:c===3?['☁️','흐림']:c<=48?['🌫️','안개']:c<=57?['🌦️','이슬비']:c<=67?['🌧️','비']:c<=77?['🌨️','눈']:c<=82?['🌧️','소나기']:c<=86?['🌨️','눈 소나기']:['⛈️','뇌우'];
+const WXCACHE={};
+async function wxCoords(t){
+  for(const k of Object.keys(t.items||{}))for(const it of t.items[k]||[]){const p=pinsFlat(it)[0];if(p&&isFinite(+p.lat)&&isFinite(+p.lng))return{lat:+p.lat,lng:+p.lng}}
+  const q=placeQueries(t).slice(0,1).concat(placeQueries(t).slice(-1))[0];
+  const ci=cInfo(t.country),city=ci.cities.find(x=>x.k===t.city),ce=city?city.e:(t.city||'');
+  return geocodeText((ce?ce+', ':'')+ci.en)}
+async function loadWx(){const t=trip();if(!t)return;const el=$('#wx');if(!el)return;
+  const key=t.id+'|'+t.city+'|'+t.country;let c=WXCACHE[key];
+  try{
+    if(!c||Date.now()-c.at>6e5){
+      const g=c&&c.g||await wxCoords(t);if(!g)throw Error('geo');
+      const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+g.lat.toFixed(3)+'&longitude='+g.lng.toFixed(3)+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1&wind_speed_unit=ms');
+      if(!r.ok)throw Error('wx'+r.status);const j=await r.json();c=WXCACHE[key]={at:Date.now(),g,j}}
+    const cu=c.j.current,d=c.j.daily,[ic,tx]=WXC(cu.weather_code);
+    const e2=$('#wx');if(!e2)return;e2.className='wx';
+    const city=(()=>{const ci=cInfo(t.country);return t.city||ci.n})();
+    e2.innerHTML=`<div class="wi">${ic}</div><div class="wt"><b>${Math.round(cu.temperature_2m)}°</b><span>${tx}</span><small>${esc(city)} 현재 · 체감 ${Math.round(cu.apparent_temperature)}° · 최저 ${Math.round(d.temperature_2m_min[0])}° / 최고 ${Math.round(d.temperature_2m_max[0])}° · 습도 ${Math.round(cu.relative_humidity_2m)}%</small></div>`;
+  }catch(e){const e2=$('#wx');if(e2){e2.className='wx mut';e2.textContent='날씨 정보를 불러오지 못했어요'}}}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
   const cnt=(()=>{const u=new Set();Object.keys(t.items).forEach(k=>{if(+k<n)t.items[k].forEach(it=>pinsFlat(it).forEach(p=>u.add((+p.lat).toFixed(4)+','+(+p.lng).toFixed(4))))});return u.size})();
   let h=previewHero(t,ci,n,cnt);
@@ -1147,6 +1174,7 @@ function render(){const y=scrollY;const jumpToNow=S.screen==='preview'&&!render.
   if(S.screen==='preview'){const e=$('#hlnow');if(e&&!render.scrolled){render.scrolled=1;setTimeout(()=>e.scrollIntoView({block:'center',behavior:'smooth'}),100)}}
   else render.scrolled=0;
   // 프리뷰 최초 진입 시에는 현재 진행 일정으로 이동하고, 이후 갱신에서는 기존 스크롤 위치를 유지합니다.
+  if(S.screen==='preview')loadWx();
   if(!jumpToNow)scrollTo(0,y)}
 setInterval(()=>{if(S.screen==='preview'&&!document.querySelector('details[open]'))render()},30000);
 // 공유 링크를 보는 기기는 15초마다 서버의 변경 여부를 확인하고, 변경된 경우에만 화면을 갱신합니다.
