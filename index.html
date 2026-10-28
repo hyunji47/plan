@@ -42,6 +42,9 @@ input:focus,select:focus{border-color:var(--accent)}
 .badge.tr{position:absolute;top:10px;right:12px;margin:0;z-index:1}
 .trip .tt{display:block;padding-right:58px}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent2);color:var(--accent);margin-left:6px}
+.ptabs{position:sticky;top:calc(57px + env(safe-area-inset-top));z-index:15;background:var(--bg);margin:0 -14px;padding:8px 14px 0}
+#totop{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+#totop.on{opacity:1;pointer-events:auto;transform:none}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tabs.fit .tab{flex:1 1 0;min-width:0;padding-left:4px;padding-right:4px}
@@ -121,9 +124,9 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .trash:hover,.trash:active{opacity:.9;color:var(--danger);background:var(--card2)}
 .pinbtn{border:0;background:var(--accent2);color:var(--accent);width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .pinbtn.on{background:var(--accent);color:#fff}
-.phero{position:relative;margin:-12px -14px 0;min-height:230px;background:linear-gradient(135deg,#3560e8,#8fb2ff) center/cover no-repeat;display:flex;align-items:flex-end;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent)}
+.phero{position:relative;margin:-12px -14px 0;min-height:230px;background:linear-gradient(135deg,#3560e8,#8fb2ff) center/cover no-repeat;display:flex;align-items:center;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent)}
 .pov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,12,24,.82),rgba(8,12,24,.2) 62%,rgba(8,12,24,.1))}
-.pin{position:relative;width:100%;padding:56px 18px 74px;color:#fff;text-align:center}
+.pin{position:relative;width:100%;color:#fff;text-align:center}
 .pchips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .pchip{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .pin h2{font-size:28px;line-height:1.2;margin:10px 0 6px;color:#fff;text-shadow:none;text-wrap:balance;word-break:keep-all}
@@ -314,6 +317,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 <div id="app"></div>
 <div id="toast"></div>
 <div id="expfull"></div>
+<button id="totop" aria-label="맨 위로" onclick="scrollTo({top:0,behavior:'smooth'})"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 <div id="wxfull"></div>
 <div id="modal" onclick="if(event.target===this)closeModal()"></div>
 <div id="drawer" onclick="if(event.target===this)closeMenu()"></div>
@@ -1200,7 +1204,7 @@ function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   let h=previewHero(t,ci,n,cnt);
   if(!S.view)h+=`<button class="btn block" onclick="shareLink()" style="margin-bottom:12px">📤 프리뷰 공유하기</button>`;
   else h+=`<div class="muted" style="text-align:center;margin-bottom:10px">공유된 프리뷰 화면입니다${S.shareId?' · 오른쪽 위 ↻ 로 최신 일정 확인':''}</div>`;
-  h+=dayTabs(t,S.pday,'selPDay');
+  h+=`<div class="ptabs">${dayTabs(t,S.pday,'selPDay')}</div>`;
   h+=`<div class="dsum"><div><b>${S.pday+1}일차</b><span>${dlabel(dateOfDay(t,S.pday))}</span></div><div class="dm">${moneyTxt(t,dayTotal(t,S.pday))}</div></div>`;
   if(!a.length)h+=`<div class="card muted" style="text-align:center;padding:26px">이 날은 등록된 일정이 없어요.</div>`;
   else{const ai=activeIdx(t,S.pday,a);h+='<div class="tl">';a.forEach((it,k)=>{
@@ -1240,6 +1244,7 @@ async function initPMap(){const el=$('#lmap');if(!el)return;const t=trip();
     map.fitBounds(b,{padding:[34,34],maxZoom:16});setTimeout(()=>map.invalidateSize(),50)
   }catch(e){el.innerHTML='<div class="muted" style="padding:22px;text-align:center">지도를 불러오지 못했어요. 핀 아이콘을 눌러 구글 지도에서 확인하세요.</div>'}}
 
+addEventListener('scroll',()=>{const b=document.getElementById('totop');if(b)b.classList.toggle('on',scrollY>300)},{passive:true});
 function render(){const y=scrollY;const jumpToNow=S.screen==='preview'&&!render.scrolled;
   if(S.view&&!S.viewTrip){
     $('#app').innerHTML=header()+`<div class="card" style="text-align:center;padding:30px 14px;margin-top:20px">${S.loadErr?'<div style="font-size:38px">📡</div><p>일정을 불러오지 못했어요.<br><span class="muted">링크가 끊겼거나 네트워크 문제일 수 있어요.</span></p><button class="btn" onclick="retryShared()">다시 시도</button>':'<p class="muted">일정을 불러오는 중…</p>'}</div>`;
