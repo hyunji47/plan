@@ -1254,10 +1254,10 @@ function render(){const y=scrollY;const jumpToNow=S.screen==='preview'&&!render.
   const body={list:screenList,info:screenInfo,exp:screenExp,plan:screenPlan,preview:screenPreview}[S.screen]();
   $('#app').innerHTML=header()+body+nav();
   syncBg();
-  if(S.screen==='preview'){const e=$('#hlnow');if(e&&!render.scrolled){render.scrolled=1;setTimeout(()=>e.scrollIntoView({block:'center',behavior:'smooth'}),100)}}
+  if(S.screen==='preview'){const e=$('#hlnow');if(e&&!render.scrolled){render.scrolled=1;setTimeout(()=>{const pt=$('.ptabs');const off=pt?(parseFloat(getComputedStyle(pt).top)||57)+pt.offsetHeight:120;scrollTo({top:Math.max(0,e.getBoundingClientRect().top+scrollY-off-14),behavior:'smooth'})},100)}}
   else render.scrolled=0;
   // 프리뷰 최초 진입 시에는 현재 진행 일정으로 이동하고, 이후 갱신에서는 기존 스크롤 위치를 유지합니다.
-  if(S.screen==='preview')loadWx();
+  if(S.screen==='preview'){loadWx();const at=document.querySelector('.ptabs .tab.on');if(at){const tb=at.parentElement;tb.scrollLeft=at.offsetLeft-(tb.clientWidth-at.offsetWidth)/2}}
   if(!jumpToNow)scrollTo(0,y)}
 setInterval(()=>{if(S.screen==='preview'&&!document.querySelector('details[open]'))render()},30000);
 // 공유 링크를 보는 기기는 15초마다 서버의 변경 여부를 확인하고, 변경된 경우에만 화면을 갱신합니다.
