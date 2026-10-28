@@ -6,9 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>나의 여행 플래너</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f7f9">
 <meta name="apple-mobile-web-app-title" content="여행 플래너">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <style>
+html{color-scheme:light dark;background:var(--bg)}
 :root{--bg:#f6f7f9;--card:#ffffff;--card2:#f3f5f9;--text:#1d2330;--sub:#6b7385;--line:#e4e8ef;--accent:#2f6bff;--accent2:#e8f0ff;--hl:#fff4cc;--hlb:#f2b200;--danger:#e5484d;--glass:rgba(255,255,255,.82);--ov1:rgba(255,255,255,.35);--ov2:rgba(246,247,249,.9);--shadow:0 2px 12px rgba(20,30,60,.08)}
 [data-theme=dark]{--bg:#0e1117;--card:#171b24;--card2:#1e2330;--text:#eef1f7;--sub:#9aa3b5;--line:#2a3140;--accent:#6c98ff;--accent2:#1f2b48;--hl:#3b3314;--hlb:#f5c542;--danger:#ff6b70;--glass:rgba(20,24,32,.84);--ov1:rgba(10,12,18,.45);--ov2:rgba(14,17,23,.92);--shadow:0 2px 12px rgba(0,0,0,.4)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -405,7 +408,7 @@ function openModal(h){const m=$('#modal');m.innerHTML='<div class="sheet">'+h+'<
 function closeModal(){$('#modal').classList.remove('on')}
 
 /* ---------- 테마 ---------- */
-function setTheme(t){document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem(THEME_KEY,t)}catch(e){}}
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);try{document.querySelector('meta[name=theme-color]').setAttribute('content',t==='dark'?'#0e1117':'#f6f7f9')}catch(e){}try{localStorage.setItem(THEME_KEY,t)}catch(e){}}
 function toggleTheme(){setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');render()}
 
 /* ---------- 날짜/금액 ---------- */
