@@ -166,7 +166,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .exr{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .exr:first-of-type{border-top:0}
 .exr .ec{font-size:20px;flex:none}
-.clab{flex:none;min-width:46px;text-align:center;font-size:12px;font-weight:700;padding:4px 9px;border-radius:99px;background:color-mix(in srgb,var(--cc,#7a8499) 16%,transparent);color:var(--cc,#7a8499)}
+.clab{flex:none;min-width:0;text-align:center;font-size:10.5px;font-weight:700;padding:2px 7px;line-height:1.5;border-radius:99px;background:color-mix(in srgb,var(--cc,#7a8499) 16%,transparent);color:var(--cc,#7a8499)}
 .clab[data-c=lodging]{--cc:#7c5cff}.clab[data-c=transport]{--cc:#2f6bff}.clab[data-c=shopping]{--cc:#e0489a}.clab[data-c=food]{--cc:#e07b00}.clab[data-c=sight]{--cc:#12a06a}
 [data-theme=dark] .clab[data-c=lodging]{--cc:#a995ff}[data-theme=dark] .clab[data-c=transport]{--cc:#7fa6ff}[data-theme=dark] .clab[data-c=shopping]{--cc:#ff7fbd}[data-theme=dark] .clab[data-c=food]{--cc:#ffab40}[data-theme=dark] .clab[data-c=sight]{--cc:#4fd6a0}[data-theme=dark] .clab[data-c=etc]{--cc:#a8b0c2}
 .exr .em{flex:1;min-width:0}
@@ -187,6 +187,8 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .exd .exh{display:flex;justify-content:space-between;padding:8px 0 2px}
 .exd .exh span{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
 .exr.ro .em b{font-weight:600}
+.exr.ro .em{display:flex;align-items:center;gap:8px}
+.exr.ro .em b.mm{margin-top:0;display:block}
 .pstats small.ico{margin:0 0 3px;font-size:12px}
 .pstats small{display:block;font-size:11px;color:var(--sub);margin-top:3px}
 .ev.hasp{padding-right:var(--pr,44px)}
@@ -231,8 +233,10 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .subbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
 .addsub{border:0;background:var(--accent2);color:var(--accent);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;flex:none;white-space:nowrap}
 .rmsub{border:0;background:none;color:var(--danger);width:28px;height:28px;border-radius:8px;font-size:20px;line-height:1;cursor:pointer;flex:none;opacity:.75}
-.exr .rmsub{color:var(--sub);opacity:.5;font-size:18px;width:24px;height:28px;padding:0;margin-left:-8px}
-.exr .rmsub:first-of-type{margin-left:0}
+
+.exr .em .clab{display:inline-block}
+.exr .em b.mm{margin-top:6px;overflow-wrap:anywhere}
+.exr .trash{width:34px}
 .subtot{font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;text-align:right}
 .item input:disabled{opacity:.6}
 .item textarea{padding:6px 8px;font-size:14px;border-radius:8px}
@@ -938,7 +942,7 @@ function screenExp(){const t=trip();const n=dayCount(t);
     <input id="expMemo" style="margin-top:8px" placeholder="내용 (선택)" maxlength="60" onkeydown="if(event.key==='Enter')addExp()">
     <button class="btn block" style="margin-top:10px" onclick="addExp()">${S.eedit?'수정 저장':'저장'}</button>${S.eedit?'<button class="btn block ghost" style="margin-top:8px" onclick="cancelEdit()">취소</button>':''}</div>
   <div class="card xcard"><h2 style="margin:0 0 6px">${expLabel(k)} 지출 ${list.length?`<span class="muted" style="font-size:13px;font-weight:500">${list.length}건</span>`:''}</h2>
-    ${list.length?list.map(e=>{const c=catOf(e.cat);return `<div class="exr"><span class="clab" data-c="${c[0]}">${c[1]}</span><div class="em"><b>${esc(e.memo||'')}</b></div><div class="ea">${expAmtTxt(t,e)}</div><button class="rmsub" onclick="editExp('${e.id}')" aria-label="수정">✎</button><button class="rmsub" onclick="delExp('${e.id}')" aria-label="삭제">×</button></div>`}).join(''):'<div class="muted" style="padding:14px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}</div>`}
+    ${list.length?list.map(e=>{const c=catOf(e.cat);return `<div class="exr"><div class="em"><span class="clab" data-c="${c[0]}">${c[1]}</span>${e.memo?`<b class="mm">${esc(e.memo)}</b>`:''}</div><div class="ea">${expAmtTxt(t,e)}</div><span style="display:flex;gap:2px;flex:none;margin-right:-8px"><button class="trash edit" onclick="editExp('${e.id}')" aria-label="수정"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button><button class="trash" onclick="delExp('${e.id}')" aria-label="삭제"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></span></div>`}).join(''):'<div class="muted" style="padding:14px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}</div>`}
 function openExpModal(){S.xday='all';S.xcat='all';drawExpFull();$('#expfull').classList.add('on');$('#expfull').scrollTop=0}
 function closeExpFull(){const e=$('#expfull');if(e)e.classList.remove('on')}
 function selXDay(k){S.xday=k;drawExpFull();$('#expfull').scrollTop=0}
@@ -953,7 +957,7 @@ function drawExpFull(){const t=trip();if(!t)return;const keys=expKeys(t),cur=S.x
   const sum=k=>shown(k).reduce((a,e)=>a+expKRW(t,e),0);
   const total=scope.reduce((a,k)=>a+sum(k),0),count=scope.reduce((a,k)=>a+shown(k).length,0);
   const fcn=fc==='all'?'':catOf(fc)[1];
-  const row=e=>{const c=catOf(e.cat);return `<div class="exr ro"><span class="clab" data-c="${c[0]}">${c[1]}</span><div class="em"><b>${esc(e.memo||'')}</b></div><div class="ea">${expAmtTxt(t,e)}</div></div>`};
+  const row=e=>{const c=catOf(e.cat);return `<div class="exr ro"><div class="em"><span class="clab" data-c="${c[0]}">${c[1]}</span>${e.memo?`<b class="mm">${esc(e.memo)}</b>`:''}</div><div class="ea">${expAmtTxt(t,e)}</div></div>`};
   const cats=CATS.filter(c=>byCat[c[0]]>0);
   const chips=cats.length>1||fc!=='all'?`<div class="fchips"><button class="fchip ${fc==='all'?'on':''}" onclick="selXCat('${fc}')">전체</button>${cats.map(c=>`<button class="fchip ${fc===c[0]?'on':''}" onclick="selXCat('${c[0]}')">${c[2]} ${c[1]}</button>`).join('')}</div>`:'';
   const head=cur==='all'?`<b>전체</b><span>${fcn||'모든 지출'} · ${count}건</span>`:`<b>${expLabel(cur)}</b><span>${cur==='pre'?'출발 전':dlabel(dateOfDay(t,cur))}${fcn?' · '+fcn:''} · ${count}건</span>`;
