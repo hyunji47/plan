@@ -128,7 +128,9 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .pchip{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .pin h2{font-size:28px;line-height:1.2;margin:10px 0 6px;color:#fff;text-shadow:none;text-wrap:balance;word-break:keep-all}
 .pdate{font-size:13px;opacity:.92;font-variant-numeric:tabular-nums}
-.pstats{position:relative;margin:-26px 0 14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.pcard{position:relative;margin:-26px 0 14px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.pstats{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.wxa+.pstats{border-top:1px solid var(--line)}
 .pstats>div{display:flex;flex-direction:column;justify-content:center;padding:12px 6px;text-align:center;border-right:1px solid var(--line);min-width:0}
 .pstats>div:last-child{border-right:0}
 .wx{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0 0 14px;box-shadow:var(--shadow)}
@@ -142,15 +144,18 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .ctag button{border:0;background:none;color:inherit;opacity:.6;font-size:16px;line-height:1;width:22px;height:22px;cursor:pointer}
 .csug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .csug button{border:1px dashed var(--line);background:none;color:var(--sub);font-size:12.5px;border-radius:99px;padding:4px 10px;cursor:pointer}
-.wxs{display:flex;overflow-x:auto;scrollbar-width:none;margin:0 0 14px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);cursor:pointer;position:relative}
-.wxs::-webkit-scrollbar{display:none}
-.wxc{flex:1 0 96px;padding:10px 8px;text-align:center;border-right:1px solid var(--line);min-width:0}
-.wxc .n{font-size:12px;font-weight:600;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wxc .wr{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:2px}
-.wxc .wi{font-size:20px}
-.wxc b{font-size:18px;font-variant-numeric:tabular-nums}
-.wxc small{display:block;font-size:11.5px;margin-top:1px;font-variant-numeric:tabular-nums;color:var(--sub)}
-.wxg{flex:none;display:flex;align-items:center;padding:0 10px;color:var(--sub);font-style:normal;font-size:18px}
+.wxa{padding:12px 14px 2px}
+.wxa .top{display:flex;align-items:center;gap:12px;cursor:pointer}
+.wxa .top .m{font-size:38px;line-height:1}
+.wxa .top>b{font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.wxa .top .r{font-size:12.5px;line-height:1.5;min-width:0}
+.wxa .top .r b{font-size:13.5px}
+.wxa .top .r span{color:var(--sub)}
+.wxa .top .g{margin-left:auto;color:var(--sub);font-size:18px}
+.wxa .pl{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 0 12px}
+.wxa .pl::-webkit-scrollbar{display:none}
+.wxa .pl button{flex:none;border:0;font:inherit;font-size:12px;background:var(--card2);color:var(--text);border-radius:99px;padding:5px 11px;cursor:pointer;white-space:nowrap}
+.wxa .pl button.on{background:var(--accent2);color:var(--accent);font-weight:700}
 .lo,.dsum .dm .lo{color:#2f6bff}.hi,.dsum .dm .hi{color:#e05a2a}
 #wxfull{position:fixed;inset:0;z-index:55;display:none;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
 #wxfull.on{display:block}
@@ -1131,8 +1136,7 @@ function previewHero(t,ci,n,cnt){
   return `<div class="phero" id="heroimg" ${img?'style="background-image:url(\''+cssUrl(img)+'\')"':''}><div class="pov"></div><div class="pin">
     <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${cityTxt(t)?' · '+esc(cityTxt(t)):''}</span><span class="pchip">${dd}</span></div>
     <h2>${esc(t.title||'나의 여행')}</h2><div class="pdate">${fd(parseD(t.start))} – ${fd(parseD(t.end))}</div></div></div>
-  <div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div class="tap" onclick="openExpModal()" role="button" tabindex="0"><small class="ico">💰<span class="est">(${final?'최종':'예상'})</span></small><b>₩${fmt(final?spent:tot)}</b><small>지출내역 ›</small></div></div>
-  <div id="wx" class="wx mut">⏳ 현재 날씨 불러오는 중…</div>
+  <div class="pcard"><div id="wx" class="wx mut" style="box-shadow:none;border:0;margin:0;border-radius:0">⏳ 날씨 불러오는 중…</div><div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div class="tap" onclick="openExpModal()" role="button" tabindex="0"><small class="ico">💰<span class="est">(${final?'최종':'예상'})</span></small><b>₩${fmt(final?spent:tot)}</b><small>지출내역 ›</small></div></div></div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 const WXC=c=>c===0?['☀️','맑음']:c<=2?['🌤️','구름 조금']:c===3?['☁️','흐림']:c<=48?['🌫️','안개']:c<=57?['🌦️','이슬비']:c<=67?['🌧️','비']:c<=77?['🌨️','눈']:c<=82?['🌧️','소나기']:c<=86?['🌨️','눈 소나기']:['⛈️','뇌우'];
 const WXCACHE={};
@@ -1151,10 +1155,12 @@ async function loadWx(){const t=trip();if(!t)return;if(!$('#wx'))return;
   const el=$('#wx');if(!el)return;
   if(!res.some(x=>x.j)){el.className='wx mut';el.textContent='날씨 정보를 불러오지 못했어요';return}
   const R=v=>Math.round(v);
-  el.outerHTML='<div id="wx" class="wxs">'+res.map(({n,j},i)=>{
-    if(!j)return `<div class="wxc"><div class="n">${esc(n)}</div><small>실패</small></div>`;
-    const cu=j.current,d=j.daily;
-    return `<div class="wxc" onclick="openWx(${i})" role="button" tabindex="0"><div class="n">${esc(n)}</div><div class="wr"><span class="wi">${WXC(cu.weather_code)[0]}</span><b>${R(cu.temperature_2m)}°</b></div><small><span class="lo">${R(d.temperature_2m_min[0])}°</span> / <span class="hi">${R(d.temperature_2m_max[0])}°</span></small></div>`}).join('')+'</div>'}
+  S.wsel=Math.max(0,res.findIndex(x=>x.j));drawWxCard()}
+function drawWxCard(){const el=$('#wx');if(!el||!WXRES.length)return;const R=v=>Math.round(v);
+  const i=S.wsel||0,cur=WXRES[i];if(!cur||!cur.j)return;const j=cur.j,cu=j.current,d=j.daily,[ic,tx]=WXC(cu.weather_code),pp=d.precipitation_probability_max[0];
+  const pills=WXRES.length>1?`<div class="pl">${WXRES.map((x,k)=>x.j?`<button class="${k===i?'on':''}" onclick="selWsel(${k})">${esc(x.n)} ${k===i?'':WXC(x.j.current.weather_code)[0]+' '}${R(x.j.current.temperature_2m)}°</button>`:'').join('')}</div>`:'<div style="height:10px"></div>';
+  el.outerHTML=`<div id="wx" class="wxa"><div class="top" onclick="openWx(${i})" role="button" tabindex="0"><span class="m">${ic}</span><b>${R(cu.temperature_2m)}°</b><div class="r"><b>${esc(cur.n)} · ${tx}</b><br><span class="lo">${R(d.temperature_2m_min[0])}°</span> <span>/</span> <span class="hi">${R(d.temperature_2m_max[0])}°</span>${pp!=null?` <span>· ☔ ${pp}%</span>`:''}</div><span class="g">›</span></div>${pills}</div>`}
+function selWsel(i){S.wsel=i;drawWxCard()}
 function openWx(i){if(!WXRES.some(x=>x.j))return;S.wcity=WXRES[i]&&WXRES[i].j?i:Math.max(0,WXRES.findIndex(x=>x.j));S.wdate=null;drawWx();const e=$('#wxfull');e.classList.add('on');e.scrollTop=0}
 function closeWx(){const e=$('#wxfull');if(e)e.classList.remove('on')}
 function selWC(i){S.wcity=i;drawWx()}
