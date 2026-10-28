@@ -124,7 +124,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .trash:hover,.trash:active{opacity:.9;color:var(--danger);background:var(--card2)}
 .pinbtn{border:0;background:var(--accent2);color:var(--accent);width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .pinbtn.on{background:var(--accent);color:#fff}
-.phero{position:relative;margin:-12px -14px 0;min-height:230px;background:linear-gradient(135deg,#3560e8,#8fb2ff) center/cover no-repeat;display:flex;align-items:center;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent)}
+.phero{position:relative;margin:-12px -14px 0;min-height:290px;background:linear-gradient(135deg,#3560e8,#8fb2ff) center/cover no-repeat;display:flex;align-items:center;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent)}
 .pov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,12,24,.82),rgba(8,12,24,.2) 62%,rgba(8,12,24,.1))}
 .pin{position:relative;width:100%;color:#fff;text-align:center}
 .pchips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -1134,7 +1134,8 @@ function activeIdx(t,day,a){
     else{let nx=null;for(let j=k+1;j<a.length;j++){const x=hm(a[j].time);if(x!=null&&x>s){nx=x;break}}e=nx!=null?nx:s+60}
     if(nm>=s&&nm<e)return k}
   return -1}
-function selPDay(i){S.pday=i;render()}
+function selPDay(i){const pt=$('.ptabs');const stuck=pt&&pt.getBoundingClientRect().top<=60;S.pday=i;render();
+  if(stuck){const t=$('.ptabs'),d=$('.dsum');if(t&&d){const y=d.getBoundingClientRect().top+scrollY-t.getBoundingClientRect().bottom-8;scrollTo(0,Math.max(0,y))}}}
 const cssUrl=u=>String(u).replace(/['"()\s\\]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase().padStart(2,'0'));
 function previewHero(t,ci,n,cnt){
   const fd=d=>d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+'('+WD[d.getDay()]+')';
