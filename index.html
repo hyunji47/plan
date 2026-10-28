@@ -234,6 +234,11 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .addsub{border:0;background:var(--accent2);color:var(--accent);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;flex:none;white-space:nowrap}
 .rmsub{border:0;background:none;color:var(--danger);width:28px;height:28px;border-radius:8px;font-size:20px;line-height:1;cursor:pointer;flex:none;opacity:.75}
 
+.exs{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-top:1px solid var(--line)}
+.exs::-webkit-scrollbar{display:none}
+.exs:first-of-type{border-top:0}
+.exs .exr{flex:0 0 100%;border:0;scroll-snap-align:start;box-sizing:border-box}
+.exs .acts{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:4px;width:88px;scroll-snap-align:end}
 .exr .em .clab{display:inline-block}
 .exr .em b.mm{margin-top:6px;overflow-wrap:anywhere}
 .exr .trash{width:34px}
@@ -942,7 +947,7 @@ function screenExp(){const t=trip();const n=dayCount(t);
     <input id="expMemo" style="margin-top:8px" placeholder="내용 (선택)" maxlength="60" onkeydown="if(event.key==='Enter')addExp()">
     <button class="btn block" style="margin-top:10px" onclick="addExp()">${S.eedit?'수정 저장':'저장'}</button>${S.eedit?'<button class="btn block ghost" style="margin-top:8px" onclick="cancelEdit()">취소</button>':''}</div>
   <div class="card xcard"><h2 style="margin:0 0 6px">${expLabel(k)} 지출 ${list.length?`<span class="muted" style="font-size:13px;font-weight:500">${list.length}건</span>`:''}</h2>
-    ${list.length?list.map(e=>{const c=catOf(e.cat);return `<div class="exr"><div class="em"><span class="clab" data-c="${c[0]}">${c[1]}</span>${e.memo?`<b class="mm">${esc(e.memo)}</b>`:''}</div><div class="ea">${expAmtTxt(t,e)}</div><span style="display:flex;gap:2px;flex:none;margin-right:-8px"><button class="trash edit" onclick="editExp('${e.id}')" aria-label="수정"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button><button class="trash" onclick="delExp('${e.id}')" aria-label="삭제"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></span></div>`}).join(''):'<div class="muted" style="padding:14px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}</div>`}
+    ${list.length?list.map(e=>{const c=catOf(e.cat);return `<div class="exs"><div class="exr"><div class="em"><span class="clab" data-c="${c[0]}">${c[1]}</span>${e.memo?`<b class="mm">${esc(e.memo)}</b>`:''}</div><div class="ea">${expAmtTxt(t,e)}</div></div><div class="acts"><button class="trash edit" onclick="editExp('${e.id}')" aria-label="수정"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button><button class="trash" onclick="delExp('${e.id}')" aria-label="삭제"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></div></div>`}).join(''):'<div class="muted" style="padding:14px 0;text-align:center">아직 입력한 지출이 없어요.</div>'}</div>`}
 function openExpModal(){S.xday='all';S.xcat='all';drawExpFull();$('#expfull').classList.add('on');$('#expfull').scrollTop=0}
 function closeExpFull(){const e=$('#expfull');if(e)e.classList.remove('on')}
 function selXDay(k){S.xday=k;drawExpFull();$('#expfull').scrollTop=0}
