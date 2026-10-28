@@ -1151,20 +1151,24 @@ async function loadWx(){const t=trip();if(!t)return;if(!$('#wx'))return;
   const el=$('#wx');if(!el)return;
   if(!res.some(x=>x.j)){el.className='wx mut';el.textContent='날씨 정보를 불러오지 못했어요';return}
   const R=v=>Math.round(v);
-  el.outerHTML='<div id="wx" class="wxs" onclick="openWx()" role="button" tabindex="0">'+res.map(({n,j})=>{
+  el.outerHTML='<div id="wx" class="wxs">'+res.map(({n,j},i)=>{
     if(!j)return `<div class="wxc"><div class="n">${esc(n)}</div><small>실패</small></div>`;
     const cu=j.current,d=j.daily;
-    return `<div class="wxc"><div class="n">${esc(n)}</div><div class="wr"><span class="wi">${WXC(cu.weather_code)[0]}</span><b>${R(cu.temperature_2m)}°</b></div><small><span class="lo">${R(d.temperature_2m_min[0])}°</span> / <span class="hi">${R(d.temperature_2m_max[0])}°</span></small></div>`}).join('')+'<i class="wxg">›</i></div>'}
-function openWx(){if(!WXRES.some(x=>x.j))return;S.wcity=Math.max(0,WXRES.findIndex(x=>x.j));S.wdate=null;drawWx();const e=$('#wxfull');e.classList.add('on');e.scrollTop=0}
+    return `<div class="wxc" onclick="openWx(${i})" role="button" tabindex="0"><div class="n">${esc(n)}</div><div class="wr"><span class="wi">${WXC(cu.weather_code)[0]}</span><b>${R(cu.temperature_2m)}°</b></div><small><span class="lo">${R(d.temperature_2m_min[0])}°</span> / <span class="hi">${R(d.temperature_2m_max[0])}°</span></small></div>`}).join('')+'</div>'}
+function openWx(i){if(!WXRES.some(x=>x.j))return;S.wcity=WXRES[i]&&WXRES[i].j?i:Math.max(0,WXRES.findIndex(x=>x.j));S.wdate=null;drawWx();const e=$('#wxfull');e.classList.add('on');e.scrollTop=0}
 function closeWx(){const e=$('#wxfull');if(e)e.classList.remove('on')}
 function selWC(i){S.wcity=i;drawWx()}
 function selWD(d){S.wdate=d;drawWx()}
 function drawWx(){const t=trip();const res=WXRES,cur=res[S.wcity]||res.find(x=>x.j);const j=cur.j;if(!j)return;
-  const R=v=>Math.round(v),dates=j.daily.time;
-  const td=j.current.time.slice(0,10);if(!S.wdate||!dates.includes(S.wdate))S.wdate=dates[0];
-  const di=dates.indexOf(S.wdate);
+  const R=v=>Math.round(v),all=j.daily.time;
+  const td=j.current.time.slice(0,10);
   const tripDay=ds=>{const n=dayCount(t);for(let i=0;i<n;i++){const d=dateOfDay(t,i),x=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(x===ds)return i+1}return 0};
+  const dates=all.filter(ds=>tripDay(ds));
   const wd=['일','월','화','수','목','금','토'];
+  const head=`<header class="top"><button class="ib" onclick="closeWx()" aria-label="닫기">‹</button><h1>🌤️ 날씨</h1></header>`;
+  if(!dates.length){$('#wxfull').innerHTML=`<div class="xin">${head}<div class="muted" style="padding:50px 10px;text-align:center;line-height:1.7">여행 기간의 예보가 아직 없어요.<br>예보는 오늘부터 16일 이내만 제공돼요.</div></div>`;return}
+  if(!S.wdate||!dates.includes(S.wdate))S.wdate=dates.includes(td)?td:dates[0];
+  const di=all.indexOf(S.wdate);
   const tabs=dates.map(ds=>{const dt=new Date(ds+'T00:00:00'),n=tripDay(ds);return `<button class="tab ${ds===S.wdate?'on':''}" onclick="selWD('${ds}')">${ds===td?'오늘':(dt.getMonth()+1)+'/'+dt.getDate()+'('+wd[dt.getDay()]+')'}<small>${n?n+'일차':'&nbsp;'}</small></button>`}).join('');
   const ctabs=res.length>1?`<div class="fchips">${res.map((x,i)=>`<button class="fchip ${i===S.wcity?'on':''}" onclick="selWC(${i})">${esc(x.n)}</button>`).join('')}</div>`:'';
   const [ic,tx]=WXC(j.daily.weather_code[di]);const pp=j.daily.precipitation_probability_max[di];
@@ -1172,7 +1176,7 @@ function drawWx(){const t=trip();const res=WXRES,cur=res[S.wcity]||res.find(x=>x
   const nowH=S.wdate===td?+j.current.time.slice(11,13):-1;
   const rows=[];for(let h=0;h<24;h++){const ix=di*24+h;if(j.hourly.time[ix]==null)break;const [hi]=WXC(j.hourly.weather_code[ix]),p=j.hourly.precipitation_probability[ix];
     rows.push(`<div class="whr ${h===nowH?'now':''}"><span class="t">${String(h).padStart(2,'0')}:00</span><span class="i">${hi}</span><b>${R(j.hourly.temperature_2m[ix])}°</b><span class="p">${p!=null?'☔ '+p+'%':''}</span></div>`)}
-  $('#wxfull').innerHTML=`<div class="xin"><header class="top"><button class="ib" onclick="closeWx()" aria-label="닫기">‹</button><h1>🌤️ 날씨</h1></header><div class="xtabs"><div class="tabs">${tabs}</div></div>${ctabs}${sum}<div class="card" style="padding:6px 18px">${rows.join('')}</div><div class="muted" style="text-align:center;font-size:11.5px">데이터: Open-Meteo · 현지 시각 기준 · 16일 예보</div></div>`;
+  $('#wxfull').innerHTML=`<div class="xin">${head}<div class="xtabs"><div class="tabs">${tabs}</div></div>${ctabs}${sum}<div class="card" style="padding:6px 18px">${rows.join('')}</div><div class="muted" style="text-align:center;font-size:11.5px">데이터: Open-Meteo · 현지 시각 기준 · 여행 기간 예보</div></div>`;
   const on=$('#wxfull .tab.on');if(on)on.scrollIntoView({inline:'center',block:'nearest'});
   const nr=$('#wxfull .whr.now');if(nr&&!drawWx.s){drawWx.s=1;nr.scrollIntoView({block:'center'})}}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
