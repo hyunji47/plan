@@ -137,6 +137,19 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .wx .wt b{font-size:22px;font-variant-numeric:tabular-nums}
 .wx .wt span{margin-left:8px;font-size:13.5px;font-weight:600}
 .wx .wt small{display:block;color:var(--sub);font-size:12px;margin-top:3px;line-height:1.5}
+.ctags{display:flex;flex-wrap:wrap;gap:6px}
+.ctag{display:inline-flex;align-items:center;gap:2px;background:var(--accent2);color:var(--accent);font-weight:600;font-size:13.5px;border-radius:99px;padding:5px 6px 5px 12px}
+.ctag button{border:0;background:none;color:inherit;opacity:.6;font-size:16px;line-height:1;width:22px;height:22px;cursor:pointer}
+.csug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.csug button{border:1px dashed var(--line);background:none;color:var(--sub);font-size:12.5px;border-radius:99px;padding:4px 10px;cursor:pointer}
+.wxs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 0 14px}
+.wxs::-webkit-scrollbar{display:none}
+.wxc{flex:1 0 108px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;box-shadow:var(--shadow)}
+.wxc .n{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wxc .wi{font-size:30px;line-height:1.3;margin-top:4px}
+.wxc b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.wxc small{display:block;color:var(--sub);font-size:11.5px;margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wxc .lo{color:#2f6bff}.wxc .hi{color:#e05a2a}
 .wx.mut{color:var(--sub);font-size:13px;justify-content:center}
 .pstats b{display:block;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .pstats .est{font-size:10px;font-weight:500;color:var(--sub);opacity:.75;margin-left:3px;vertical-align:middle}
@@ -438,7 +451,7 @@ function go(screen,id){if(id)S.tripId=id;S.screen=screen;S.open=null;if(screen==
   if(screen==='preview'){const t=trip();const td=Math.round((new Date().setHours(0,0,0,0)-parseD(t.start))/864e5);S.pday=td>=0&&td<dayCount(t)?td:0}
   render();window.scrollTo(0,0)}
 function newTrip(){const s=new Date(),e=new Date();e.setDate(e.getDate()+2);
-  const ci=COUNTRIES[1];const t={id:uid(),country:ci.n,city:ci.cities[0].k,title:'',start:ymd(s),end:ymd(e),currency:ci.c,rate:+krwPer(ci.c).toFixed(4),items:{}};
+  const ci=COUNTRIES[1];const t={id:uid(),country:ci.n,city:ci.cities[0].k,cities:[ci.cities[0].k],title:'',start:ymd(s),end:ymd(e),currency:ci.c,rate:+krwPer(ci.c).toFixed(4),items:{}};
   S.store.trips.unshift(t);persist(true);S.tripId=t.id;S.day=0;go('info')}
 function openTrip(id){S.day=0;go('plan',id)}
 function dupTrip(id){const t=S.store.trips.find(x=>x.id===id);const n=JSON.parse(JSON.stringify(t));n.id=uid();delete n.shareId;n.title=(t.title||'여행')+' (복사)';
@@ -540,10 +553,15 @@ function menuDo(a){closeMenu();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();closeModal();closeExpFull()}});
 
 /* ---------- 정보 입력 ---------- */
+const tcities=t=>Array.isArray(t.cities)&&t.cities.length?t.cities.filter(Boolean):(t.city?[t.city]:[]);
+const cityTxt=t=>tcities(t).join(' · ');
+function setCities(a){const t=trip();a=[...new Set(a.map(x=>String(x).trim().slice(0,40)).filter(Boolean))].slice(0,8);t.cities=a;t.city=a[0]||'';persist();render();syncBg()}
+function addCity(v){const t=trip();const el=$('#cityin');v=(v||(el&&el.value)||'').trim();if(!v)return;setCities(tcities(t).concat(v))}
+function rmCity(i){const t=trip();const a=tcities(t);a.splice(i,1);setCities(a)}
 function setField(k,v){const t=trip();t[k]=v;
   if(k==='start'&&t.end<v)t.end=v;if(k==='end'&&t.end<t.start)t.start=t.end;
   persist();if(k==='start'||k==='end'){render()}}
-function setCountry(n){const t=trip(),ci=cInfo(n);t.country=n;t.currency=ci.c;t.city=ci.cities[0].k;t.rate=+krwPer(ci.c).toFixed(4);persist();render()}
+function setCountry(n){const t=trip(),ci=cInfo(n);t.country=n;t.currency=ci.c;t.city=ci.cities[0].k;t.cities=[t.city];t.rate=+krwPer(ci.c).toFixed(4);persist();render()}
 function applyRate(){const t=trip();t.rate=+krwPer(t.currency).toFixed(4);persist();render();toast('현재 환율을 적용했어요')}
 async function refreshRate(){toast('환율 불러오는 중…');await fetchRates(true);toast(RATE_LIVE?'환율을 갱신했어요':'네트워크 오류 – 참고용 환율 사용');render()}
 function cv(side,v){const t=trip();const r=+t.rate||1;const o=side==='L'?$('#cvK'):$('#cvL');if(v==='')return void(o.value='');
@@ -815,7 +833,7 @@ function cleanTrip(j){if(!j||typeof j!=='object')throw new Error('bad');
   const s=(v,max=300)=>String(v??'').slice(0,max);const num=v=>{v=+v;return isFinite(v)?v:0};
   const numOrBlank=v=>(v===''||v==null)?'':num(v);const tm=v=>/^\d{2}:\d{2}$/.test(v)?v:'';
   const dre=/^\d{4}-\d{2}-\d{2}$/;if(!dre.test(j.start)||!dre.test(j.end))throw new Error('bad date');
-  const t={id:s(j.id,40),country:s(j.country,60),city:s(j.city,80),title:s(j.title,120),start:j.start,end:j.end,
+  const t={id:s(j.id,40),country:s(j.country,60),city:s(j.city,80),cities:Array.isArray(j.cities)?j.cities.slice(0,8).map(x=>s(x,40)).filter(Boolean):undefined,title:s(j.title,120),start:j.start,end:j.end,
     currency:/^[A-Z]{3}$/.test(j.currency)?j.currency:'KRW',rate:num(j.rate)||1,items:{}};
   if(BID.test(j.shareId||''))t.shareId=j.shareId;
   {const ex={};const arrOf=k=>Array.isArray(j.exp&&j.exp[k])?j.exp[k]:[];
@@ -913,7 +931,7 @@ function screenList(){const ts=S.store.trips;
   if(!ts.length)h+=`<div class="card" style="text-align:center;padding:30px 14px"><div style="font-size:42px">🧳</div><p class="muted">아직 계획한 여행이 없어요.</p><button class="btn" onclick="newTrip()">＋ 새 여행 추가</button></div>`;
   ts.forEach(t=>{const ci=cInfo(t.country);const n=dayCount(t);
     h+=`<div class="card trip"><span class="badge tr">${ddayBadge(t)}</span><div class="th" style="${(t.thumb||t.img)?`background-image:url('${cssUrl(t.thumb||t.img)}')`:''}" onclick="openTrip('${t.id}')">${(t.thumb||t.img)?'':flag(ci.i)}</div>
-    <div class="tb"><div onclick="openTrip('${t.id}')"><b class="tt">${esc(t.title||'제목 없음')}</b><span class="muted">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><br><span class="muted">${t.start.slice(5).replace('-','/')} ~ ${t.end.slice(5).replace('-','/')} · ${n}일</span></div>
+    <div class="tb"><div onclick="openTrip('${t.id}')"><b class="tt">${esc(t.title||'제목 없음')}</b><span class="muted">${flag(ci.i)} ${esc(t.country)}${cityTxt(t)?' · '+esc(cityTxt(t)):''}</span><br><span class="muted">${t.start.slice(5).replace('-','/')} ~ ${t.end.slice(5).replace('-','/')} · ${n}일</span></div>
     <div style="display:flex;gap:4px;margin-top:6px;align-items:center;justify-content:space-between"><button class="btn ghost xs" onclick="go('preview','${t.id}')">프리뷰</button><span style="display:flex;gap:2px"><button class="trash edit" onclick="go('info','${t.id}')" aria-label="여행 정보 편집"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></svg></button><button class="trash" onclick="delTrip('${t.id}')" aria-label="여행 삭제"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></svg></button></span></div></div></div>`});
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 /* ---------- 지출내역 ---------- */
@@ -986,9 +1004,11 @@ function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   <div class="g2in">
     <div><label class="f" style="margin-top:0">여행지</label>
     <select onchange="setCountry(this.value)">${COUNTRIES.map(c=>`<option ${c.n===t.country?'selected':''}>${esc(c.n)}</option>`).join('')}</select></div>
-    <div><label class="f" style="margin-top:0">도시 / 지역</label>
-    <input id="cityin" value="${esc(t.city)}" placeholder="예: 도쿄" autocomplete="off" onchange="setField('city',this.value.trim());syncBg()"></div>
   </div>
+  <label class="f">도시 / 지역 <small class="muted">(여러 곳 선택 가능)</small></label>
+  <div class="ctags">${tcities(t).map((c,i)=>`<span class="ctag">${esc(c)}<button onclick="rmCity(${i})" aria-label="삭제">×</button></span>`).join('')||'<span class="muted">아직 선택한 지역이 없어요</span>'}</div>
+  <div class="inl" style="margin-top:8px"><input id="cityin" placeholder="도시 입력 (예: 오사카)" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();addCity()}"><button class="btn xs" style="white-space:nowrap;flex:none;padding:0 16px;height:auto;align-self:stretch;font-size:14px" onclick="addCity()">추가</button></div>
+  <div class="csug">${ci.cities.filter(c=>!tcities(t).includes(c.k)).map(c=>`<button onclick="addCity('${esc(c.k)}')">+ ${esc(c.k)}</button>`).join('')}</div>
   <label class="f">여행 타이틀</label>
   <input value="${esc(t.title)}" placeholder="예: 가을 도쿄 맛집 여행" oninput="setField('title',this.value);document.querySelector('header h1').textContent=this.value||'새 여행'">
   <label class="f">여행 기간</label>
@@ -1094,30 +1114,31 @@ function previewHero(t,ci,n,cnt){
   const spent=expTotal(t),ended=new Date().setHours(0,0,0,0)>parseD(t.end).getTime(),final=ended&&spent>0;
   const sub=t.currency!=='KRW'&&t.rate?'≈ '+fmt(tot/t.rate)+' '+t.currency:'원화 기준';
   return `<div class="phero" id="heroimg" ${img?'style="background-image:url(\''+cssUrl(img)+'\')"':''}><div class="pov"></div><div class="pin">
-    <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${t.city?' · '+esc(t.city):''}</span><span class="pchip">${dd}</span></div>
+    <div class="pchips"><span class="pchip">${flag(ci.i)} ${esc(t.country)}${cityTxt(t)?' · '+esc(cityTxt(t)):''}</span><span class="pchip">${dd}</span></div>
     <h2>${esc(t.title||'나의 여행')}</h2><div class="pdate">${fd(parseD(t.start))} – ${fd(parseD(t.end))}</div></div></div>
   <div class="pstats"><div><small class="ico">📅</small><b>${n-1}박 ${n}일</b><small>기간</small></div><div><small class="ico">📍</small><b>${cnt}곳</b><small>방문 장소</small></div><div class="tap" onclick="openExpModal()" role="button" tabindex="0"><small class="ico">💰<span class="est">(${final?'최종':'예상'})</span></small><b>₩${fmt(final?spent:tot)}</b><small>지출내역 ›</small></div></div>
   <div id="wx" class="wx mut">⏳ 현재 날씨 불러오는 중…</div>
   ${t.currency!=='KRW'?'<div class="muted" style="text-align:center;margin:-2px 0 12px">1 '+t.currency+' = '+fmt2(t.rate)+' KRW 적용</div>':''}`}
 const WXC=c=>c===0?['☀️','맑음']:c<=2?['🌤️','구름 조금']:c===3?['☁️','흐림']:c<=48?['🌫️','안개']:c<=57?['🌦️','이슬비']:c<=67?['🌧️','비']:c<=77?['🌨️','눈']:c<=82?['🌧️','소나기']:c<=86?['🌨️','눈 소나기']:['⛈️','뇌우'];
 const WXCACHE={};
-async function wxCoords(t){
-  for(const k of Object.keys(t.items||{}))for(const it of t.items[k]||[]){const p=pinsFlat(it)[0];if(p&&isFinite(+p.lat)&&isFinite(+p.lng))return{lat:+p.lat,lng:+p.lng}}
-  const q=placeQueries(t).slice(0,1).concat(placeQueries(t).slice(-1))[0];
-  const ci=cInfo(t.country),city=ci.cities.find(x=>x.k===t.city),ce=city?city.e:(t.city||'');
-  return geocodeText((ce?ce+', ':'')+ci.en)}
-async function loadWx(){const t=trip();if(!t)return;const el=$('#wx');if(!el)return;
-  const key=t.id+'|'+t.city+'|'+t.country;let c=WXCACHE[key];
-  try{
-    if(!c||Date.now()-c.at>6e5){
-      const g=c&&c.g||await wxCoords(t);if(!g)throw Error('geo');
-      const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+g.lat.toFixed(3)+'&longitude='+g.lng.toFixed(3)+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1&wind_speed_unit=ms');
-      if(!r.ok)throw Error('wx'+r.status);const j=await r.json();c=WXCACHE[key]={at:Date.now(),g,j}}
-    const cu=c.j.current,d=c.j.daily,[ic,tx]=WXC(cu.weather_code);
-    const e2=$('#wx');if(!e2)return;e2.className='wx';
-    const city=(()=>{const ci=cInfo(t.country);return t.city||ci.n})();
-    e2.innerHTML=`<div class="wi">${ic}</div><div class="wt"><b>${Math.round(cu.temperature_2m)}°</b><span>${tx}</span><small>${esc(city)} 현재 · 체감 ${Math.round(cu.apparent_temperature)}° · 최저 ${Math.round(d.temperature_2m_min[0])}° / 최고 ${Math.round(d.temperature_2m_max[0])}° · 습도 ${Math.round(cu.relative_humidity_2m)}%</small></div>`;
-  }catch(e){const e2=$('#wx');if(e2){e2.className='wx mut';e2.textContent='날씨 정보를 불러오지 못했어요'}}}
+async function wxGeo(name,t){const ci=cInfo(t.country),m=ci.cities.find(x=>x.k===name),ce=m?m.e:name;
+  const k='g|'+ce+'|'+ci.en;if(WXCACHE[k])return WXCACHE[k];const g=await geocodeText(ce+', '+ci.en);if(g)WXCACHE[k]=g;return g}
+async function wxOne(name,t){const g=await wxGeo(name,t);if(!g)throw Error('geo');
+  const k='w|'+g.lat.toFixed(2)+','+g.lng.toFixed(2);let c=WXCACHE[k];
+  if(!c||Date.now()-c.at>6e5){
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+g.lat.toFixed(3)+'&longitude='+g.lng.toFixed(3)+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1');
+    if(!r.ok)throw Error('wx'+r.status);c=WXCACHE[k]={at:Date.now(),j:await r.json()}}
+  return c.j}
+async function loadWx(){const t=trip();if(!t)return;if(!$('#wx'))return;
+  let names=tcities(t);if(!names.length)names=[cInfo(t.country).n];
+  const res=await Promise.all(names.map(n=>wxOne(n,t).then(j=>({n,j}),()=>({n,j:null}))));
+  const el=$('#wx');if(!el)return;
+  if(!res.some(x=>x.j)){el.className='wx mut';el.textContent='날씨 정보를 불러오지 못했어요';return}
+  const R=v=>Math.round(v);
+  el.outerHTML='<div id="wx" class="wxs">'+res.map(({n,j})=>{
+    if(!j)return `<div class="wxc"><div class="n">${esc(n)}</div><div class="wi">❔</div><small>불러오기 실패</small></div>`;
+    const cu=j.current,d=j.daily,[ic,tx]=WXC(cu.weather_code);
+    return `<div class="wxc"><div class="n">${esc(n)}</div><div class="wi">${ic}</div><b>${R(cu.temperature_2m)}°</b><small>${tx}</small><small><span class="lo">${R(d.temperature_2m_min[0])}°</span> / <span class="hi">${R(d.temperature_2m_max[0])}°</span></small></div>`}).join('')+'</div>'}
 function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);const a=itemsOf(t,S.pday);
   const cnt=(()=>{const u=new Set();Object.keys(t.items).forEach(k=>{if(+k<n)t.items[k].forEach(it=>pinsFlat(it).forEach(p=>u.add((+p.lat).toFixed(4)+','+(+p.lng).toFixed(4))))});return u.size})();
   let h=previewHero(t,ci,n,cnt);
