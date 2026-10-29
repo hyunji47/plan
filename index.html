@@ -172,8 +172,14 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .wxl .wh b{font-size:16px;margin-right:auto}
 .wxl .wh span{font-size:14px;font-weight:700}
 .wxl .wh .sub{font-weight:500;font-size:12.5px}
-.hfs{display:flex;gap:16px;padding:6px 16px 10px;font-size:13px;color:var(--sub)}
-.hfs b{color:var(--text);font-size:14px}
+.tz{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 12px 2px}
+.tz>div{background:var(--card2);border-radius:12px;padding:8px 2px;text-align:center;font-size:11px;color:var(--sub);min-width:0}
+.tz b{display:block;font-size:15px;color:var(--text);margin:1px 0}
+.tz .o{display:block;font-size:19px;margin:3px 0}
+.tz small{display:block;color:var(--text);font-size:11px;font-weight:600;line-height:1.35}
+.chk{display:flex;gap:6px;padding:8px 16px 0;flex-wrap:wrap}
+.chk span{font-size:11.5px;border:1px dashed var(--line);border-radius:99px;padding:3px 9px;color:var(--sub)}
+.chk span.y{border:1px solid var(--accent);background:var(--accent2);color:var(--accent);font-weight:700}
 .hs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 12px;border-top:1px solid var(--line);padding-top:10px}
 .hs::-webkit-scrollbar{display:none}
 .hc{flex:none;width:52px;text-align:center;padding:8px 0;border-radius:12px;font-variant-numeric:tabular-nums}
@@ -1155,12 +1161,13 @@ function previewHero(t,ci,n,cnt){
   `}
 const WXC=c=>c===0?['☀️','맑음']:c<=2?['🌤️','구름 조금']:c===3?['☁️','흐림']:c<=48?['🌫️','안개']:c<=57?['🌦️','이슬비']:c<=67?['🌧️','비']:c<=77?['🌨️','눈']:c<=82?['🌧️','소나기']:c<=86?['🌨️','눈 소나기']:['⛈️','뇌우'];
 const WXCACHE={};
+const OUTFIT=t=>t>=28?['🩳','매우 더워요']:t>=23?['👕','반팔']:t>=20?['👕','긴팔 · 가볍게']:t>=17?['👕','긴팔 + 가디건']:t>=12?['🧥','겉옷 필수']:t>=8?['🧥','코트 · 니트']:t>=5?['🧣','두꺼운 코트']:['🧣','패딩 · 목도리'];
 async function wxGeo(name,t){const ci=cInfo(t.country),m=ci.cities.find(x=>x.k===name),ce=m?m.e:name;
   const k='g|'+ce+'|'+ci.en;if(WXCACHE[k])return WXCACHE[k];const g=await geocodeText(ce+', '+ci.en);if(g)WXCACHE[k]=g;return g}
 async function wxOne(name,t){const g=await wxGeo(name,t);if(!g)throw Error('geo');
   const k='w|'+g.lat.toFixed(2)+','+g.lng.toFixed(2);let c=WXCACHE[k];
   if(!c||Date.now()-c.at>6e5){
-    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+g.lat.toFixed(3)+'&longitude='+g.lng.toFixed(3)+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=temperature_2m,weather_code,precipitation_probability&timezone=auto&forecast_days=16');
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+g.lat.toFixed(3)+'&longitude='+g.lng.toFixed(3)+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=temperature_2m,apparent_temperature,weather_code,precipitation_probability&timezone=auto&forecast_days=16');
     if(!r.ok)throw Error('wx'+r.status);c=WXCACHE[k]={at:Date.now(),j:await r.json()}}
   return c.j}
 let WXRES=[];
@@ -1194,12 +1201,18 @@ function drawWx(){const t=trip();const res=WXRES;const base=(res.find(x=>x.j)||{
     const di=j.daily.time.indexOf(S.wdate);if(di<0)return '';
     const hx=h=>di*24+h,H=j.hourly;
     const [dic,dtx]=WXC(j.daily.weather_code[di]);const pp=j.daily.precipitation_probability_max[di];
-    const half=(h,l)=>{const [i]=WXC(H.weather_code[hx(h)]);return `<span class="hf">${l} ${i} <b>${R(H.temperature_2m[hx(h)])}°</b></span>`};
+    const AT=H.apparent_temperature||H.temperature_2m;
+    const zone=(l,hs)=>{const v=hs.map(h=>AT[hx(h)]).filter(x=>x!=null);if(!v.length)return '';const m=v.reduce((a,b)=>a+b,0)/v.length,[o,w]=OUTFIT(m);return `<div><span>${l}</span><span class="o">${o}</span><b>${R(m)}°</b><small>${w}</small></div>`};
+    const mn=j.daily.temperature_2m_min[di],mx=j.daily.temperature_2m_max[di],rng=mx-mn,sunny=j.daily.weather_code[di]<=2;
+    const zs=[[6,9],[12,15],[18,21],[22,23]].map(z=>{const a=[];for(let h=z[0];h<=z[1];h++)a.push(h);return a});
+    const zm=zs.map(a=>{const v=a.map(h=>AT[hx(h)]).filter(x=>x!=null);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null}).filter(x=>x!=null);
+    const chip=(on,t)=>`<span class="${on?'y':''}">${t}</span>`;
+    const chips=[chip(pp!=null&&pp>=50,pp!=null&&pp>=50?'☂️ 우산':'☂️ 우산 불필요'),chip(zm.some(x=>x<20),'🧥 겉옷'),chip(rng>=10,'🧅 겹쳐입기'),chip(sunny&&mx>=24,'🧢 모자'),chip(sunny,'🕶️ 선글라스'),chip(sunny,'🧴 자외선차단')].join('');
     const nowH=S.wdate===td?+j.current.time.slice(11,13):-1;
     const strip=[...Array(24).keys()].map(h=>{const ix=hx(h);if(H.time[ix]==null)return '';const [hi]=WXC(H.weather_code[ix]),p=H.precipitation_probability[ix];
       return `<div class="hc ${h===nowH?'now':''}"><span class="t">${h===nowH?'지금':String(h).padStart(2,'0')+'시'}</span><i>${hi}</i><b>${R(H.temperature_2m[ix])}°</b><small>${p!=null?p+'%':''}</small></div>`}).join('');
     return `<div class="card wxl"><div class="wh"><b>${esc(n)}</b><span class="lo">${R(j.daily.temperature_2m_min[di])}°</span><span class="sub">/</span><span class="hi">${R(j.daily.temperature_2m_max[di])}°</span>${pp!=null?`<span class="sub" style="margin-left:6px">☔ ${pp}%</span>`:''}</div>
-    <div class="hfs">${half(9,'오전')}${half(15,'오후')}</div><div class="hs">${strip}</div></div>`}).join('');
+    <div class="tz">${zone('아침 6–9',zs[0])}${zone('낮 12–15',zs[1])}${zone('저녁 18–21',zs[2])}${zone('밤 22~',zs[3])}</div><div class="chk">${chips}</div><div class="hs" style="margin-top:10px">${strip}</div></div>`}).join('');
   $('#wxfull').innerHTML=`<div class="xin">${head}<div class="xtabs"><div class="tabs fit">${tabs}</div></div><div style="height:8px"></div>${cards}<div class="muted" style="text-align:center;font-size:11.5px">데이터: Open-Meteo · 현지 시각 기준 · 여행 기간 예보</div></div>`;
   wxScroll()}
 function wxScroll(){document.querySelectorAll('#wxfull .hs').forEach(e=>{const n=e.querySelector('.now');if(n)e.scrollLeft=Math.max(0,n.offsetLeft-e.offsetLeft-40)})}
