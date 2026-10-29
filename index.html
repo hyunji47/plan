@@ -28,10 +28,13 @@ header.top h1{flex:1;margin:0;font-size:17px;white-space:nowrap;overflow:hidden;
 .btn.sm{padding:7px 10px;font-size:13px;border-radius:10px}
 .btn.block{width:100%}
 .btn.xs{padding:4px 10px;font-size:12px;font-weight:600;border-radius:8px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
 h2{font-size:16px;margin:0 0 10px}
 label.f{display:block;font-size:12px;color:var(--sub);margin:10px 0 4px}
 input,select,textarea{width:100%;font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px;outline:none;min-width:0}
+input[type=date]{color-scheme:light;font-size:13.5px;padding:7px 8px;height:38px}
+html[data-theme=dark] input[type=date]{color-scheme:dark}
+input[type=date]::-webkit-calendar-picker-indicator{opacity:.7;cursor:pointer}
 input:focus,select:focus{border-color:var(--accent)}
 .row{display:flex;gap:8px;align-items:center;margin-top:8px}
 .row>*{flex:1}.row>.fix{flex:none}
@@ -105,7 +108,7 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 #expfull.on{display:block}
 #expfull .xin{max-width:480px;margin:0 auto;padding:0 14px 40px}
 #expfull .xin header.top{position:sticky;top:0;margin:0 -14px 0}
-.exd2{padding:12px 22px 14px;margin-bottom:16px}
+.exd2{padding:14px 24px 16px;margin-bottom:16px}
 .exd2 .exh b small{margin-left:8px;color:var(--sub);font-weight:500;font-size:12px}
 .xtabs{position:sticky;top:57px;z-index:15;background:var(--bg);padding:8px 0 2px}
 .fchips{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
@@ -114,7 +117,7 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 .fchip span{margin-left:6px;color:var(--sub);font-size:11.5px}
 .fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .fchip.on span{color:rgba(255,255,255,.85)}
-.xcard{padding:20px 22px}
+.xcard{padding:24px 24px}
 .exd2 .exh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .exd2 .exh{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 14px}
 .exd2 .exh span{white-space:nowrap;flex:none;margin-left:10px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -137,7 +140,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .pcard{position:relative;margin:-26px 0 14px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
 .pstats{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .wxa+.pstats{border-top:1px solid var(--line)}
-.pstats>div{display:flex;flex-direction:column;justify-content:center;padding:12px 6px;text-align:center;border-right:1px solid var(--line);min-width:0}
+.pstats>div{display:flex;flex-direction:column;justify-content:center;padding:16px 6px;text-align:center;border-right:1px solid var(--line);min-width:0}
 .pstats>div:last-child{border-right:0}
 .wx{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0 0 14px;box-shadow:var(--shadow)}
 .wx .wi{font-size:34px;line-height:1;flex:none}
@@ -150,7 +153,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .ctag button{border:0;background:none;color:inherit;opacity:.6;font-size:16px;line-height:1;width:22px;height:22px;cursor:pointer}
 .csug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .csug button{border:1px dashed var(--line);background:none;color:var(--sub);font-size:12.5px;border-radius:99px;padding:4px 10px;cursor:pointer}
-.wxa{padding:12px 14px 2px}
+.wxa{padding:18px 20px 4px}
 .wxa .top{display:flex;align-items:center;gap:12px;cursor:pointer}
 .wxa .top .m{font-size:38px;line-height:1}
 .wxa .top>b{font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
@@ -158,7 +161,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .wxa .top .r b{font-size:13.5px}
 .wxa .top .r span{color:var(--sub)}
 .wxa .top .g{margin-left:auto;color:var(--sub);font-size:18px}
-.wxa .pl{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 0 12px}
+.wxa .pl{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:14px 0 18px}
 .wxa .pl::-webkit-scrollbar{display:none}
 .wxa .pl button{flex:none;border:0;font:inherit;font-size:12px;background:var(--card2);color:var(--text);border-radius:99px;padding:5px 11px;cursor:pointer;white-space:nowrap}
 .wxa .pl button.on{background:var(--accent2);color:var(--accent);font-weight:700}
@@ -167,17 +170,17 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 #wxfull.on{display:block}
 #wxfull .xin{max-width:480px;margin:0 auto;padding:0 14px 40px}
 #wxfull .xin header.top{position:sticky;top:0;margin:0 -14px 0}
-.wxl{padding:14px 0 10px}
-.wxl .wh{display:flex;align-items:baseline;gap:6px;padding:0 16px}
+.wxl{padding:20px 0 14px}
+.wxl .wh{display:flex;align-items:baseline;gap:6px;padding:0 20px}
 .wxl .wh b{font-size:16px;margin-right:auto}
 .wxl .wh span{font-size:14px;font-weight:700}
 .wxl .wh .sub{font-weight:500;font-size:12.5px}
-.tz{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 12px 2px}
+.tz{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:14px 20px 2px}
 .tz>div{background:var(--card2);border-radius:12px;padding:8px 2px;text-align:center;font-size:11px;color:var(--sub);min-width:0}
 .tz b{display:block;font-size:15px;color:var(--text);margin:1px 0}
 .tz .o{display:block;font-size:19px;margin:3px 0}
 .tz small{display:block;color:var(--text);font-size:11px;font-weight:600;line-height:1.35}
-.chk{display:flex;gap:6px;padding:8px 16px 0;flex-wrap:wrap}
+.chk{display:flex;gap:6px;padding:12px 20px 0;flex-wrap:wrap}
 .chk span{font-size:11.5px;border:1px dashed var(--line);border-radius:99px;padding:3px 9px;color:var(--sub)}
 .chk span.y{border:1px solid var(--accent);background:var(--accent2);color:var(--accent);font-weight:700}
 .hs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 12px;border-top:1px solid var(--line);padding-top:10px}
