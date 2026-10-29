@@ -32,7 +32,10 @@ header.top h1{flex:1;margin:0;font-size:17px;white-space:nowrap;overflow:hidden;
 h2{font-size:16px;margin:0 0 10px}
 label.f{display:block;font-size:12px;color:var(--sub);margin:10px 0 4px}
 input,select,textarea{width:100%;font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px;outline:none;min-width:0}
-input[type=date]{color-scheme:light;font-size:13.5px;padding:7px 8px;height:38px}
+input[type=time],input[type=date]{color-scheme:light}
+html[data-theme=dark] input[type=time]{color-scheme:dark}
+input[type=time]::-webkit-calendar-picker-indicator{opacity:.7;cursor:pointer}
+input[type=date]{font-size:13.5px;padding:7px 8px;height:38px}
 html[data-theme=dark] input[type=date]{color-scheme:dark}
 input[type=date]::-webkit-calendar-picker-indicator{opacity:.7;cursor:pointer}
 input:focus,select:focus{border-color:var(--accent)}
@@ -89,12 +92,12 @@ nav.bot div{display:flex;width:100%;max-width:480px}
 nav.bot button{flex:1;border:0;background:none;color:var(--sub);padding:10px 0 12px;font-size:12px;cursor:pointer}
 nav.bot button b{display:block;font-size:20px;font-weight:400}
 nav.bot button.on{color:var(--accent);font-weight:700}
-.tl{position:relative;padding-left:22px}
+.tl{position:relative;padding-left:18px}
 .tl:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
 .ev{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px}
-.ev:before{content:"";position:absolute;left:-22px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
+.ev:before{content:"";position:absolute;left:-18px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
 .ev.hl{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.ev.hl:before{background:var(--accent);width:14px;height:14px;left:-24px;top:14px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent),0 0 12px var(--accent)}
+.ev.hl:before{background:var(--accent);left:-18px;top:16px;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent),0 0 10px var(--accent)}
 .ev .t{font-weight:700;font-size:13px;color:var(--accent)}
 .ev .p{font-size:16px;font-weight:600;margin:2px 0}
 .nowtag{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px}
