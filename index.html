@@ -1211,7 +1211,7 @@ function drawWx(){const t=trip();const res=WXRES;const base=(res.find(x=>x.j)||{
     const hx=h=>di*24+h,H=j.hourly;
     const [dic,dtx]=WXC(j.daily.weather_code[di]);const pp=j.daily.precipitation_probability_max[di];
     const AT=H.apparent_temperature||H.temperature_2m;
-    const zone=(l,hs)=>{const v=hs.map(h=>AT[hx(h)]).filter(x=>x!=null);if(!v.length)return '';const m=v.reduce((a,b)=>a+b,0)/v.length,[o,w]=OUTFIT(m);return `<div><span>${l}</span><span class="o">${o}</span><b>${R(m)}°</b><small>${w}</small></div>`};
+    const zone=(l,hs)=>{const v=hs.map(h=>AT[hx(h)]).filter(x=>x!=null),rv=hs.map(h=>H.temperature_2m[hx(h)]).filter(x=>x!=null);if(!v.length)return '';const m=v.reduce((a,b)=>a+b,0)/v.length,rm=rv.length?rv.reduce((a,b)=>a+b,0)/rv.length:m,[o,w]=OUTFIT(m);return `<div><span>${l}</span><span class="o">${o}</span><b>${R(rm)}°</b><small>${w}</small></div>`};
     const mn=j.daily.temperature_2m_min[di],mx=j.daily.temperature_2m_max[di],rng=mx-mn,sunny=j.daily.weather_code[di]<=2;
     const zs=[[6,9],[12,15],[18,21],[22,23]].map(z=>{const a=[];for(let h=z[0];h<=z[1];h++)a.push(h);return a});
     const zm=zs.map(a=>{const v=a.map(h=>AT[hx(h)]).filter(x=>x!=null);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null}).filter(x=>x!=null);
