@@ -67,7 +67,7 @@ input:focus,select:focus{border-color:var(--accent)}
 .mini:active{background:var(--line)}
 .mini:disabled{opacity:.25;cursor:default}
 .mini.del{opacity:.55}.mini.del:active{color:var(--danger);opacity:1}
-.ibody{padding:16px 14px;display:flex;flex-direction:column;gap:8px}
+.ibody{padding:16px;display:flex;flex-direction:column;gap:8px}
 .ibody input.pl{font-size:15px;font-weight:600}
 .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .fld{min-width:0}
@@ -91,7 +91,7 @@ nav.bot button b{display:block;font-size:20px;font-weight:400}
 nav.bot button.on{color:var(--accent);font-weight:700}
 .tl{position:relative;padding-left:22px}
 .tl:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
-.ev{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:10px}
+.ev{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px}
 .ev:before{content:"";position:absolute;left:-22px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--card)}
 .ev.hl{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .ev.hl:before{background:var(--accent);width:14px;height:14px;left:-24px;top:14px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent),0 0 12px var(--accent)}
@@ -117,7 +117,7 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 .fchip span{margin-left:6px;color:var(--sub);font-size:11.5px}
 .fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .fchip.on span{color:rgba(255,255,255,.85)}
-.xcard{padding:24px 24px}
+.xcard{padding:20px}
 .exd2 .exh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .exd2 .exh{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0 14px}
 .exd2 .exh span{white-space:nowrap;flex:none;margin-left:10px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -276,7 +276,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .g2in .inl{position:relative}
 .g2in .inl input{flex:1 1 auto;width:100%;padding-right:30px}
 .g2in .inl .rmsub{position:absolute;right:2px;top:50%;transform:translateY(-50%);background:var(--card)}
-.ev.hasp .subs,.ev.hasp .evimgs{margin-right:calc(10px - var(--pr,44px))}
+.ev.hasp .subs,.ev.hasp .evimgs{margin-right:calc(16px - var(--pr,44px))}
 .ev .dur{font-weight:600;color:var(--sub);font-size:12px;margin-left:8px}
 .ev .pn{font-size:12px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ev .memo{margin-top:6px;font-size:13px;color:var(--sub);white-space:pre-wrap;overflow-wrap:anywhere}
@@ -1164,7 +1164,7 @@ function previewHero(t,ci,n,cnt){
   `}
 const WXC=c=>c===0?['☀️','맑음']:c<=2?['🌤️','구름 조금']:c===3?['☁️','흐림']:c<=48?['🌫️','안개']:c<=57?['🌦️','이슬비']:c<=67?['🌧️','비']:c<=77?['🌨️','눈']:c<=82?['🌧️','소나기']:c<=86?['🌨️','눈 소나기']:['⛈️','뇌우'];
 const WXCACHE={};
-const OUTFIT=t=>t>=28?['🩳','매우 더워요']:t>=23?['👕','반팔']:t>=20?['👕','긴팔 · 가볍게']:t>=17?['👕','긴팔 + 가디건']:t>=12?['🧥','겉옷 필수']:t>=8?['🧥','코트 · 니트']:t>=5?['🧣','두꺼운 코트']:['🧣','패딩 · 목도리'];
+const OUTFIT=t=>t>=28?['🩳','민소매 · 반팔']:t>=23?['👕','반팔']:t>=20?['👕','긴팔']:t>=17?['🧥','얇은 잠바']:t>=12?['🧥','두꺼운 잠바']:t>=8?['🧥','코트']:['🧣',t>=5?'패딩':'패딩 · 목도리'];
 async function wxGeo(name,t){const ci=cInfo(t.country),m=ci.cities.find(x=>x.k===name),ce=m?m.e:name;
   const k='g|'+ce+'|'+ci.en;if(WXCACHE[k])return WXCACHE[k];const g=await geocodeText(ce+', '+ci.en);if(g)WXCACHE[k]=g;return g}
 async function wxOne(name,t){const g=await wxGeo(name,t);if(!g)throw Error('geo');
