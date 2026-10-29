@@ -18,8 +18,8 @@ html{color-scheme:light dark;background:var(--bg)}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;font-size:15px}
 #bg{position:fixed;inset:0;z-index:-2;background:linear-gradient(135deg,#dbe6ff,#f4f7fb) center/cover no-repeat;transition:opacity .6s}
 #bgov{position:fixed;inset:0;z-index:-1;background:linear-gradient(var(--ov1),var(--ov2) 280px,var(--ov2))}
-#app{max-width:480px;margin:0 auto;min-height:100dvh;padding:0 14px calc(90px + env(safe-area-inset-bottom))}
-header.top{position:sticky;top:0;z-index:20;margin:0 -14px 12px;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:8px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+#app{max-width:480px;margin:0 auto;min-height:100dvh;padding:0 18px calc(90px + env(safe-area-inset-bottom))}
+header.top{position:sticky;top:0;z-index:20;margin:0 -18px 12px;padding:calc(10px + env(safe-area-inset-top)) 18px 10px;display:flex;align-items:center;gap:8px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 header.top h1{flex:1;margin:0;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ib{border:0;background:var(--card2);color:var(--text);width:36px;height:36px;border-radius:50%;font-size:17px;cursor:pointer}
 .btn{border:0;background:var(--accent);color:#fff;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer}
@@ -51,7 +51,7 @@ input:focus,select:focus{border-color:var(--accent)}
 .badge.tr{position:absolute;top:10px;right:12px;margin:0;z-index:1}
 .trip .tt{display:block;padding-right:58px}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--accent2);color:var(--accent);margin-left:6px}
-.ptabs{position:sticky;top:calc(57px + env(safe-area-inset-top));z-index:15;background:var(--bg);margin:0 -14px;padding:8px 14px 0}
+.ptabs{position:sticky;top:calc(57px + env(safe-area-inset-top));z-index:15;background:var(--bg);margin:0 -18px;padding:8px 18px 0}
 #totop{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:40;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
 #totop.on{opacity:1;pointer-events:auto;transform:none}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
@@ -109,8 +109,8 @@ nav.bot button.on{color:var(--accent);font-weight:700}
 #modal.on{display:flex}
 #expfull{position:fixed;inset:0;z-index:55;display:none;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
 #expfull.on{display:block}
-#expfull .xin{max-width:480px;margin:0 auto;padding:0 14px 40px}
-#expfull .xin header.top{position:sticky;top:0;margin:0 -14px 0}
+#expfull .xin{max-width:480px;margin:0 auto;padding:0 18px 40px}
+#expfull .xin header.top{position:sticky;top:0;margin:0 -18px 0}
 .exd2{padding:14px 24px 16px;margin-bottom:16px}
 .exd2 .exh b small{margin-left:8px;color:var(--sub);font-weight:500;font-size:12px}
 .xtabs{position:sticky;top:57px;z-index:15;background:var(--bg);padding:8px 0 2px}
@@ -133,7 +133,7 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .trash:hover,.trash:active{opacity:.9;color:var(--danger);background:var(--card2)}
 .pinbtn{border:0;background:var(--accent2);color:var(--accent);width:34px;height:34px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .pinbtn.on{background:var(--accent);color:#fff}
-.phero{position:relative;margin:-12px -14px 0;min-height:290px;background:linear-gradient(135deg,#15171c,#4b505b) center/cover no-repeat;display:flex;align-items:center;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent)}
+.phero{position:relative;margin:-12px -18px 0;min-height:290px;background:linear-gradient(135deg,#15171c,#4b505b) center/cover no-repeat;display:flex;align-items:center;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 78px),transparent)}
 .pov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,12,24,.82),rgba(8,12,24,.2) 62%,rgba(8,12,24,.1))}
 .pin{position:relative;width:100%;color:#fff;text-align:center}
 .pchips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -171,8 +171,8 @@ details summary{cursor:pointer;font-weight:600;padding:4px 0}
 .lo,.dsum .dm .lo{color:#2f6bff}.hi,.dsum .dm .hi{color:#e05a2a}
 #wxfull{position:fixed;inset:0;z-index:55;display:none;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
 #wxfull.on{display:block}
-#wxfull .xin{max-width:480px;margin:0 auto;padding:0 14px 40px}
-#wxfull .xin header.top{position:sticky;top:0;margin:0 -14px 0}
+#wxfull .xin{max-width:480px;margin:0 auto;padding:0 18px 40px}
+#wxfull .xin header.top{position:sticky;top:0;margin:0 -18px 0}
 .wxl{padding:20px 0 14px}
 .wxl .wh{display:flex;align-items:baseline;gap:6px;padding:0 20px}
 .wxl .wh b{font-size:16px;margin-right:auto}
