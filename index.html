@@ -1184,7 +1184,7 @@ async function wxLight(g){const k=g.lat.toFixed(2)+','+g.lng.toFixed(2),store=ls
     if(!r.ok)throw Error('wx'+r.status);const n={at:Date.now(),j:await r.json()};
     if(WXCACHE['w|'+k]&&WXCACHE['w|'+k].j.hourly)n.j.hourly=WXCACHE['w|'+k].j.hourly;
     WXCACHE['w|'+k]=n;const st=lsj('travelplanner.wxc',{});st[k]={at:n.at,j:{current:n.j.current,daily:n.j.daily}};lss('travelplanner.wxc',st);return n}
-  if(c&&!fresh){WXCACHE['w|'+k]=c;}
+  if(c)WXCACHE['w|'+k]=c;
   if(fresh)return{c,stale:false,k};
   if(c&&Date.now()-c.at<108e5){return{c,stale:true,k,again:fetchIt()}}
   return{c:await fetchIt(),stale:false,k}}
