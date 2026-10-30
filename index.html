@@ -911,7 +911,7 @@ async function stopShare(){const t=trip();if(!t.shareId)return;
   delete t.shareId;persist(true);closeModal();toast(ok?'공유를 중단했어요':'이 기기에서는 공유를 해제했어요 (서버 삭제는 실패)')}
 
 /* 받는 사람 쪽: 불러오기 / 새로고침 */
-async function loadShared(id){try{S.viewTrip=cleanTrip(await sharedGet(id));S.viewTrip.shareId=id;S.loadErr=false;return true}catch(e){S.loadErr=true;return false}}
+async function loadShared(id){try{const raw=await sharedGet(id);try{idbSet('sc.'+id,raw).catch(()=>{})}catch(e){}S.viewTrip=cleanTrip(raw);S.viewTrip.shareId=id;S.loadErr=false;return true}catch(e){S.loadErr=true;return false}}
 async function refreshShared(){if(!S.shareId)return;toast('불러오는 중…');
   const before=JSON.stringify(S.viewTrip);const ok=await loadShared(S.shareId);
   if(S.viewTrip&&S.pday>=dayCount(S.viewTrip))S.pday=0;render();
@@ -921,7 +921,7 @@ async function pollShared(){
   if(sharedPollBusy||!S.view||!S.shareId||S.screen!=='preview'||document.hidden||document.querySelector('details[open]'))return;
   sharedPollBusy=true;
   try{
-    const fresh=cleanTrip(await sharedGet(S.shareId));fresh.shareId=S.shareId;
+    const raw=await sharedGet(S.shareId);try{idbSet('sc.'+S.shareId,raw).catch(()=>{})}catch(e){}const fresh=cleanTrip(raw);fresh.shareId=S.shareId;
     const before=JSON.stringify(S.viewTrip),after=JSON.stringify(fresh);
     if(before!==after){
       const y=scrollY;S.viewTrip=fresh;S.loadErr=false;
@@ -1172,28 +1172,51 @@ function previewHero(t,ci,n,cnt){
 const WXC=c=>c===0?['☀️','맑음']:c<=2?['🌤️','구름 조금']:c===3?['☁️','흐림']:c<=48?['🌫️','안개']:c<=57?['🌦️','이슬비']:c<=67?['🌧️','비']:c<=77?['🌨️','눈']:c<=82?['🌧️','소나기']:c<=86?['🌨️','눈 소나기']:['⛈️','뇌우'];
 const WXCACHE={};
 const OUTFIT=t=>t>=28?['🩳','민소매 · 반팔']:t>=23?['👕','반팔']:t>=20?['👕','긴팔']:t>=17?['🧥','얇은 잠바']:t>=12?['🧥','두꺼운 잠바']:t>=8?['🧥','코트']:['🧣',t>=5?'패딩':'패딩 · 목도리'];
+const lsj=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const lss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 async function wxGeo(name,t){const ci=cInfo(t.country),m=ci.cities.find(x=>x.k===name),ce=m?m.e:name;
-  const k='g|'+ce+'|'+ci.en;if(WXCACHE[k])return WXCACHE[k];const g=await geocodeText(ce+', '+ci.en);if(g)WXCACHE[k]=g;return g}
-async function wxOne(name,t){const g=await wxGeo(name,t);if(!g)throw Error('geo');
-  const k='w|'+g.lat.toFixed(2)+','+g.lng.toFixed(2);let c=WXCACHE[k];
-  if(!c||Date.now()-c.at>6e5){
-    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+g.lat.toFixed(3)+'&longitude='+g.lng.toFixed(3)+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=temperature_2m,apparent_temperature,weather_code,precipitation_probability&timezone=auto&forecast_days=16');
-    if(!r.ok)throw Error('wx'+r.status);c=WXCACHE[k]={at:Date.now(),j:await r.json()}}
-  return c.j}
-let WXRES=[];
+  const k=ce+'|'+ci.en,gc=lsj('travelplanner.geo',{});if(gc[k])return gc[k];
+  const g=await geocodeText(ce+', '+ci.en);if(g){gc[k]=g;lss('travelplanner.geo',gc)}return g}
+const WXQ='latitude=%LAT%&longitude=%LNG%&timezone=auto&forecast_days=16';
+async function wxLight(g){const k=g.lat.toFixed(2)+','+g.lng.toFixed(2),store=lsj('travelplanner.wxc',{});let c=WXCACHE['w|'+k]||store[k];
+  const fresh=c&&Date.now()-c.at<6e5;
+  const fetchIt=async()=>{const r=await fetch('https://api.open-meteo.com/v1/forecast?'+WXQ.replace('%LAT%',g.lat.toFixed(3)).replace('%LNG%',g.lng.toFixed(3))+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max');
+    if(!r.ok)throw Error('wx'+r.status);const n={at:Date.now(),j:await r.json()};
+    if(WXCACHE['w|'+k]&&WXCACHE['w|'+k].j.hourly)n.j.hourly=WXCACHE['w|'+k].j.hourly;
+    WXCACHE['w|'+k]=n;const st=lsj('travelplanner.wxc',{});st[k]={at:n.at,j:{current:n.j.current,daily:n.j.daily}};lss('travelplanner.wxc',st);return n}
+  if(c&&!fresh){WXCACHE['w|'+k]=c;}
+  if(fresh)return{c,stale:false,k};
+  if(c&&Date.now()-c.at<108e5){return{c,stale:true,k,again:fetchIt()}}
+  return{c:await fetchIt(),stale:false,k}}
+async function wxHourly(g){const k='w|'+g.lat.toFixed(2)+','+g.lng.toFixed(2),c=WXCACHE[k];if(!c)return;if(c.j.hourly&&c.hat&&Date.now()-c.hat<6e5)return;
+  const r=await fetch('https://api.open-meteo.com/v1/forecast?'+WXQ.replace('%LAT%',g.lat.toFixed(3)).replace('%LNG%',g.lng.toFixed(3))+'&hourly=temperature_2m,apparent_temperature,weather_code,precipitation_probability');
+  if(!r.ok)throw Error('wxh'+r.status);const j=await r.json();c.j.hourly=j.hourly;c.hat=Date.now()}
+let WXRES=[];let WXTOK=0;
 async function loadWx(){const t=trip();if(!t)return;if(!$('#wx'))return;
   let names=tcities(t);if(!names.length)names=[cInfo(t.country).n];
-  const res=WXRES=await Promise.all(names.map(n=>wxOne(n,t).then(j=>({n,j}),()=>({n,j:null}))));
-  const el=$('#wx');if(!el)return;
-  if(!res.some(x=>x.j)){el.className='wx mut';el.textContent='날씨 정보를 불러오지 못했어요';return}
-  const R=v=>Math.round(v);
-  S.wsel=Math.max(0,res.findIndex(x=>x.j));drawWxCard()}
+  const tok=++WXTOK;WXRES=names.map(n=>({n,j:null,g:null}));S.wsel=S.wsel||0;
+  let any=false,done=0;
+  const upd=()=>{if(tok!==WXTOK)return;if(!$('#wx')&&!$('.wxa'))return;
+    if(!WXRES.some(x=>x.j)){if(done>=names.length){const el=$('#wx');if(el){el.className='wx mut';el.textContent='날씨 정보를 불러오지 못했어요'}}return}
+    if(!WXRES[S.wsel]||!WXRES[S.wsel].j)S.wsel=WXRES.findIndex(x=>x.j);drawWxCard()};
+  await Promise.all(names.map(async(n,i)=>{try{const g=await wxGeo(n,t);if(!g)throw Error('geo');WXRES[i].g=g;
+    const r=await wxLight(g);WXRES[i].j=r.c.j;done++;upd();
+    if(r.again)r.again.then(c=>{if(tok===WXTOK){WXRES[i].j=c.j;upd()}},()=>{})}catch(e){done++;upd()}}));
+  if(tok!==WXTOK)return;
+  /* 시간별 예보는 첫 화면이 그려진 뒤 조용히 받아 둡니다 */
+  setTimeout(()=>{if(tok===WXTOK)WXRES.forEach(x=>{if(x.g)wxHourly(x.g).catch(()=>{})})},800)}
 function drawWxCard(){const el=$('#wx');if(!el||!WXRES.length)return;const R=v=>Math.round(v);
   const i=S.wsel||0,cur=WXRES[i];if(!cur||!cur.j)return;const j=cur.j,cu=j.current,d=j.daily,[ic,tx]=WXC(cu.weather_code),pp=d.precipitation_probability_max[0];
   const pills=WXRES.length>1?`<div class="pl">${WXRES.map((x,k)=>x.j?`<button class="${k===i?'on':''}" onclick="selWsel(${k})">${esc(x.n)} ${k===i?'':WXC(x.j.current.weather_code)[0]+' '}${R(x.j.current.temperature_2m)}°</button>`:'').join('')}</div>`:'<div style="height:10px"></div>';
   el.outerHTML=`<div id="wx" class="wxa"><div class="top" onclick="openWx(${i})" role="button" tabindex="0"><span class="m">${ic}</span><b>${R(cu.temperature_2m)}°</b><div class="r"><b>${esc(cur.n)} · ${tx}</b><br><span class="lo">${R(d.temperature_2m_min[0])}°</span> <span>/</span> <span class="hi">${R(d.temperature_2m_max[0])}°</span>${pp!=null?` <span>· ☔ ${pp}%</span>`:''}</div><span class="g">›</span></div>${pills}</div>`}
 function selWsel(i){S.wsel=i;drawWxCard()}
-function openWx(i){if(!WXRES.some(x=>x.j))return;S.wcity=WXRES[i]&&WXRES[i].j?i:Math.max(0,WXRES.findIndex(x=>x.j));S.wdate=null;drawWx();const e=$('#wxfull');e.classList.add('on');e.scrollTop=0;wxScroll()}
+async function openWx(i){if(!WXRES.some(x=>x.j))return;S.wcity=WXRES[i]&&WXRES[i].j?i:Math.max(0,WXRES.findIndex(x=>x.j));S.wdate=null;
+  const e=$('#wxfull');e.classList.add('on');e.scrollTop=0;
+  if(WXRES.some(x=>x.j&&!x.j.hourly)){e.innerHTML='<div class="xin"><header class="top"><button class="ib" onclick="closeWx()" aria-label="닫기">‹</button><h1>🌤️ 날씨</h1></header><div class="muted" style="padding:60px 10px;text-align:center">시간별 예보 불러오는 중…</div></div>';
+    await Promise.all(WXRES.map(x=>x.g&&x.j?wxHourly(x.g).then(()=>{x.j=(WXCACHE['w|'+x.g.lat.toFixed(2)+','+x.g.lng.toFixed(2)]||{j:x.j}).j},()=>{}):0))}
+  if(!e.classList.contains('on'))return;
+  if(!WXRES.some(x=>x.j&&x.j.hourly)){e.innerHTML='<div class="xin"><header class="top"><button class="ib" onclick="closeWx()" aria-label="닫기">‹</button><h1>🌤️ 날씨</h1></header><div class="muted" style="padding:60px 10px;text-align:center">시간별 예보를 불러오지 못했어요</div></div>';return}
+  drawWx();e.scrollTop=0;wxScroll()}
 function closeWx(){const e=$('#wxfull');if(e)e.classList.remove('on')}
 function selWC(i){S.wcity=i;drawWx()}
 function selWD(d){S.wdate=d;drawWx()}
@@ -1208,6 +1231,7 @@ function drawWx(){const t=trip();const res=WXRES;const base=(res.find(x=>x.j)||{
   const tabs=dates.map(ds=>{const dt=new Date(ds+'T00:00:00'),n=tripDay(ds);return `<button class="tab ${ds===S.wdate?'on':''}" onclick="selWD('${ds}')">${n}일차<small>${(dt.getMonth()+1)+'/'+dt.getDate()+'('+wd[dt.getDay()]+')'}</small></button>`}).join('');
   const cards=res.map(({n,j})=>{
     if(!j)return `<div class="card wxl"><div class="wh"><b>${esc(n)}</b><span class="muted">불러오지 못했어요</span></div></div>`;
+    if(!j.hourly)return `<div class="card wxl"><div class="wh"><b>${esc(n)}</b><span class="muted">시간별 예보 없음</span></div></div>`;
     const di=j.daily.time.indexOf(S.wdate);if(di<0)return '';
     const hx=h=>di*24+h,H=j.hourly;
     const [dic,dtx]=WXC(j.daily.weather_code[di]);const pp=j.daily.precipitation_probability_max[di];
@@ -1296,7 +1320,13 @@ setInterval(()=>{pollShared()},30000);
   const h=location.hash;
   const todayIdx=t=>{const td=Math.round((new Date().setHours(0,0,0,0)-parseD(t.start))/864e5);return td>=0&&td<dayCount(t)?td:0};
   if(!window.__SHARED__&&(h.startsWith('#s=')||h.startsWith('#g='))){const id=h.slice(3);
-    if(BID.test(id)||parseSrc(id)){S.view=true;S.shareId=id;S.screen='preview';render.scrolled=0;render();await loadShared(id);if(S.viewTrip)S.pday=todayIdx(S.viewTrip);render.scrolled=0;render();return}}
+    if(BID.test(id)||parseSrc(id)){S.view=true;S.shareId=id;S.screen='preview';render.scrolled=0;render();
+      let first=false;try{const c=await Promise.race([idbGet('sc.'+id).catch(()=>null),new Promise(r=>setTimeout(()=>r(null),500))]);
+        if(c){S.viewTrip=cleanTrip(c);S.viewTrip.shareId=id;S.pday=todayIdx(S.viewTrip);first=true;render.scrolled=0;render()}}catch(e){}
+      const before=first?JSON.stringify(S.viewTrip):'';
+      await loadShared(id);
+      if(first){if(S.viewTrip&&JSON.stringify(S.viewTrip)!==before){if(S.pday>=dayCount(S.viewTrip))S.pday=0;const y=scrollY;render();scrollTo(0,y)}return}
+      if(S.viewTrip)S.pday=todayIdx(S.viewTrip);render.scrolled=0;render();return}}
   let shared=null;
   try{if(window.__SHARED__)shared=cleanTrip(window.__SHARED__);else if(h.startsWith('#v='))shared=cleanTrip(await dec(h.slice(3)))}catch(e){shared=null}
   if(shared){S.view=true;S.viewTrip=shared;S.shareId=shared.shareId||null;S.screen='preview';S.pday=todayIdx(shared);render.scrolled=0;render();return}
