@@ -1047,7 +1047,7 @@ function drawExpFull(){const t=trip();if(!t)return;const keys=expKeys(t),cur=S.x
   if(!days.length)body+=`<div class="muted" style="padding:30px 0;text-align:center">${inScope.length?'이 카테고리의 지출이 없어요.':(cur==='all'?'아직 입력한 지출이 없어요.':'이 날은 입력한 지출이 없어요.')}</div>`;
   else if(cur==='all')body+=days.map(k=>`<div class="card exd2"><div class="exh"><b>${expLabel(k)}<small>${k==='pre'?'출발 전':dlabel(dateOfDay(t,k))}</small></b><span>₩${fmt(sum(k))}</span></div>${shown(k).map(row).join('')}</div>`).join('');
   else body+=`<div class="card exd2">${shown(cur).map(row).join('')}</div>`;
-  $('#expfull').innerHTML=`<div class="xin"><header class="top"><button class="ib" onclick="closeExpFull()" aria-label="닫기">‹</button><h1>💳 지출 내역</h1></header><div class="xtabs">${tabs}</div>${body}</div>`}
+  $('#expfull').innerHTML=`<div class="xin"><header class="top"><button class="ib" onclick="closeExpFull()" aria-label="닫기">‹</button><h1>💳 지출 내역</h1></header><div class="xtabs">${tabs}</div>${body}<button class="btn ghost block" style="margin-top:6px" onclick="saveExpImg()">🖼️ 이미지로 저장</button></div>`}
 function screenInfo(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
   const unit=t.rate<1?100:1;
   let h=`<div class="hero"><h2>${flag(ci.i)} 여행 정보</h2></div><div class="card">
@@ -1153,6 +1153,65 @@ function activeIdx(t,day,a){
     else{let nx=null;for(let j=k+1;j<a.length;j++){const x=hm(a[j].time);if(x!=null&&x>s){nx=x;break}}e=nx!=null?nx:s+60}
     if(nm>=s&&nm<e)return k}
   return -1}
+/* ---------- 이미지로 저장 (캔버스에 직접 그려서 PNG 로 저장/공유) ---------- */
+const IMGFONT='-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif';
+function wrapTxt(ctx,text,maxW){const out=[];String(text).split('\n').forEach(par=>{let line='';for(const ch of par){const w=line+ch;if(ctx.measureText(w).width>maxW&&line){out.push(line);line=ch}else line=w}out.push(line)});return out}
+function buildImg(spec,draw,cv){const W=1080,PX=64,RX=W-PX;const c=cv||document.createElement('canvas');c.width=W;const ctx=c.getContext('2d');
+  const F=(px,w)=>ctx.font=(w||500)+' '+px+'px '+IMGFONT;
+  let y=0;const H0=330;
+  if(draw){const g=ctx.createLinearGradient(0,0,W,H0);g.addColorStop(0,'#15171c');g.addColorStop(1,'#4b505b');ctx.fillStyle=g;ctx.fillRect(0,0,W,H0);
+    ctx.textBaseline='alphabetic';ctx.textAlign='left';ctx.fillStyle='#fff';F(56,800);ctx.fillText(wrapTxt(ctx,spec.title,W-PX*2)[0],PX,118);
+    ctx.fillStyle='rgba(255,255,255,.78)';F(30,500);ctx.fillText(wrapTxt(ctx,spec.sub,W-PX*2)[0],PX,170);
+    ctx.fillStyle='#fff';F(46,800);ctx.fillText(spec.big,PX,262);
+    ctx.fillStyle='rgba(255,255,255,.78)';F(30,500);ctx.fillText(spec.bigSub||'',PX,304);
+    ctx.textAlign='right';ctx.fillStyle='#fff';F(46,800);ctx.fillText(spec.total||'',RX,262);ctx.fillStyle='rgba(255,255,255,.78)';F(30,500);ctx.fillText(spec.total2||'',RX,304);ctx.textAlign='left'}
+  y=H0;
+  const rows=[];spec.groups.forEach(g=>{if(g.head)rows.push({g:1,...g});g.rows.forEach(r=>rows.push(r))});
+  if(!rows.length){y+=120;if(draw){ctx.fillStyle='#7a8499';F(34,500);ctx.textAlign='center';ctx.fillText('등록된 내용이 없어요',W/2,y-40);ctx.textAlign='left'}}
+  rows.forEach((r,i)=>{
+    if(r.g){const h=104;if(draw){ctx.fillStyle='#eef2fb';ctx.fillRect(0,y,W,h);ctx.fillStyle='#1a2233';F(38,800);ctx.fillText(r.head,PX,y+66);if(r.sub){const hw=ctx.measureText(r.head).width;ctx.fillStyle='#7a8499';F(28,500);ctx.fillText(r.sub,PX+hw+18,y+66)}ctx.textAlign='right';ctx.fillStyle='#2f6bff';F(38,800);ctx.fillText(r.right||'',RX,y+66);ctx.textAlign='left'}y+=h;return}
+    F(30,700);const rw=r.rt?Math.max(ctx.measureText(r.rt||'').width,ctx.measureText(r.rt2||'').width)+30:0;
+    const maxW=RX-PX-rw;let lines=[];
+    const pad=30;let h=pad;
+    if(r.lt)h+=44;
+    F(40,700);const tl=wrapTxt(ctx,r.title||'',maxW).slice(0,3);if(r.title)h+=tl.length*54;
+    F(30,500);const nl=(r.note?wrapTxt(ctx,r.note,maxW):[]).slice(0,6);h+=nl.length*44+(nl.length?6:0);
+    h+=pad;if(h<110)h=110;
+    if(draw){if(i&&!rows[i-1].g){ctx.fillStyle='#e6e9f0';ctx.fillRect(PX,y,W-PX*2,2)}
+      let yy=y+pad+(r.lt?30:0);
+      if(r.lt){ctx.fillStyle=r.ltc||'#2f6bff';F(30,700);ctx.fillText(r.lt,PX,y+pad+30)}
+      ctx.fillStyle='#1a2233';F(40,700);if(r.title){tl.forEach((l,k)=>ctx.fillText(l,PX,yy+(r.lt?14:10)+40+k*54));yy+=(r.lt?14:10)+tl.length*54-(r.lt?0:0)}
+      ctx.fillStyle='#7a8499';F(30,500);nl.forEach((l,k)=>ctx.fillText(l,PX,yy+34+k*44));
+      if(r.rt){ctx.textAlign='right';ctx.fillStyle='#1a2233';F(36,800);ctx.fillText(r.rt,RX,y+pad+36);if(r.rt2){ctx.fillStyle='#7a8499';F(28,500);ctx.fillText(r.rt2,RX,y+pad+78)}ctx.textAlign='left'}}
+    y+=h});
+  y+=40;const fh=110;
+  if(draw){ctx.fillStyle='#f6f7f9';ctx.fillRect(0,y,W,fh);ctx.fillStyle='#9aa3b5';F(26,500);ctx.textAlign='center';ctx.fillText('✈️ 나의 여행 플래너',W/2,y+64);ctx.textAlign='left'}
+  return y+fh}
+async function saveImg(spec,name){
+  const m=document.createElement('canvas');const H=buildImg(spec,false,m);
+  const c=document.createElement('canvas');c.width=1080;c.height=H;
+  const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,1080,H);buildImg(spec,true,c);
+  const blob=await new Promise(res=>c.toBlob(res,'image/png'));if(!blob){toast('이미지를 만들지 못했어요');return}
+  const fn=(name||'travel').replace(/[\\/:*?"<>|\s]+/g,'_')+'.png';
+  try{const f=new File([blob],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e&&e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},4000);toast('이미지를 저장했어요')}
+function tripHead(t){return{title:t.title||'나의 여행',sub:[t.country,cityTxt(t)].filter(Boolean).join(' · ')+'  ·  '+t.start.replace(/-/g,'.')+' – '+t.end.replace(/-/g,'.')}}
+function saveDayImg(){const t=trip();if(!t)return;const d=S.pday,its=itemsOf(t,d);
+  const rows=its.map(it=>{const unit=unitOf(t,it),tot=itemTotal(it);
+    const notes=[];if(it.pinName||it.pinText)notes.push('📍 '+(it.pinName||it.pinText));
+    if(it.memo)notes.push(it.memo);
+    (it.sub||[]).filter(x=>x.name||+x.amt).forEach(x=>notes.push('· '+(x.name||'상세 일정')+(+x.amt?'  '+fmt2(+x.amt)+' '+unit:'')));
+    return{lt:(it.time||'--:--')+(it.end?' – '+it.end:''),title:it.place||'(일정 미입력)',note:notes.join('\n'),rt:tot>0?fmt2(tot)+' '+unit:'',rt2:''}});
+  const tot=dayTotal(t,d);const h=tripHead(t);
+  saveImg({...h,big:(d+1)+'일차',bigSub:dlabel(dateOfDay(t,d)),total:'₩'+fmt(tot),total2:t.currency!=='KRW'&&t.rate?'≈ '+fmt(tot/t.rate)+' '+t.currency:'',groups:[{rows}]},(t.title||'여행')+'_'+(d+1)+'일차')}
+function saveExpImg(){const t=trip();if(!t)return;const keys=expKeys(t),cur=S.xday||'all',fc=S.xcat||'all';
+  const scope=cur==='all'?keys:[cur];const shown=k=>expGet(t,k).filter(e=>fc==='all'||catOf(e.cat)[0]===fc);
+  const lab=k=>k==='pre'?'출발 전':dlabel(dateOfDay(t,k));
+  const mk=e=>{const c=catOf(e.cat);const fx=e.cur==='LOCAL'&&t.currency!=='KRW';return{lt:c[2]+' '+c[1],title:e.memo||'',rt:fx?fmt2(+e.amount)+' '+t.currency:'₩'+fmt(+e.amount),rt2:fx?'≈ ₩'+fmt(expKRW(t,e)):''}};
+  const groups=scope.filter(k=>shown(k).length).map(k=>({head:expLabel(k),sub:lab(k),right:'₩'+fmt(shown(k).reduce((a,e)=>a+expKRW(t,e),0)),rows:shown(k).map(mk)}));
+  const total=scope.reduce((a,k)=>a+shown(k).reduce((b,e)=>b+expKRW(t,e),0),0),count=scope.reduce((a,k)=>a+shown(k).length,0);
+  const h=tripHead(t),fcn=fc==='all'?'':catOf(fc)[1];
+  saveImg({...h,big:'지출 내역'+(cur==='all'?'':' · '+expLabel(cur)),bigSub:(cur==='all'?'전체':lab(cur))+(fcn?' · '+fcn:'')+' · '+count+'건',total:'₩'+fmt(total),total2:t.currency!=='KRW'&&t.rate?'≈ '+fmt(total/t.rate)+' '+t.currency:'',groups},(t.title||'여행')+'_지출'+(cur==='all'?'전체':expLabel(cur)))}
 function selPDay(i){const pt=$('.ptabs');const stuck=pt&&pt.getBoundingClientRect().top<=60;S.pday=i;render();
   if(stuck){const t=$('.ptabs'),d=$('.dsum');if(t&&d){const y=d.getBoundingClientRect().top+scrollY-t.getBoundingClientRect().bottom-8;scrollTo(0,Math.max(0,y))}}}
 const cssUrl=u=>String(u).replace(/['"()\s\\]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase().padStart(2,'0'));
@@ -1268,6 +1327,7 @@ function screenPreview(){const t=trip(),ci=cInfo(t.country);const n=dayCount(t);
     h+=`<div class="ev${hl?' hl':''}${hasPin?' hasp':''}" ${hl?'id="hlnow"':''}>${hasPin?(pl.length>1?`<button class="evpin" onclick="openPinPicker('${it.id}')" aria-label="핀 선택" title="핀 선택"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><i class="pcnt">${pl.length}</i></button>`:`<a class="evpin" href="${esc(googleMapHref(pl[0]))}" target="_blank" rel="noopener" aria-label="지도에서 위치 보기" title="지도에서 보기"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></a>`):''}<div class="t">${esc(timeTxt(it))}${dur?`<span class="dur">⏱ ${dur}</span>`:''}${hl?'<span class="nowtag">지금 진행</span>':''}</div>
     <div class="p">${esc(it.place||'(일정 미입력)')}</div>${meta}${it.memo?`<div class="memo">${linkify(it.memo)}</div>`:''}${(it.imgs&&it.imgs.length)?`<div class="evimgs n${it.imgs.length}">${it.imgs.filter(okImg).map(src=>`<img src="${src}" alt="" loading="lazy" onclick="zoomImg(this.src)">`).join('')}</div>`:''}${subHtml}</div>`});h+='</div>'}
   h+=`<details class="mapd" ontoggle="if(this.open)initPMap()"><summary>🗺️ ${S.pday+1}일차 핀 지도 보기</summary><div id="lmap" style="margin-top:8px"></div></details>`;
+  h+=`<button class="btn ghost block" style="margin-top:14px" onclick="saveDayImg()">🖼️ ${S.pday+1}일차 이미지로 저장</button>`;
   return h+`<div class="credit" id="credit">${creditHtml()}</div>`}
 
 /* 프리뷰 지도: 핀을 지정한 장소만 고정 마커로 표시 (Leaflet + OpenStreetMap) */
