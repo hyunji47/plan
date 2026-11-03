@@ -1176,12 +1176,15 @@ function buildImg(spec,draw,cv){const W=1080,PX=64,RX=W-PX;const c=cv||document.
     if(r.lt)h+=44;
     F(40,700);const tl=wrapTxt(ctx,r.title||'',maxW).slice(0,3);if(r.title)h+=tl.length*54;
     F(30,500);const nl=(r.note?wrapTxt(ctx,r.note,maxW):[]).slice(0,6);h+=nl.length*44+(nl.length?6:0);
+    const ims=(r.ims||[]).filter(Boolean);const ih=ims.length?(ims.length===1?460:ims.length===2?340:240):0;if(ih)h+=ih+14;
     h+=pad;if(h<110)h=110;
     if(draw){if(i&&!rows[i-1].g){ctx.fillStyle='#e6e9f0';ctx.fillRect(PX,y,W-PX*2,2)}
       let yy=y+pad+(r.lt?30:0);
       if(r.lt){ctx.fillStyle=r.ltc||'#2f6bff';F(30,700);ctx.fillText(r.lt,PX,y+pad+30)}
       ctx.fillStyle='#1a2233';F(40,700);if(r.title){tl.forEach((l,k)=>ctx.fillText(l,PX,yy+(r.lt?14:10)+40+k*54));yy+=(r.lt?14:10)+tl.length*54-(r.lt?0:0)}
       ctx.fillStyle='#7a8499';F(30,500);nl.forEach((l,k)=>ctx.fillText(l,PX,yy+34+k*44));
+      if(ih){const n=ims.length,gap=14,iw=(RX-PX-gap*(n-1))/n,iy=y+h-pad-ih;ims.forEach((im,k)=>{const ix=PX+k*(iw+gap);ctx.save();ctx.beginPath();if(ctx.roundRect)ctx.roundRect(ix,iy,iw,ih,18);else ctx.rect(ix,iy,iw,ih);ctx.clip();
+        const sc=Math.max(iw/im.naturalWidth,ih/im.naturalHeight),dw=im.naturalWidth*sc,dh=im.naturalHeight*sc;ctx.fillStyle='#eef1f6';ctx.fillRect(ix,iy,iw,ih);ctx.drawImage(im,ix+(iw-dw)/2,iy+(ih-dh)/2,dw,dh);ctx.restore()})}
       if(r.rt){ctx.textAlign='right';ctx.fillStyle='#1a2233';F(36,800);ctx.fillText(r.rt,RX,y+pad+36);if(r.rt2){ctx.fillStyle='#7a8499';F(28,500);ctx.fillText(r.rt2,RX,y+pad+78)}ctx.textAlign='left'}}
     y+=h});
   y+=40;const fh=110;
@@ -1196,14 +1199,12 @@ async function saveImg(spec,name){
   try{const f=new File([blob],fn,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e&&e.name==='AbortError')return}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},4000);toast('이미지를 저장했어요')}
 function tripHead(t){return{title:t.title||'나의 여행',sub:[t.country,cityTxt(t)].filter(Boolean).join(' · ')+'  ·  '+t.start.replace(/-/g,'.')+' – '+t.end.replace(/-/g,'.')}}
-function saveDayImg(){const t=trip();if(!t)return;const d=S.pday,its=itemsOf(t,d);
-  const rows=its.map(it=>{const unit=unitOf(t,it),tot=itemTotal(it);
-    const notes=[];if(it.pinName||it.pinText)notes.push('📍 '+(it.pinName||it.pinText));
-    if(it.memo)notes.push(it.memo);
-    (it.sub||[]).filter(x=>x.name||+x.amt).forEach(x=>notes.push('· '+(x.name||'상세 일정')+(+x.amt?'  '+fmt2(+x.amt)+' '+unit:'')));
-    return{lt:(it.time||'--:--')+(it.end?' – '+it.end:''),title:it.place||'(일정 미입력)',note:notes.join('\n'),rt:tot>0?fmt2(tot)+' '+unit:'',rt2:''}});
-  const tot=dayTotal(t,d);const h=tripHead(t);
-  saveImg({...h,big:(d+1)+'일차',bigSub:dlabel(dateOfDay(t,d)),total:'₩'+fmt(tot),total2:t.currency!=='KRW'&&t.rate?'≈ '+fmt(tot/t.rate)+' '+t.currency:'',groups:[{rows}]},(t.title||'여행')+'_'+(d+1)+'일차')}
+const loadImgEl=src=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src});
+async function saveDayImg(){const t=trip();if(!t)return;const d=S.pday,its=itemsOf(t,d);toast('이미지 만드는 중…');
+  const rows=[];for(const it of its){const ims=await Promise.all((it.imgs||[]).filter(okImg).slice(0,3).map(loadImgEl));
+    rows.push({lt:(it.time||'--:--')+(it.end?' – '+it.end:''),title:it.place||'(일정 미입력)',note:it.memo||'',ims})}
+  const h=tripHead(t);
+  saveImg({...h,big:(d+1)+'일차',bigSub:dlabel(dateOfDay(t,d)),total:'',total2:'',groups:[{rows}]},(t.title||'여행')+'_'+(d+1)+'일차')}
 function saveExpImg(){const t=trip();if(!t)return;const keys=expKeys(t),cur=S.xday||'all',fc=S.xcat||'all';
   const scope=cur==='all'?keys:[cur];const shown=k=>expGet(t,k).filter(e=>fc==='all'||catOf(e.cat)[0]===fc);
   const lab=k=>k==='pre'?'출발 전':dlabel(dateOfDay(t,k));
